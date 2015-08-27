@@ -187,30 +187,42 @@ namespace Aldentea.SweetMutus.Data
 		/// </summary>
 		/// <param name="songs_root">曲ファイルを格納しているディレクトリのフルパスです．</param>
 		/// <returns></returns>
-		public XElement GenerateElement(string songs_root = null)
+		public XElement GenerateElement(string songs_root, bool exporting = false)
 		{
 			var element = new XElement(ELEMENT_NAME);
 			element.Add(new XAttribute(ID_ATTRIBUTE, this.ID));
-			element.Add(new XAttribute(NO_ATTRIBUTE, this.No));
-			element.Add(new XAttribute(CATEGORY_ATTRIBUTE, this.Category));
+			if (this.No.HasValue)
+			{
+				element.Add(new XAttribute(NO_ATTRIBUTE, this.No));
+			}
+			if (!string.IsNullOrEmpty(this.Category))
+			{
+				element.Add(new XAttribute(CATEGORY_ATTRIBUTE, this.Category));
+			}
 			// (0.3.3)とりあえず従前のように秒数を出力しておく．
-			element.Add(new XAttribute(PLAY_POS_ATTRIBUTE, this.PlayPos.TotalSeconds));
-			element.Add(new XAttribute(SABI_POS_ATTRIBUTE, this.SabiPos.TotalSeconds));
-
+			if (this.PlayPos > TimeSpan.Zero)
+			{
+				element.Add(new XAttribute(PLAY_POS_ATTRIBUTE, this.PlayPos.TotalSeconds));
+			}
+			if (this.SabiPos > TimeSpan.Zero)
+			{
+				element.Add(new XAttribute(SABI_POS_ATTRIBUTE, this.SabiPos.TotalSeconds));
+			}
 			element.Add(new XElement(TITLE_ELEMENT, this.Title));
 			element.Add(new XElement(ARTIST_ELEMENT, this.Artist));
 
 			// XMLに出力する曲のファイル名．
+			string file_full_name = exporting ? Path.Combine(songs_root, Path.GetFileName(this.FileName)) : this.FileName;
 			string file_name;
-			if (!string.IsNullOrEmpty(songs_root) && this.FileName.Contains(songs_root))
+			if (!string.IsNullOrEmpty(songs_root) && file_full_name.Contains(songs_root))
 			{
 				// songs_rootからの相対パスを記録．
-				file_name = this.FileName.Substring(songs_root.Length).TrimStart('\\');
+				file_name = file_full_name.Substring(songs_root.Length).TrimStart('\\');
 			}
 			else
 			{
 				// フルパスを記録．
-				file_name = this.FileName;
+				file_name = file_full_name;
 			}
 			element.Add(new XElement(FILE_NAME_ELEMENT, file_name));
 			return element;

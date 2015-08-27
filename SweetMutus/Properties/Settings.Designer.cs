@@ -22,5 +22,40 @@ namespace Aldentea.SweetMutus.Properties {
                 return defaultInstance;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("20")]
+        public byte FileHistoryCount {
+            get {
+                return ((byte)(this["FileHistoryCount"]));
+            }
+            set {
+                this["FileHistoryCount"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("10")]
+        public byte FileHistoryDisplayCount {
+            get {
+                return ((byte)(this["FileHistoryDisplayCount"]));
+            }
+            set {
+                this["FileHistoryDisplayCount"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        public global::System.Collections.Specialized.StringCollection FileHistory {
+            get {
+                return ((global::System.Collections.Specialized.StringCollection)(this["FileHistory"]));
+            }
+            set {
+                this["FileHistory"] = value;
+            }
+        }
     }
 }

@@ -9,6 +9,7 @@ using System.Collections.Specialized;
 
 using GrandMutus.Data;
 using System.Xml.Linq;
+using System.IO;
 
 namespace Aldentea.SweetMutus.Data
 {
@@ -212,32 +213,84 @@ namespace Aldentea.SweetMutus.Data
 		public const string ELEMENT_NAME = "questions";
 		const string PATH_ATTRIBUTE = "path";
 
+		// (0.0.1)エクスポートの場合に対応したつもりです．
+		#region *XMLを生成(GenerateXML)
 		/// <summary>
+		/// 
 		/// </summary>
+		/// <param name="destination_directory">出力されるXMLファイルのディレクトリのフルパスを与えます．</param>
+		/// <param name="exported_songs_root">エクスポートするときは，その曲を格納するディレクトリの名前を与えます．
+		/// そうでなければnullを与えます．</param>
 		/// <returns></returns>
-		public XElement GenerateElement(string songs_root = null)
+		public XElement GenerateElement(string destination_directory, string export_songs_root = null)
 		{
 			XElement element = new XElement(ELEMENT_NAME);
 
+			// path属性について，以下の3つのパターンがある．
+			// 1. 絶対パスを記述．
+			// 2. songs_root(というかファイルを保存するディレクトリ)からの相対パスを記述．
+			// 3. 記述なし．
+
+			bool exporting = !string.IsNullOrEmpty(export_songs_root);
+			var songs_root =  exporting ? export_songs_root : this.RootDirectory;
+
+			if (songs_root.Contains(destination_directory))
+			{
+				if (songs_root == destination_directory)
+				{
+					// 記述なし．
+				}
+				else
+				{
+					// 相対パスを記述．
+					element.Add(new XAttribute(PATH_ATTRIBUTE, songs_root.Substring(destination_directory.Length).Trim('\\')));
+				}
+			}
+			else
+			{
+				if (!string.IsNullOrEmpty(songs_root))
+				{
+					// 絶対パスを記述．
+					element.Add(new XAttribute(PATH_ATTRIBUTE, songs_root));
+				}
+			}
+
 			foreach (var question in this.Items)
 			{
-				element.Add(question.GenerateElement(songs_root));
+				element.Add(question.GenerateElement(songs_root, exporting));
 			}
 
 			return element;
 		}
+		#endregion
 
-
-		// (0.3.3)とりあえずIntroQuestionのみ。
-		public void LoadElement(XElement questionsElement)
+		public void LoadElement(XElement questionsElement, string source_directory)
 		{
+			var path = (string)questionsElement.Attribute(PATH_ATTRIBUTE);
+			string songs_root;
+			if (string.IsNullOrEmpty(path))
+			{
+				songs_root = source_directory;	// ロードするファイルのあるディレクトリが入っているはずである．
+			}
+			else
+			{
+				if (Path.IsPathRooted(path))
+				{
+					this.RootDirectory = path;
+				}
+				else
+				{
+					this.RootDirectory = Path.Combine(source_directory, path);
+				}
+				songs_root = this.RootDirectory;
+			}
 			foreach (var question_element in questionsElement.Elements())
 			{
 				// ☆ここの処理は動的に分岐を生成するようにしたい！
 				switch (question_element.Name.LocalName)
 				{
 					case "question":
-						this.Add(SweetQuestion.Generate(question_element));
+						this.Add(SweetQuestion.Generate(question_element, songs_root));
 						break;
 					default:
 						// ※知らない要素が出てきたらどうしますか？

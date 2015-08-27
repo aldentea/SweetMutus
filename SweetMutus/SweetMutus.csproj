@@ -35,6 +35,21 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="AldenteaWpfApplication">
+      <HintPath>..\external\AldenteaWpfApplication.dll</HintPath>
+    </Reference>
+    <Reference Include="AldenteaWpfDocument">
+      <HintPath>..\external\AldenteaWpfDocument.dll</HintPath>
+    </Reference>
+    <Reference Include="AldenteaWpfUtility">
+      <HintPath>..\..\GrandMutus\GrandMutusClassic\external\AldenteaWpfUtility.dll</HintPath>
+    </Reference>
+    <Reference Include="GrandMutusData">
+      <HintPath>..\external\GrandMutusData.dll</HintPath>
+    </Reference>
+    <Reference Include="MutusBase">
+      <HintPath>..\external\MutusBase.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
@@ -93,6 +108,12 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\SweetMutusData\SweetMutusData.csproj">
+      <Project>{a593175e-e42b-4000-acde-c63fd4a0d2f7}</Project>
+      <Name>SweetMutusData</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

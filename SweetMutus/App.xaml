@@ -1,8 +1,9 @@
-﻿<Application x:Class="SweetMutus.App"
+﻿<base:Application x:Class="Aldentea.SweetMutus.App"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+						 xmlns:base="clr-namespace:Aldentea.Wpf.Application;assembly=AldenteaWpfApplication"
              StartupUri="MainWindow.xaml">
     <Application.Resources>
          
     </Application.Resources>
-</Application>
+</base:Application>

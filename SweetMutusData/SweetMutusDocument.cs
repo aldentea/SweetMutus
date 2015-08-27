@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-using Aldentea.Wpf.Document;
+//using Aldentea.Wpf.Document;
 using System.Xml;
 using System.Xml.Linq;
 using GrandMutus.Data;
@@ -13,7 +13,7 @@ using System.IO;
 namespace Aldentea.SweetMutus.Data
 {
 
-	public class SweetMutusDocument : GrandMutus.Data.DocumentWithOperationHistory
+	public class SweetMutusDocument : DocumentWithOperationHistory
 	{
 
 		#region MutusDocumentのコピペ
@@ -48,9 +48,9 @@ namespace Aldentea.SweetMutus.Data
 		#endregion
 
 		// (0.2.0)Songs以外でも共通に使えるのではなかろうか？
-		void Songs_ItemChanged(object sender, ItemEventArgs<GrandMutus.Data.IOperationCache> e) // Aldentea.Wpf.DocumentにもIOperationCacheがある．
+		void Songs_ItemChanged(object sender, ItemEventArgs<IOperationCache> e) // Aldentea.Wpf.DocumentにもIOperationCacheがある．
 		{
-			var operationCache = (GrandMutus.Data.IOperationCache)e.Item;
+			var operationCache = (IOperationCache)e.Item;
 			if (operationCache != null)
 			{
 				this.AddOperationHistory(operationCache);
@@ -235,15 +235,24 @@ namespace Aldentea.SweetMutus.Data
 		const string VERSION_ATTERIBUTE = "version";
 		const string SWEET_ELEMENT_NAME = "sweet";
 
-		// (0.3.3.1)Questionsの出力を追加．
-		public XDocument GenerateXml(string destination)
+		// (0.0.1)エクスポートの場合に対応したつもりです．
+		#region *XMLを生成(GenerateXML)
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="destination_directory">出力されるXMLファイルのディレクトリのフルパスを与えます．</param>
+		/// <param name="exported_songs_root">エクスポートするときは，その曲を格納するディレクトリの名前を与えます．
+		/// そうでなければnullを与えます．</param>
+		/// <returns></returns>
+		public XDocument GenerateXml(string destination_directory, string exported_songs_root = null)
 		{
 			XDocument xdoc = new XDocument(new XElement(ROOT_ELEMENT_NAME, new XAttribute(VERSION_ATTERIBUTE, "3.0")));
 			XElement sweet = new XElement(SWEET_ELEMENT_NAME);
-			sweet.Add(Questions.GenerateElement(System.IO.Path.GetDirectoryName(destination)));
-			xdoc.Add(sweet);
+			sweet.Add(Questions.GenerateElement(destination_directory, exported_songs_root));
+			xdoc.Root.Add(sweet);
 			return xdoc;
 		}
+		#endregion
 
 		#endregion
 
@@ -273,8 +282,7 @@ namespace Aldentea.SweetMutus.Data
 						if (version >= 3.0M)
 						{
 							var sweet = root.Element(SWEET_ELEMENT_NAME);
-							this.Questions.RootDirectory = Path.GetDirectoryName(fileName);	// RootDirectoryのデフォルトの値を設定する。
-							this.Questions.LoadElement(sweet.Element(SweetQuestionsCollection.ELEMENT_NAME));
+							this.Questions.LoadElement(sweet.Element(SweetQuestionsCollection.ELEMENT_NAME), Path.GetDirectoryName(fileName));
 							return true;
 						}
 					}
@@ -288,7 +296,7 @@ namespace Aldentea.SweetMutus.Data
 		{
 			using (XmlWriter writer = XmlWriter.Create(destination, this.WriterSettings))
 			{
-				GenerateXml(destination).WriteTo(writer);
+				GenerateXml(System.IO.Path.GetDirectoryName(destination)).WriteTo(writer);
 			}
 			// 基本的にtrueを返せばよろしい．
 			// falseを返すべきなのは，保存する前にキャンセルした時とかかな？
