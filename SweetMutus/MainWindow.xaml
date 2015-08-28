@@ -58,7 +58,7 @@
 			</MenuItem>
 		</Menu>
 		<DataGrid HorizontalAlignment="Left" Height="357" Margin="36,24,0,0" Grid.Row="1" VerticalAlignment="Top" Width="648"
-							ItemsSource="{Binding Questions}" AutoGenerateColumns="False">
+							ItemsSource="{Binding CurrentCategoryQuestions}" AutoGenerateColumns="False">
 			<DataGrid.Columns>
 				<DataGridTextColumn Header="#" Binding="{Binding Path=ID}" IsReadOnly="True" />
 				<DataGridTextColumn Header="No" Binding="{Binding Path=No, Converter={StaticResource noConverter}}" />
