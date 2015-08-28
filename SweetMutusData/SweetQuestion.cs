@@ -251,8 +251,9 @@ namespace Aldentea.SweetMutus.Data
 			{
 				question.ID = (int)id_attribute;
 			}
-			question.No = (int?)questionElement.Attribute(NO_ATTRIBUTE);
 			question.Category = (string)questionElement.Attribute(CATEGORY_ATTRIBUTE);
+			
+			question.No = (int?)questionElement.Attribute(NO_ATTRIBUTE);
 
 			question.Title = (string)questionElement.Element(TITLE_ELEMENT);
 			question.Artist = (string)questionElement.Element(ARTIST_ELEMENT);

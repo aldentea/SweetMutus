@@ -115,6 +115,16 @@ namespace Aldentea.SweetMutus
 
 		#endregion
 
+		#region SetRootDirectoryCommand
+
+		private void SetRootDirectory_Executed(object sender, ExecutedRoutedEventArgs e)
+		{
+			this.SetRootDirectory();
+		}
+
+
+		#endregion
+
 		#endregion
 
 
@@ -241,8 +251,34 @@ namespace Aldentea.SweetMutus
 				// ドキュメント保存
 				MyDocument.SaveExport(fileName, songDirectory);
 			}
-
 			
+		}
+
+
+		private void SetRootDirectory()
+		{
+			var directory = HyperMutus.Helpers.SelectSongsRoot(this.MyDocument.Questions.RootDirectory);
+			if (directory != null)
+			{
+				MyDocument.Questions.RootDirectory = directory;
+			}
+		}
+
+
+		private void Expander_Expanded(object sender, RoutedEventArgs e)
+		{
+			var expander = (Expander)sender;
+			if (expander.IsExpanded)
+			{
+				comboBoxCategories.Visibility = Visibility.Collapsed;
+				expander.ToolTip = "クリックするとカテゴリ選択に戻ります．";
+			}
+			else
+			{
+				comboBoxCategories.Visibility = Visibility.Visible;
+				// ☆デフォルトでこれを表示させる必要がある．
+				expander.ToolTip = "カテゴリを追加するにはクリックして下さい．";
+			}
 		}
 
 
@@ -257,6 +293,7 @@ namespace Aldentea.SweetMutus
 		}
 
 		#endregion
+
 	}
 
 
@@ -269,7 +306,7 @@ namespace Aldentea.SweetMutus
 		/// <summary>
 		/// 曲ファイルを選択して問題を追加します．
 		/// </summary>
-		public static RoutedCommand AddQuestionsCommand = new RoutedCommand();
+		//public static RoutedCommand AddQuestionsCommand = new RoutedCommand();
 
 		/// <summary>
 		/// 出題曲をエクスポートします．

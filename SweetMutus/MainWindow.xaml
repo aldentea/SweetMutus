@@ -22,10 +22,12 @@
 		</MultiBinding>
 	</Window.Title>
 	<Window.CommandBindings>
-		<CommandBinding Command="{x:Static local:Commands.AddQuestionsCommand}"
+		<CommandBinding Command="{x:Static grand:Commands.AddQuestionsCommand}"
 										Executed="AddQuestions_Executed" CanExecute="Always_CanExecute"/>
 		<CommandBinding Command="{x:Static local:Commands.ExportCommand}"
 										Executed="Export_Executed" CanExecute="Always_CanExecute" />
+		<CommandBinding Command="{x:Static grand:Commands.SetRootDirectoryCommand}"
+										Executed="SetRootDirectory_Executed" CanExecute="Always_CanExecute" />
 	</Window.CommandBindings>
 	<Grid>
 		<Grid.RowDefinitions>
@@ -47,25 +49,35 @@
 			</MenuItem>
 			<MenuItem Header="編集(_E)">
 				<MenuItem Header="元に戻す(_U)" Command="Undo" />
+				<MenuItem Header="やり直し(_R)" Command="Redo" />
 			</MenuItem>
 			<MenuItem Header="曲リスト(_S)">
-				<MenuItem Header="曲追加(_A)" Command="{x:Static local:Commands.AddQuestionsCommand}" />
+				<MenuItem Header="曲追加(_A)" Command="{x:Static grand:Commands.AddQuestionsCommand}" />
 				<MenuItem Header="曲追加(フォルダ選択)(_D)"
-									Command="{x:Static local:Commands.AddQuestionsCommand}">
+									Command="{x:Static grand:Commands.AddQuestionsCommand}">
 					<MenuItem.CommandParameter>
 						<sys:Boolean>True</sys:Boolean>
 					</MenuItem.CommandParameter>
 				</MenuItem>
+				<MenuItem Header="ホームフォルダ変更(_H)" Command="{x:Static grand:Commands.SetRootDirectoryCommand}" />
 			</MenuItem>
 			<MenuItem Header="お試し">
 				<MenuItem Header="フィルタ" Click="MenuItemFilter_Click" />
 			</MenuItem>
 		</Menu>
 
-		<GroupBox Header="カテゴリ" HorizontalAlignment="Left" Height="95" Margin="20,6" Grid.Row="1"
+		<GroupBox Header="カテゴリ" HorizontalAlignment="Left" Height="105" Margin="20,6" Grid.Row="1"
 							VerticalAlignment="Top" Width="213" Visibility="Visible">
-			<ComboBox HorizontalAlignment="Left" VerticalAlignment="Top" Width="190" Name="comboBoxCategories"
-								SelectionChanged="comboBoxCategories_SelectionChanged"/>
+			<StackPanel>
+				<ComboBox HorizontalAlignment="Stretch" VerticalAlignment="Top" Margin="6,3" Name="comboBoxCategories"
+									SelectionChanged="comboBoxCategories_SelectionChanged"/>
+				<Expander Header="カテゴリ追加" Collapsed="Expander_Expanded" Expanded="Expander_Expanded">
+					<StackPanel Orientation="Horizontal">
+						<TextBox MinWidth="100" Margin="3" Name="textBoxNewCategory" ToolTip="追加するカテゴリの名前を入れて下さい。" />
+						<Button Content="追加" MinWidth="60" Margin="3" />
+					</StackPanel>
+				</Expander>
+			</StackPanel>
 		</GroupBox>
 
 		<DataGrid Margin="10" Grid.Row="2"

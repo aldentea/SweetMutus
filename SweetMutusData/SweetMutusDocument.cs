@@ -314,7 +314,15 @@ namespace Aldentea.SweetMutus.Data
 						if (version >= 3.0M)
 						{
 							var sweet = root.Element(SWEET_ELEMENT_NAME);
-							this.Questions.LoadElement(sweet.Element(SweetQuestionsCollection.ELEMENT_NAME), Path.GetDirectoryName(fileName));
+							NowLoading = true;
+							try
+							{
+								this.Questions.LoadElement(sweet.Element(SweetQuestionsCollection.ELEMENT_NAME), Path.GetDirectoryName(fileName));
+							}
+							finally
+							{
+								NowLoading = false;
+							}
 							return true;
 						}
 					}
