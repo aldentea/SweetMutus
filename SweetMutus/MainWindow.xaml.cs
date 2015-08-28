@@ -14,7 +14,7 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 
 using Aldentea.Wpf.Application;
-
+using System.ComponentModel;
 
 namespace Aldentea.SweetMutus
 {
@@ -38,8 +38,14 @@ namespace Aldentea.SweetMutus
 		public MainWindow()
 		{
 			InitializeComponent();
-
 			this.FileHistoryShortcutParent = menuItemHistory;
+
+			MyDocument.Initialized += MyDocument_Initialized;
+			MyDocument.Opened += MyDocument_Opened;
+
+			dataGridQuestions.Items.SortDescriptions.Add(
+				new SortDescription { Direction = ListSortDirection.Ascending, PropertyName = "No" }
+			);
 
 			CommandBindings.Add(
 				new CommandBinding(ApplicationCommands.Close,
@@ -111,6 +117,48 @@ namespace Aldentea.SweetMutus
 
 		#endregion
 
+
+		// カレントカテゴリ関連
+
+		void MyDocument_Initialized(object sender, EventArgs e)
+		{
+			this.comboBoxCategories.Items.Clear();
+			this.comboBoxCategories.Items.Add(string.Empty);
+		}
+
+		void MyDocument_Opened(object sender, EventArgs e)
+		{
+			this.comboBoxCategories.Items.Clear();
+			foreach (var category in MyDocument.Questions.Categories)
+			{
+				this.comboBoxCategories.Items.Add(category);
+			}
+		}
+
+		private void comboBoxCategories_SelectionChanged(object sender, SelectionChangedEventArgs e)
+		{
+			dataGridQuestions.Items.Filter = q => ((SweetQuestion)q).Category == (string)comboBoxCategories.SelectedItem;
+			
+		}
+
+
+
+		public string CurrentCategory
+		{
+			get { return (string)GetValue(CurrentCategoryProperty); }
+			set { SetValue(CurrentCategoryProperty, value); }
+		}
+
+		// Using a DependencyProperty as the backing store for CurrentCategory.  This enables animation, styling, binding, etc...
+		public static readonly DependencyProperty CurrentCategoryProperty =
+				DependencyProperty.Register("CurrentCategory", typeof(string), typeof(MainWindow),
+				new PropertyMetadata(string.Empty, CurrentCategoryChanged));
+
+		static void CurrentCategoryChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+		{
+			var window = (MainWindow)d;
+			window.dataGridQuestions.Items.Filter = q => ((SweetQuestion)q).Category == (string)e.NewValue;
+		}
 
 		#region 問題リスト関連
 
@@ -194,9 +242,21 @@ namespace Aldentea.SweetMutus
 				MyDocument.SaveExport(fileName, songDirectory);
 			}
 
-
+			
 		}
 
+
+		#region お試し
+
+		private void MenuItemFilter_Click(object sender, RoutedEventArgs e)
+		{
+			dataGridQuestions.Items.Filter = (q) => { return ((SweetQuestion)q).Category == "tanuki"; };
+			dataGridQuestions.Items.SortDescriptions.Add(
+				new SortDescription { Direction = ListSortDirection.Ascending, PropertyName = "No" }
+			);
+		}
+
+		#endregion
 	}
 
 

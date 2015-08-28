@@ -31,8 +31,6 @@ namespace Aldentea.SweetMutus.Data
 		}
 		#endregion
 
-
-
 		#region Documentとの関係
 
 		public SweetMutusDocument Document { get { return _document; } }
@@ -365,6 +363,18 @@ namespace Aldentea.SweetMutus.Data
 		}
 
 		#endregion
+
+		/// <summary>
+		/// 現在のドキュメントで使用しているカテゴリを取得します．
+		/// </summary>
+		public IEnumerable<string> Categories
+		{
+			get
+			{
+				return this.Select(q => q.Category).Distinct();
+			}
+		}
+
 
 
 		#region XML入出力関連

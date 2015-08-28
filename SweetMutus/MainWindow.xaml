@@ -30,6 +30,7 @@
 	<Grid>
 		<Grid.RowDefinitions>
 			<RowDefinition Height="Auto" />
+			<RowDefinition Height="Auto" />
 			<RowDefinition Height="*" />
 			<RowDefinition Height="Auto" />
 		</Grid.RowDefinitions>
@@ -56,9 +57,22 @@
 					</MenuItem.CommandParameter>
 				</MenuItem>
 			</MenuItem>
+			<MenuItem Header="お試し">
+				<MenuItem Header="フィルタ" Click="MenuItemFilter_Click" />
+			</MenuItem>
 		</Menu>
-		<DataGrid HorizontalAlignment="Left" Height="357" Margin="36,24,0,0" Grid.Row="1" VerticalAlignment="Top" Width="648"
-							ItemsSource="{Binding CurrentCategoryQuestions}" AutoGenerateColumns="False">
+
+		<GroupBox Header="カテゴリ" HorizontalAlignment="Left" Height="95" Margin="20,6" Grid.Row="1"
+							VerticalAlignment="Top" Width="213" Visibility="Visible">
+			<ComboBox HorizontalAlignment="Left" VerticalAlignment="Top" Width="190" Name="comboBoxCategories"
+								SelectionChanged="comboBoxCategories_SelectionChanged"/>
+		</GroupBox>
+
+		<DataGrid Margin="10" Grid.Row="2"
+							ItemsSource="{Binding Questions}" AutoGenerateColumns="False"
+							CanUserAddRows="False" CanUserSortColumns="False"
+							Name="dataGridQuestions"
+							>
 			<DataGrid.Columns>
 				<DataGridTextColumn Header="#" Binding="{Binding Path=ID}" IsReadOnly="True" />
 				<DataGridTextColumn Header="No" Binding="{Binding Path=No, Converter={StaticResource noConverter}}" />

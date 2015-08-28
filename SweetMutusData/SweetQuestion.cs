@@ -11,7 +11,7 @@ using System.IO;
 namespace Aldentea.SweetMutus.Data
 {
 
-	public class SweetQuestion : GrandMutus.Data.QuestionBase<SweetQuestionsCollection>
+	public class SweetQuestion : GrandMutus.Data.QuestionBase<SweetQuestionsCollection>/*, IEditableObject*/
 	{
 
 		#region Songのコピペ
@@ -284,6 +284,47 @@ namespace Aldentea.SweetMutus.Data
 		#endregion
 
 
+		#region IEditable実装
+/*
+		XElement _backup = null;
+		
+		public void BeginEdit()
+		{
+			// 通常、このメソッドは、DataRowView の BeginEdit のセマンティクスを取り込むために使用されます。
+			// 既に編集されているオブジェクトで BeginEdit を呼び出した場合、2 番目以降の呼び出しは無視されます。
+
+			// 実装時の注意
+			// このインターフェイスを実装しているオブジェクトは、BeginEdit が呼び出された後で行われた更新内容を格納しておき、
+			// CancelEdit が呼び出された場合にそれらの更新を破棄できるようにしておく必要があります。
+			if (_backup == null)
+			{
+				_backup = GenerateElement(string.Empty);
+			}
+		}
+		
+		public void CancelEdit()
+		{
+			// 最後に BeginEdit が呼び出された後に行われた変更を破棄します。
+			// 解説
+			// 通常、このメソッドは、DataRowView の CancelEdit のセマンティクスを取り込むために使用されます。
+			// 編集中ではないオブジェクトで呼び出した場合、このメソッドは無視されます。
+			// 所有側のリストが IBindingList を実装している場合、IBindingList.AddNew を使用して作成されたオブジェクトに対して
+			// CancelEdit を呼び出すと、そのオブジェクトは破棄されます。
+			Generate(_backup);
+		}
+
+		public void EndEdit()
+		{
+			// 対象となるオブジェクトに、最後に BeginEdit または IBindingList.AddNew を呼び出した後に行われた変更を適用します。
+			
+			// 解説
+			// 通常、このメソッドは、DataRowView の EndEdit のセマンティクスを取り込むために使用されます。
+			// 編集中ではないオブジェクトで呼び出した場合、このメソッドは無視されます。
+
+			_backup = null;
+		}
+		*/
+		#endregion
 
 	}
 

@@ -42,7 +42,7 @@ namespace Aldentea.SweetMutus.Data
 			_questions.QuestionNoChanged += Questions_QuestionNoChanged;
 
 			// カレントカテゴリ関連
-			this.Opened += SweetMutusDocument_Opened;
+			//this.Opened += SweetMutusDocument_Opened;
 
 			// XML出力関連処理
 			_xmlWriterSettings = new XmlWriterSettings
@@ -340,6 +340,11 @@ namespace Aldentea.SweetMutus.Data
 		#endregion
 
 
+
+
+
+		// これ以下のコードは不要になりそう！
+/*
 		void SweetMutusDocument_Opened(object sender, EventArgs e)
 		{
 			NotifyPropertyChanged("CurrentCategory");
@@ -414,7 +419,6 @@ namespace Aldentea.SweetMutus.Data
 					NotifyPropertyChanged("CurrentCategoryQuestions");
 					NotifyPropertyChanged("CurrentUnnumberedQuestions");
 					NotifyPropertyChanged("CurrentNumberedQuestions");
-					
 				}
 			}
 		}
@@ -430,7 +434,8 @@ namespace Aldentea.SweetMutus.Data
 		{
 			get
 			{
-				return this.Questions.Where(q => q.Category == CurrentCategory).OrderBy(q => q.No);
+				return this.Questions.Where(q => q.Category == CurrentCategory);
+				//return this.Questions.Where(q => q.Category == CurrentCategory).OrderBy(q => q.No);
 			}
 		}
 		#endregion
@@ -462,7 +467,7 @@ namespace Aldentea.SweetMutus.Data
 			}
 		}
 		#endregion
-
+*/
 
 
 	}
