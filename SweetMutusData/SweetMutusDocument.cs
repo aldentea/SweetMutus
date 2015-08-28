@@ -256,6 +256,21 @@ namespace Aldentea.SweetMutus.Data
 
 		#endregion
 
+		/// <summary>
+		/// エクスポート時にファイルを保存します．
+		/// 曲ファイルのコピーは予め済ませておいて下さい．
+		/// </summary>
+		/// <param name="destination"></param>
+		/// <param name="songs_root"></param>
+		public void SaveExport(string destination, string songs_root)
+		{
+			using (XmlWriter writer = XmlWriter.Create(destination, this.WriterSettings))
+			{
+				GenerateXml(System.IO.Path.GetDirectoryName(destination), songs_root).WriteTo(writer);
+			}
+
+		}
+
 
 		#region DocumentBase実装
 

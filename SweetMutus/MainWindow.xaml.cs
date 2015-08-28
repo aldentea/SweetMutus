@@ -82,7 +82,14 @@ namespace Aldentea.SweetMutus
 
 		private void AddQuestions_Executed(object sender, ExecutedRoutedEventArgs e)
 		{
-			AddQuestions();
+			if (e.Parameter is bool && (bool)e.Parameter)
+			{
+				AddQuestionsFromDirectory();
+			}
+			else
+			{
+				AddQuestions();
+			}
 		}
 
 		//private void AddQuestions_CanExecute(object sender, CanExecuteRoutedEventArgs e)
@@ -92,8 +99,20 @@ namespace Aldentea.SweetMutus
 
 		#endregion
 
+		#region Export
+
+		private void Export_Executed(object sender, ExecutedRoutedEventArgs e)
+		{
+			this.Export();
+		}
+
 
 		#endregion
+
+		#endregion
+
+
+		#region 問題リスト関連
 
 		void AddQuestions()
 		{
@@ -103,6 +122,25 @@ namespace Aldentea.SweetMutus
 			{
 				AddQuestions(fileNames);
 			//SayInfo("曲追加完了！");
+			}
+		}
+
+		void AddQuestionsFromDirectory()
+		{
+			var dialog = new Wpf.Controls.FolderBrowserDialog
+			{
+				Description = "指定したフォルダ以下にある全ての音楽ファイル(既定では'*.mp3')を問題リストに追加します．",
+				Title = "フォルダから曲を追加",
+				DisplaySpecialFolders = Wpf.Controls.SpecialFoldersFlag.Personal | Wpf.Controls.SpecialFoldersFlag.MyMusic
+			};
+			if (dialog.ShowDialog() == true)
+			{
+				var directory = dialog.SelectedPath;
+				AddQuestions(System.IO.Directory.GetFiles(directory, "*.mp3", System.IO.SearchOption.AllDirectories));
+				if (string.IsNullOrEmpty(MyDocument.Questions.RootDirectory))
+				{
+					MyDocument.Questions.RootDirectory = directory;
+				}
 			}
 		}
 
@@ -133,6 +171,31 @@ namespace Aldentea.SweetMutus
 		}
 		#endregion
 
+		#endregion
+
+		void Export()
+		{
+			// ファイル名選択
+			var dialog = new HyperMutus.ExportDialog { FileFilter = this.SaveFileDialogFilter };
+			if (dialog.ShowDialog() == true)
+			{
+				string fileName = dialog.Destination;
+				//var document = IntroMutusDocument.Clone<IntroMutusDocument>();
+
+				// 曲ファイルコピー
+				var songDirectory = dialog.SongDirectory;
+				var destinationDirectory = System.IO.Path.GetDirectoryName(fileName);
+				string songsDestination = songDirectory == null ? destinationDirectory : System.IO.Path.Combine(destinationDirectory, songDirectory);
+
+				//document.SongsRoot = songsDestination;
+				Helpers.ExportFiles(MyDocument.Questions.Select(q => q.FileName), songsDestination);
+
+				// ドキュメント保存
+				MyDocument.SaveExport(fileName, songDirectory);
+			}
+
+
+		}
 
 	}
 
@@ -143,7 +206,15 @@ namespace Aldentea.SweetMutus
 	// とりあえずここに置いておく．
 	public static class Commands
 	{
+		/// <summary>
+		/// 曲ファイルを選択して問題を追加します．
+		/// </summary>
 		public static RoutedCommand AddQuestionsCommand = new RoutedCommand();
+
+		/// <summary>
+		/// 出題曲をエクスポートします．
+		/// </summary>
+		public static RoutedCommand ExportCommand = new RoutedCommand();
 
 		//public static RoutedCommand SetSabiPosCommand = new RoutedCommand();
 	}

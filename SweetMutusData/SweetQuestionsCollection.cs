@@ -202,7 +202,6 @@ namespace Aldentea.SweetMutus.Data
 		{
 			this.Clear();
 			this.RootDirectory = string.Empty;
-
 		}
 
 		#endregion
@@ -228,7 +227,7 @@ namespace Aldentea.SweetMutus.Data
 
 			// path属性について，以下の3つのパターンがある．
 			// 1. 絶対パスを記述．
-			// 2. songs_root(というかファイルを保存するディレクトリ)からの相対パスを記述．
+			// 2. songs_root(というかファイルを保存するディレクトリ)からの相対パスを記述．(songs_rootと等しいときは，path="."とする！)
 			// 3. 記述なし．
 
 			bool exporting = !string.IsNullOrEmpty(export_songs_root);
@@ -238,7 +237,9 @@ namespace Aldentea.SweetMutus.Data
 			{
 				if (songs_root == destination_directory)
 				{
+					// ↓記述することにした．
 					// 記述なし．
+					element.Add(new XAttribute(PATH_ATTRIBUTE, "."));
 				}
 				else
 				{
@@ -264,19 +265,26 @@ namespace Aldentea.SweetMutus.Data
 		}
 		#endregion
 
+		#region *questionsElementを読み込む(LoadElement)
 		public void LoadElement(XElement questionsElement, string source_directory)
 		{
 			var path = (string)questionsElement.Attribute(PATH_ATTRIBUTE);
 			string songs_root;
 			if (string.IsNullOrEmpty(path))
 			{
+				// RootDirectoryプロパティは設定されない．
 				songs_root = source_directory;	// ロードするファイルのあるディレクトリが入っているはずである．
 			}
 			else
 			{
+				// 何らかの形でRootDirectoryプロパティが設定される．
 				if (Path.IsPathRooted(path))
 				{
 					this.RootDirectory = path;
+				}
+				else if (path == ".")
+				{
+					this.RootDirectory = source_directory;
 				}
 				else
 				{
@@ -284,9 +292,9 @@ namespace Aldentea.SweetMutus.Data
 				}
 				songs_root = this.RootDirectory;
 			}
+
 			foreach (var question_element in questionsElement.Elements())
 			{
-				// ☆ここの処理は動的に分岐を生成するようにしたい！
 				switch (question_element.Name.LocalName)
 				{
 					case "question":
@@ -298,6 +306,7 @@ namespace Aldentea.SweetMutus.Data
 				}
 			}
 		}
+		#endregion
 
 		#endregion
 

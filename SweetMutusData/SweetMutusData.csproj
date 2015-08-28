@@ -45,6 +45,9 @@
     <Reference Include="GrandMutusData">
       <HintPath>..\external\GrandMutusData.dll</HintPath>
     </Reference>
+    <Reference Include="MutusData">
+      <HintPath>..\external\MutusData.dll</HintPath>
+    </Reference>
     <Reference Include="RIFFMP3Tag">
       <HintPath>..\external\RIFFMP3Tag.dll</HintPath>
     </Reference>
