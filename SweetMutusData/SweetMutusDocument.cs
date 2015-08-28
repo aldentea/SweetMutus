@@ -31,12 +31,18 @@ namespace Aldentea.SweetMutus.Data
 		#endregion
 
 		// (0.3.3)Questions関連処理を追加。
-		#region *コンストラクタ(MutusDocument)
+		#region *コンストラクタ(SweetMutusDocument)
 		public SweetMutusDocument()
 		{
 			// Questions関連処理
 			_questions = new SweetQuestionsCollection(this);
 			_questions.QuestionsRemoved += Questions_QuestionsRemoved;
+			_questions.ItemChanged += Songs_ItemChanged;
+			_questions.RootDirectoryChanged += Questions_RootDirectoryChanged;
+			_questions.QuestionNoChanged += Questions_QuestionNoChanged;
+
+			// カレントカテゴリ関連
+			
 
 			// XML出力関連処理
 			_xmlWriterSettings = new XmlWriterSettings
@@ -219,7 +225,18 @@ namespace Aldentea.SweetMutus.Data
 
 		// (0.4.1)
 
+		// (0.4.5.1)
+		void Questions_QuestionNoChanged(object sender, ValueChangedEventArgs<int?> e)
+		{
+			var question = (SweetQuestion)sender;
+			AddOperationHistory(new QuestionNoChangedCache(question, e.PreviousValue, e.CurrentValue));
+		}
 
+		// (0.4.4)
+		void Questions_RootDirectoryChanged(object sender, ValueChangedEventArgs<string> e)
+		{
+			this.AddOperationHistory(new RootDirectoryChangedCache(this.Questions, e.PreviousValue, e.CurrentValue));
+		}
 
 		#endregion
 
@@ -321,6 +338,122 @@ namespace Aldentea.SweetMutus.Data
 
 
 		#endregion
+
+
+		#region カレントカテゴリ関連
+
+					// (0.1.1)
+			void Questions_QuestionNoChangeCompleted(object sender, ValueChangedEventArgs<int?> e)
+			{
+				Question question = (Question)sender;
+				if (question.Category == this.CurrentCategory)
+				{
+					NotifyPropertyChanged("CurrentCategoryQuestions");
+					NotifyPropertyChanged("CurrentNumberedQuestions");
+					if (!e.PreviousValue.HasValue || !e.CurrentValue.HasValue)
+					{
+						NotifyPropertyChanged("CurrentUnnumberedQuestions");
+					}
+				}
+			}
+
+			// (0.1.0)
+			void Questions_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+			{
+				NotifyPropertyChanged("CurrentCategoryQuestions");
+				NotifyPropertyChanged("CurrentUnnumberedQuestions");
+				NotifyPropertyChanged("CurrentNumberedQuestions");
+			}
+
+			// (0.1.0)
+			void GrandMutusClassicDocument_Opened(object sender, EventArgs e)
+			{
+				CurrentCategory = string.Empty;
+			}
+
+			// (0.1.0)
+			void GrandMutusClassicDocument_Initialized(object sender, EventArgs e)
+			{
+				CurrentCategory = string.Empty;
+			}
+			#endregion
+
+			// (0.1.0)
+			#region *CurrentCategoryプロパティ
+			/// <summary>
+			/// 現在のカテゴリを取得／設定します．
+			/// </summary>
+			public string CurrentCategory
+			{
+				get
+				{
+					return _currentCategory;
+				}
+				set
+				{
+					if (string.IsNullOrEmpty(value))
+					{
+						value = string.Empty;
+					}
+					if (this.CurrentCategory != value)
+					{
+						this._currentCategory = value;
+						// このときは，OperationCacheをどうにかする必要がありそう？
+						// でも，View用のプロパティなんだから，そんなことしなくていいんじゃない？
+						// (実質的な変化を及ぼすものではないということ．)
+						NotifyPropertyChanged("CurrentCategory");
+						NotifyPropertyChanged("CurrentCategoryQuestions");
+						NotifyPropertyChanged("CurrentUnnumberedQuestions");
+						NotifyPropertyChanged("CurrentNumberedQuestions");
+					
+					}
+				}
+			}
+			string _currentCategory = string.Empty;
+			#endregion
+
+			// (0.1.0)
+			#region *CurrentCategoryQuestionsプロパティ
+			/// <summary>
+			/// CurrentCategoryに属する問題を取得します．
+			/// </summary>
+			public IEnumerable<SweetQuestion> CurrentCategoryQuestions
+			{
+				get
+				{
+					return this.Questions.Where(q => q.Category == CurrentCategory);
+				}
+			}
+			#endregion
+
+			// (0.1.0)
+			#region *CurrentUnnumberedQuestionsプロパティ
+			/// <summary>
+			/// CurrentCategoryに属しており，Noの設定されていない問題を取得します．
+			/// </summary>
+			public IEnumerable<SweetQuestion> CurrentUnnumberedQuestions
+			{
+				get
+				{
+					return this.CurrentCategoryQuestions.Where(q => !q.No.HasValue);
+				}
+			}
+			#endregion
+
+			// (0.1.0)
+			#region *CurrentNumberedQuestionsプロパティ
+			/// <summary>
+			/// CurrentCategoryに属しており，Noの設定された問題を，Noの昇順で取得します．
+			/// </summary>
+			public IEnumerable<SweetQuestion> CurrentNumberedQuestions
+			{
+				get
+				{
+					return this.CurrentCategoryQuestions.Where(q => q.No.HasValue).OrderBy(q => q.No.Value);
+				}
+			}
+			#endregion
+
 
 
 	}

@@ -48,14 +48,14 @@
     <Reference Include="AldenteaWpfUtility">
       <HintPath>..\..\GrandMutus\GrandMutusClassic\external\AldenteaWpfUtility.dll</HintPath>
     </Reference>
+    <Reference Include="GrandMutusBase">
+      <HintPath>..\external\GrandMutusBase.dll</HintPath>
+    </Reference>
     <Reference Include="GrandMutusData">
       <HintPath>..\external\GrandMutusData.dll</HintPath>
     </Reference>
     <Reference Include="MutusBase">
       <HintPath>..\external\MutusBase.dll</HintPath>
-    </Reference>
-    <Reference Include="MutusData">
-      <HintPath>..\external\MutusData.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />

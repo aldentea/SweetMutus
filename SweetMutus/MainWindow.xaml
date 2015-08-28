@@ -4,6 +4,7 @@
 				xmlns:sys="clr-namespace:System;assembly=mscorlib"
 				xmlns:base="clr-namespace:Aldentea.Wpf.Application;assembly=AldenteaWpfApplication"
         xmlns:util="clr-namespace:Aldentea.Wpf.Utility;assembly=AldenteaWpfUtility"
+				xmlns:grand="clr-namespace:GrandMutus.Base;assembly=GrandMutusBase"
 				xmlns:local="clr-namespace:Aldentea.SweetMutus"
 				OpenFileDialogFilter="SweetMutusファイル(*.smt)|*.smt"
 				SaveFileDialogFilter="SweetMutusファイル(*.smt)|*.smt"
@@ -11,6 +12,7 @@
 	<Window.Resources>
 		<util:CaptionConverter x:Key="captionConverter" ApplicationName="SweetMutus" />
 		<util:TimeSpanDoubleConverter x:Key="timeSpanDoubleConverter" />
+		<grand:NullableIntConverter x:Key="noConverter" />
 	</Window.Resources>
 	<Window.Title>
 		<MultiBinding Converter="{StaticResource captionConverter}">
@@ -59,7 +61,7 @@
 							ItemsSource="{Binding Questions}" AutoGenerateColumns="False">
 			<DataGrid.Columns>
 				<DataGridTextColumn Header="#" Binding="{Binding Path=ID}" IsReadOnly="True" />
-				<DataGridTextColumn Header="No" Binding="{Binding Path=No}" />
+				<DataGridTextColumn Header="No" Binding="{Binding Path=No, Converter={StaticResource noConverter}}" />
 				<DataGridTextColumn Header="Title" Binding="{Binding Path=Title}" />
 				<DataGridTextColumn Header="Artist" Binding="{Binding Path=Artist}" />
 				<DataGridTextColumn Header="FileName" Binding="{Binding Path=RelativeFileName}" IsReadOnly="True"

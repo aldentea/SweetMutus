@@ -69,6 +69,7 @@ namespace Aldentea.SweetMutus.Data
 						// ☆songのプロパティ変更をここで受け取る？MutusDocumentで行えばここでは不要？
 						//question.PropertyChanging += Question_PropertyChanging;
 						//question.PropertyChanged += Question_PropertyChanged;
+						question.NoChanged += Question_NoChanged;
 						question.OnAddedTo(this);
 
 						// ☆songのプロパティ変更をここで受け取る？MutusDocumentで行えばここでは不要？
@@ -87,6 +88,7 @@ namespace Aldentea.SweetMutus.Data
 						question.PropertyChanging -= Question_PropertyChanging;
 						question.PropertyChanged -= Question_PropertyChanged;
 
+						question.NoChanged -= Question_NoChanged;
 						questions.Add(question);
 					}
 					// (MutusDocumentを経由せずに)UIから削除される場合もあるので，
@@ -97,6 +99,7 @@ namespace Aldentea.SweetMutus.Data
 					}
 					break;
 			}
+
 		}
 		#endregion
 
@@ -126,10 +129,50 @@ namespace Aldentea.SweetMutus.Data
 
 		#region SongsCollectionのコピペ
 
+		#region RootDirectory関連
+
+		// (0.4.4)set時に操作履歴に追加。
+		// (0.4.3)実装を変更し、この変更を各Songに通知するように修正。
+		#region *RootDirectoryプロパティ
 		/// <summary>
 		/// 曲ファイルを格納するディレクトリのフルパスを取得／設定します．
 		/// </summary>
-		public string RootDirectory { get; set; }
+		public string RootDirectory
+		{
+			get
+			{
+				return this._rootDirectory;
+			}
+			set
+			{
+				if (this._rootDirectory != value)
+				{
+					var previous_value = this._rootDirectory;
+					this._rootDirectory = value;
+					UpdateRelativeFileNames();
+					this.RootDirectoryChanged(this, new ValueChangedEventArgs<string>(previous_value, value));
+				}
+			}
+		}
+		string _rootDirectory = string.Empty;
+
+		// (0.4.3)
+		void UpdateRelativeFileNames()
+		{
+			foreach (SweetQuestion question in this.Items)
+			{
+				question.UpdateRelativeFileName();
+			}
+		}
+		#endregion
+
+		// (0.4.4)
+		/// <summary>
+		/// RootDirecotyプロパティの値が変更されたときに発生します。
+		/// </summary>
+		public event EventHandler<ValueChangedEventArgs<string>> RootDirectoryChanged = delegate { };
+
+		#endregion
 
 		#region アイテム変更関連
 
@@ -145,7 +188,7 @@ namespace Aldentea.SweetMutus.Data
 
 		void Question_PropertyChanging(object sender, System.ComponentModel.PropertyChangingEventArgs e)
 		{
-			Song song = (Song)sender;
+			SweetQuestion song = (SweetQuestion)sender;
 			switch (e.PropertyName)
 			{
 				case "Title":
@@ -162,35 +205,152 @@ namespace Aldentea.SweetMutus.Data
 
 		void Question_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
 		{
-			var song = (Song)sender;
+			var song = (SweetQuestion)sender;
 
 			switch (e.PropertyName)
 			{
 				case "Title":
 					this.ItemChanged(this, new ItemEventArgs<IOperationCache>
 					{
-						Item = new SongTitleChangedCache(song, _titleCache, song.Title)
+						Item = new QuestionTitleChangedCache(song, _titleCache, song.Title)
 					});
 					_titleCache = string.Empty;
 					break;
 				case "Artist":
 					this.ItemChanged(this, new ItemEventArgs<IOperationCache>
 					{
-						Item = new SongArtistChangedCache(song, _artistCache, song.Artist)
+						Item = new QuestionArtistChangedCache(song, _artistCache, song.Artist)
 					});
 					_artistCache = string.Empty;
 					break;
 				case "SabiPos":
 					this.ItemChanged(this, new ItemEventArgs<IOperationCache>
 					{
-						Item = new SongSabiPosChangedCache(song, _sabiPosCache, song.SabiPos)
+						Item = new QuestionSabiPosChangedCache(song, _sabiPosCache, song.SabiPos)
 					});
 					_sabiPosCache = TimeSpan.Zero;
+					break;
+				case "No":
+					// 整番処理は複雑なのでここでは行わない(Question_NoChangedで行う)。
 					break;
 			}
 			// ドキュメントにNotifyしたい！？
 			//e.PropertyName
 		}
+
+
+		// (0.4.6.0)QuestionNoChangeCompletedイベントの発生を追加．
+		// (0.4.5.2)で、カテゴリを考慮。
+		// (0.4.5.1)まずはカテゴリを考慮しない形で整番処理を記述．
+		#region 整番処理関連
+
+		bool _noChangingFlag = false;
+
+		void Question_NoChanged(object sender, ValueChangedEventArgs<int?> e)
+		{
+			if (_noChangingFlag)
+			{
+				return;
+			}
+			_noChangingFlag = true;
+
+			try
+			{
+				var self = (SweetQuestion)sender;
+				int? old_no = e.PreviousValue;
+				int? new_no = e.CurrentValue;
+				if (new_no.HasValue)
+				{
+					int n = Items.Count(q => { return q.Category == self.Category && q.No.HasValue; });
+					if (new_no.Value > n)
+					{
+						self.No = new_no = n;
+					}
+				}
+
+				// このあたりで操作履歴に加えておく。
+				// (ここまでの処理で変更になる可能性があるので、Questionから直接MutusDocumentに通知することはしない。)
+				this.QuestionNoChanged(self, new ValueChangedEventArgs<int?>(old_no, new_no));
+
+				if (old_no.HasValue)
+				{
+					if (new_no.HasValue)
+					{
+						// M -> N
+						int m = old_no.Value;
+						int n = new_no.Value;
+
+						if (m < n)
+						{
+							// M < N
+							// (M+1)からNを1つずつ減らす。
+							foreach (var question in Items.Where(q => { return q.Category == self.Category && q.No.HasValue && q.No > m && q.No <= n && q != self; }))
+							{
+								question.No -= 1;
+							}
+						}
+						else
+						{
+							// M > N
+							// Nから(M-1)を1つずつ増やす。
+							foreach (var question in Items.Where(q => { return q.Category == self.Category && q.No.HasValue && q.No < m && q.No >= n && q != self; }))
+							{
+								question.No += 1;
+							}
+						}
+					}
+					else
+					{
+						// N -> null
+						// Nより大きい番号を1ずつ減らす．
+						int n = old_no.Value;
+
+						foreach (var question in Items.Where(q => { return q.Category == self.Category && q.No.HasValue && q.No > n; }))
+						{
+							question.No -= 1;
+						}
+					}
+				}
+				else
+				{
+					// new_no should has value.
+					int n = new_no.Value;
+
+					// null -> N
+					// N以上の番号を1つずつ増やす。
+					foreach (var question in Items.Where(q => { return q.Category == self.Category && q.No.HasValue && q.No >= n && q != self; }))
+					{
+						question.No += 1;
+					}
+
+				}
+
+				this.QuestionNoChangeCompleted(self, new ValueChangedEventArgs<int?>(old_no, new_no));
+
+			}
+			finally
+			{
+				_noChangingFlag = false;
+			}
+		}
+
+		// (0.4.5.1)
+		/// <summary>
+		/// 問題の番号が変更になったときに発生します。(操作履歴管理用かな？)
+		/// senderはQuestionsCollectionではなくQuestionであることに一応注意。
+		/// </summary>
+		public event EventHandler<ValueChangedEventArgs<int?>> QuestionNoChanged = delegate { };
+
+		// 新しいNoの決定→変更→QuestionNoChanged→他の問題のNoの処理→QuestionNoChangeCompletedの順．
+
+		// (0.4.6.0)
+		/// <summary>
+		/// 問題番号の変更処理が完了したときに発生します（他の問題の番号スライド処理の完了後）。
+		/// senderはQuestionsCollectionではなくQuestionであることに一応注意。
+		/// </summary>
+		public event EventHandler<ValueChangedEventArgs<int?>> QuestionNoChangeCompleted = delegate { };
+
+		#endregion
 
 		#endregion
 

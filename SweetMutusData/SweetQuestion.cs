@@ -128,6 +128,12 @@ namespace Aldentea.SweetMutus.Data
 		}
 		#endregion
 
+		// (0.4.3)
+		internal void UpdateRelativeFileName()
+		{
+			this.NotifyPropertyChanged("RelativeFileName");
+		}
+
 
 		#endregion
 
