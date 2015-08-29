@@ -13,6 +13,7 @@
 		<util:CaptionConverter x:Key="captionConverter" ApplicationName="SweetMutus" />
 		<util:TimeSpanDoubleConverter x:Key="timeSpanDoubleConverter" />
 		<grand:NullableIntConverter x:Key="noConverter" />
+		<grand:VisibilityConverter x:Key="categoryVisibilityConverter" />
 	</Window.Resources>
 	<Window.Title>
 		<MultiBinding Converter="{StaticResource captionConverter}">
@@ -61,20 +62,30 @@
 				</MenuItem>
 				<MenuItem Header="ホームフォルダ変更(_H)" Command="{x:Static grand:Commands.SetRootDirectoryCommand}" />
 			</MenuItem>
+			<MenuItem Header="表示(_V)">
+				<MenuItem Name="menuItemCategoryVisible" Header="カテゴリ" IsCheckable="True" IsChecked="False" />
+			</MenuItem>
 			<MenuItem Header="お試し">
 				<MenuItem Header="フィルタ" Click="MenuItemFilter_Click" />
 			</MenuItem>
 		</Menu>
 
 		<GroupBox Header="カテゴリ" HorizontalAlignment="Left" Height="105" Margin="20,6" Grid.Row="1"
-							VerticalAlignment="Top" Width="213" Visibility="Visible">
+				VerticalAlignment="Top" Width="213"
+				Visibility="{Binding ElementName=menuItemCategoryVisible, Path=IsChecked, Converter={StaticResource categoryVisibilityConverter}}">
+			<GroupBox.CommandBindings>
+				<CommandBinding Command="{x:Static local:Commands.AddCategoryCommand}"
+												Executed="AddCategory_Executed" CanExecute="AddCategory_CanExecute" />
+			</GroupBox.CommandBindings>
 			<StackPanel>
 				<ComboBox HorizontalAlignment="Stretch" VerticalAlignment="Top" Margin="6,3" Name="comboBoxCategories"
 									SelectionChanged="comboBoxCategories_SelectionChanged"/>
 				<Expander Header="カテゴリ追加" Collapsed="Expander_Expanded" Expanded="Expander_Expanded">
 					<StackPanel Orientation="Horizontal">
 						<TextBox MinWidth="100" Margin="3" Name="textBoxNewCategory" ToolTip="追加するカテゴリの名前を入れて下さい。" />
-						<Button Content="追加" MinWidth="60" Margin="3" />
+						<Button Content="追加" MinWidth="60" Margin="3"
+										Command="{x:Static local:Commands.AddCategoryCommand}"
+										CommandParameter="{Binding ElementName=textBoxNewCategory, Path=Text}" />
 					</StackPanel>
 				</Expander>
 			</StackPanel>
@@ -92,9 +103,12 @@
 				<DataGridTextColumn Header="Artist" Binding="{Binding Path=Artist}" />
 				<DataGridTextColumn Header="FileName" Binding="{Binding Path=RelativeFileName}" IsReadOnly="True"
 														/>
-				<DataGridTextColumn Header="Start" Binding="{Binding Path=PlayPos, Converter={StaticResource timeSpanDoubleConverter}}" />
+				<DataGridTextColumn Header="Start" Binding="{Binding Path=PlayPos, Converter={StaticResource timeSpanDoubleConverter}}"
+														/>
 				<DataGridTextColumn Header="Sabi" Binding="{Binding Path=SabiPos, Converter={StaticResource timeSpanDoubleConverter}}" />
 			</DataGrid.Columns>
 		</DataGrid>
+		
+		<StatusBar Height="32" Grid.Row="3" />
 	</Grid>
 </base:BasicWindow>

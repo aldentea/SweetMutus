@@ -125,6 +125,27 @@ namespace Aldentea.SweetMutus
 
 		#endregion
 
+		#region AddCategory
+
+		private void AddCategory_Executed(object sender, ExecutedRoutedEventArgs e)
+		{
+			if (e.Parameter is string)
+			{
+				string category = (string)e.Parameter;
+				if (!comboBoxCategories.Items.Contains(category))
+				{
+					comboBoxCategories.Items.Add(category);
+				}
+			}
+		}
+
+		private void AddCategory_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+		{
+			e.CanExecute = (e.Parameter is string) && !comboBoxCategories.Items.Contains((string)e.Parameter);
+		}
+		
+		#endregion
+
 		#endregion
 
 
@@ -142,6 +163,13 @@ namespace Aldentea.SweetMutus
 			foreach (var category in MyDocument.Questions.Categories)
 			{
 				this.comboBoxCategories.Items.Add(category);
+			}
+
+			// ☆将来的にはリボンにするのがいいのかな？
+			// カテゴリグループボックスを表示。
+			if (this.comboBoxCategories.Items.Count > 1)
+			{
+				this.menuItemCategoryVisible.IsChecked = true;
 			}
 		}
 
@@ -239,7 +267,7 @@ namespace Aldentea.SweetMutus
 			{
 				string fileName = dialog.Destination;
 				//var document = IntroMutusDocument.Clone<IntroMutusDocument>();
-
+				
 				// 曲ファイルコピー
 				var songDirectory = dialog.SongDirectory;
 				var destinationDirectory = System.IO.Path.GetDirectoryName(fileName);
@@ -312,6 +340,11 @@ namespace Aldentea.SweetMutus
 		/// 出題曲をエクスポートします．
 		/// </summary>
 		public static RoutedCommand ExportCommand = new RoutedCommand();
+
+		/// <summary>
+		/// 新たなカテゴリを追加します。
+		/// </summary>
+		public static RoutedCommand AddCategoryCommand = new RoutedCommand();
 
 		//public static RoutedCommand SetSabiPosCommand = new RoutedCommand();
 	}
