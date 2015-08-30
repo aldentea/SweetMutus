@@ -4,16 +4,19 @@
 				xmlns:sys="clr-namespace:System;assembly=mscorlib"
 				xmlns:base="clr-namespace:Aldentea.Wpf.Application;assembly=AldenteaWpfApplication"
         xmlns:util="clr-namespace:Aldentea.Wpf.Utility;assembly=AldenteaWpfUtility"
+				xmlns:hypermutus="clr-namespace:HyperMutus;assembly=MutusBase"
 				xmlns:grand="clr-namespace:GrandMutus.Base;assembly=GrandMutusBase"
 				xmlns:local="clr-namespace:Aldentea.SweetMutus"
+				xmlns:ud="clr-namespace:Aldentea.Wpf.Controls;assembly=UpDownControl"
 				OpenFileDialogFilter="SweetMutusファイル(*.smt)|*.smt"
 				SaveFileDialogFilter="SweetMutusファイル(*.smt)|*.smt"
-        Height="500" Width="800">
+        Height="600" Width="800">
 	<Window.Resources>
 		<util:CaptionConverter x:Key="captionConverter" ApplicationName="SweetMutus" />
 		<util:TimeSpanDoubleConverter x:Key="timeSpanDoubleConverter" />
 		<grand:NullableIntConverter x:Key="noConverter" />
 		<grand:VisibilityConverter x:Key="categoryVisibilityConverter" />
+		<grand:VisibilityConverter x:Key="fileNameVisibilityConverter" />
 	</Window.Resources>
 	<Window.Title>
 		<MultiBinding Converter="{StaticResource captionConverter}">
@@ -29,12 +32,38 @@
 										Executed="Export_Executed" CanExecute="Always_CanExecute" />
 		<CommandBinding Command="{x:Static grand:Commands.SetRootDirectoryCommand}"
 										Executed="SetRootDirectory_Executed" CanExecute="Always_CanExecute" />
+		<CommandBinding Command="Play"
+										Executed="Play_Executed"
+										CanExecute="Play_CanExecute" />
+		<CommandBinding
+										Command="{x:Static hypermutus:Commands.SwitchPlayPauseCommand}"
+										Executed="SwitchPlayPause_Executed"
+										CanExecute="SongPlayer_CanExecute" />
+		<CommandBinding
+										Command="{x:Static hypermutus:Commands.SeekSabiCommand}"
+										Executed="SeekSabi_Executed"
+										CanExecute="SongPlayer_CanExecute" />
+		<CommandBinding Command="{x:Static grand:Commands.SetSabiPosCommand}"
+										Executed="SetSabiPos_Executed"
+										CanExecute="SongPlayer_CanExecute" />
+		<CommandBinding Command="{x:Static hypermutus:Commands.SeekRelativeCommand}"
+										Executed="SeekRelative_executed"
+										CanExecute="SongPlayer_CanExecute" />
 	</Window.CommandBindings>
+	<Window.InputBindings>
+		<KeyBinding Key="F7" Modifiers="Shift" Command="{x:Static hypermutus:Commands.SeekRelativeCommand}" CommandParameter="30" />
+		<KeyBinding Key="F7" Command="{x:Static hypermutus:Commands.SeekRelativeCommand}" CommandParameter="5" />
+		<KeyBinding Key="F4" Command="{x:Static hypermutus:Commands.SeekRelativeCommand}" CommandParameter="-5" />
+		<KeyBinding Key="F4" Modifiers="Shift" Command="{x:Static hypermutus:Commands.SeekRelativeCommand}" CommandParameter="-30" />
+		<KeyBinding Key="F6" Command="{x:Static hypermutus:Commands.SeekSabiCommand}" />
+	</Window.InputBindings>
+
 	<Grid>
 		<Grid.RowDefinitions>
 			<RowDefinition Height="Auto" />
 			<RowDefinition Height="Auto" />
 			<RowDefinition Height="*" />
+			<RowDefinition Height="Auto" />
 			<RowDefinition Height="Auto" />
 		</Grid.RowDefinitions>
 
@@ -64,14 +93,15 @@
 			</MenuItem>
 			<MenuItem Header="表示(_V)">
 				<MenuItem Name="menuItemCategoryVisible" Header="カテゴリ" IsCheckable="True" IsChecked="False" />
+				<MenuItem Name="menuItemFileNameColumnVisible" Header="ファイル名列" IsCheckable="True" IsChecked="False" />
 			</MenuItem>
 			<MenuItem Header="お試し">
 				<MenuItem Header="フィルタ" Click="MenuItemFilter_Click" />
 			</MenuItem>
 		</Menu>
 
-		<GroupBox Header="カテゴリ" HorizontalAlignment="Left" Height="105" Margin="20,6" Grid.Row="1"
-				VerticalAlignment="Top" Width="213"
+		<GroupBox Header="カテゴリ" HorizontalAlignment="Left" Margin="6,6" Grid.Row="1"
+				Width="213"
 				Visibility="{Binding ElementName=menuItemCategoryVisible, Path=IsChecked, Converter={StaticResource categoryVisibilityConverter}}">
 			<GroupBox.CommandBindings>
 				<CommandBinding Command="{x:Static local:Commands.AddCategoryCommand}"
@@ -82,7 +112,7 @@
 									SelectionChanged="comboBoxCategories_SelectionChanged"/>
 				<Expander Header="カテゴリ追加" Collapsed="Expander_Expanded" Expanded="Expander_Expanded">
 					<StackPanel Orientation="Horizontal">
-						<TextBox MinWidth="100" Margin="3" Name="textBoxNewCategory" ToolTip="追加するカテゴリの名前を入れて下さい。" />
+						<TextBox MinWidth="100" Margin="3,5" Name="textBoxNewCategory" ToolTip="追加するカテゴリの名前を入れて下さい。" />
 						<Button Content="追加" MinWidth="60" Margin="3"
 										Command="{x:Static local:Commands.AddCategoryCommand}"
 										CommandParameter="{Binding ElementName=textBoxNewCategory, Path=Text}" />
@@ -101,14 +131,58 @@
 				<DataGridTextColumn Header="No" Binding="{Binding Path=No, Converter={StaticResource noConverter}}" />
 				<DataGridTextColumn Header="Title" Binding="{Binding Path=Title}" />
 				<DataGridTextColumn Header="Artist" Binding="{Binding Path=Artist}" />
+				<!-- このVisibilityのバインディングが機能していない。
+				たぶんXAMLのスコープの話だと思うが、どうすればいいのかはよくわからない。-->
 				<DataGridTextColumn Header="FileName" Binding="{Binding Path=RelativeFileName}" IsReadOnly="True"
+														Visibility="{Binding ElementName=menuItemFileNameColumnVisible, Path=IsChecked,
+																									Converter={StaticResource fileNameVisibilityConverter}}"
 														/>
 				<DataGridTextColumn Header="Start" Binding="{Binding Path=PlayPos, Converter={StaticResource timeSpanDoubleConverter}}"
 														/>
 				<DataGridTextColumn Header="Sabi" Binding="{Binding Path=SabiPos, Converter={StaticResource timeSpanDoubleConverter}}" />
 			</DataGrid.Columns>
 		</DataGrid>
-		
-		<StatusBar Height="32" Grid.Row="3" />
+
+		<Expander Header="曲再生" Name="expanderSongPlayer" Margin="0" Grid.Row="3"
+							DataContext="{Binding RelativeSource={RelativeSource AncestorType=Window}, Path=CurrentSong}">
+			<Grid>
+				<Grid.RowDefinitions>
+					<RowDefinition Height="Auto" />
+					<RowDefinition Height="Auto" />
+				</Grid.RowDefinitions>
+				<Button Content="Play" Grid.Row="0" Height="30" Width="75"
+								HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,5"
+								Command="{x:Static hypermutus:Commands.SwitchPlayPauseCommand}" />
+				<Button Content="サビ" Grid.Row="0" Height="30" Width="75"
+								HorizontalAlignment="Left" VerticalAlignment="Top" Margin="99,5,0,5"
+								Command="{x:Static hypermutus:Commands.SeekSabiCommand}" />
+				<Button Content="サビ設定" Grid.Row="0" Height="30" Width="75"
+								HorizontalAlignment="Left" VerticalAlignment="Top" Margin="290,5,0,5"
+								Command="{x:Static grand:Commands.SetSabiPosCommand}" />
+				<TextBox HorizontalAlignment="Left" Grid.Row="0" Height="30" Margin="385,5,0,5"
+									TextWrapping="Wrap" Text="{Binding Path=SabiPos, StringFormat=m\\:ss\\.ff}"
+									VerticalAlignment="Top" Width="77" HorizontalContentAlignment="Right" VerticalContentAlignment="Center"/>
+				<ud:UpDownControl Grid.Row="0" Height="30" Width="36" Margin="462,5,0,5" HorizontalAlignment="Left" VerticalAlignment="Top"
+									UpClick="UpDownControl_UpClick" DownClick="UpDownControl_DownClick" />
+				<Slider HorizontalAlignment="Left" Grid.Row="0" Margin="590,12,0,5" VerticalAlignment="Top" Width="166" ToolTip="音量"
+								Value="{Binding RelativeSource={RelativeSource AncestorType=local:MainWindow}, Path=SongPlayer.Volume}"
+								Maximum="1" Minimum="0" SmallChange="0.01" LargeChange="0.1" />
+				<Slider HorizontalAlignment="Left" Grid.Row="1" Height="41" Margin="31,12,0,0" VerticalAlignment="Top" Width="324"
+								TickFrequency="60" Maximum="100" Minimum="0" Name="sliderSeekSong" TickPlacement="BottomRight"
+								LargeChange="30" SmallChange="5"
+								Value="{Binding RelativeSource={RelativeSource AncestorType=Window},
+												Path=SongPlayer.CurrentPosition, Mode=TwoWay, Converter={StaticResource timeSpanDoubleConverter}}"/>
+				<Label Name="labelCurrentPosition2"  Grid.Row="1"
+								Content="{Binding RelativeSource={RelativeSource AncestorType=Window},
+													Path=SongPlayer.CurrentPosition, Mode=OneWay}" ContentStringFormat="m\:ss"
+								HorizontalAlignment="Left"
+								Margin="421,23,0,0" VerticalAlignment="Top"/>
+				<Label Name="labelDuration"
+								HorizontalAlignment="Left" ContentStringFormat="m\:ss" Content="{x:Static sys:TimeSpan.Zero}"
+								Margin="521,23,0,0" Grid.Row="1" VerticalAlignment="Top"/>
+			</Grid>
+		</Expander>
+
+		<StatusBar Height="32" Grid.Row="4" />
 	</Grid>
 </base:BasicWindow>

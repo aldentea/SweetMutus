@@ -15,6 +15,7 @@ using System.Windows.Shapes;
 
 using Aldentea.Wpf.Application;
 using System.ComponentModel;
+using HyperMutus;
 
 namespace Aldentea.SweetMutus
 {
@@ -23,7 +24,7 @@ namespace Aldentea.SweetMutus
 	/// <summary>
 	/// MainWindow.xaml の相互作用ロジック
 	/// </summary>
-	public partial class MainWindow : BasicWindow
+	public partial class MainWindow : BasicWindow, INotifyPropertyChanged
 	{
 
 		#region プロパティ
@@ -40,12 +41,20 @@ namespace Aldentea.SweetMutus
 			InitializeComponent();
 			this.FileHistoryShortcutParent = menuItemHistory;
 
+
 			MyDocument.Initialized += MyDocument_Initialized;
 			MyDocument.Opened += MyDocument_Opened;
+
+			//複数曲追加
+			//this.MyDocument.AddSongsAction = this.AddSongsParallel;
 
 			dataGridQuestions.Items.SortDescriptions.Add(
 				new SortDescription { Direction = ListSortDirection.Ascending, PropertyName = "No" }
 			);
+
+			// 曲再生関連
+			//_songPlayer.Volume = App.Current.MySettings.SongPlayerVolume;
+			_songPlayer.MediaOpened += SongPlayer_MediaOpened;
 
 			CommandBindings.Add(
 				new CommandBinding(ApplicationCommands.Close,
@@ -310,17 +319,164 @@ namespace Aldentea.SweetMutus
 		}
 
 
+		#region 曲再生関連
+
+		#region *SongPlayerプロパティ
+		public HyperMutus.SongPlayer SongPlayer
+		{
+			get
+			{
+				return _songPlayer;
+			}
+		}
+		HyperMutus.SongPlayer _songPlayer = new HyperMutus.SongPlayer();
+		#endregion
+
+
+		// (0.3.2)プロパティ化。
+		#region *CurrentSongプロパティ
+		public SweetQuestion CurrentSong
+		{
+			get { return _currentSong; }
+			set
+			{
+				if (_currentSong != value)
+				{
+					_currentSong = value;
+					NotifyPropertyChanged("CurrentSong");
+				}
+			}
+		}
+		SweetQuestion _currentSong = null;
+		#endregion
+
+		//DispatcherTimer _songPlayerTimer = null;
+
+		// (0.3.2)
+
+		void SongPlayer_MediaOpened(object sender, EventArgs e)
+		{
+			if (_songPlayer.Duration.HasValue)
+			{
+				this.labelDuration.Content = _songPlayer.Duration.Value;
+				this.sliderSeekSong.Maximum = _songPlayer.Duration.Value.TotalSeconds;
+			}
+		}
+
+		#region Playコマンド
+		void Play_Executed(object sender, ExecutedRoutedEventArgs e)
+		{
+			if (e.Parameter is SweetQuestion)
+			{
+				var song = (SweetQuestion)e.Parameter;
+				_songPlayer.Open(song.FileName);
+				//_songPlayerTimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(0.25) }; // 可変にする？
+				//_songPlayerTimer.Tick += SongPlayerTimer_Tick;
+				//_songPlayerTimer.IsEnabled = true;
+				this.CurrentSong = song;
+				_songPlayer.Play();
+			}
+		}
+
+		void Play_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+		{
+			e.CanExecute = e.Parameter is SweetQuestion;
+		}
+		#endregion
+
+
+		#region SwitchPlayPauseコマンド
+		void SwitchPlayPause_Executed(object sender, ExecutedRoutedEventArgs e)
+		{
+			if (_songPlayer.CurrentState != SongPlayer.State.Inactive)
+			{
+				_songPlayer.TogglePlayPause();
+			}
+		}
+		#endregion
+
+		void SeekRelative_executed(object sender, ExecutedRoutedEventArgs e)
+		{
+			if (_songPlayer.CurrentState != SongPlayer.State.Inactive)
+			{
+				double sec;
+				if (Double.TryParse(e.Parameter.ToString(), out sec))
+				{
+				_songPlayer.CurrentPosition = _songPlayer.CurrentPosition.Add(TimeSpan.FromSeconds(sec));
+				}
+			}
+		}
+
+		void SeekSabi_Executed(object sender, ExecutedRoutedEventArgs e)
+		{
+			if (_songPlayer.CurrentState != SongPlayer.State.Inactive)
+			{
+				_songPlayer.CurrentPosition = _currentSong.SabiPos;
+			}
+		}
+
+		void SongPlayer_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+		{
+			e.CanExecute = _songPlayer.CurrentState != SongPlayer.State.Inactive;
+		}
+
+		#region SetSabiPosコマンド
+		void SetSabiPos_Executed(object sender, ExecutedRoutedEventArgs e)
+		{
+			if (_songPlayer.CurrentState != SongPlayer.State.Inactive)
+			{
+				_currentSong.SabiPos = _songPlayer.CurrentPosition;
+			}
+		}
+		#endregion
+
+		private void UpDownControl_UpClick(object sender, RoutedEventArgs e)
+		{
+			if (CurrentSong != null)
+			{
+				CurrentSong.SabiPos += TimeSpan.FromSeconds(0.1);
+			}
+		}
+
+		private void UpDownControl_DownClick(object sender, RoutedEventArgs e)
+		{
+			if (CurrentSong != null)
+			{
+				CurrentSong.SabiPos += TimeSpan.FromSeconds(-0.1);
+			}
+		}
+		#endregion
+
+		//	#endregion
+
+		#region INotifyPropertyChanged実装
+
+		public event PropertyChangedEventHandler PropertyChanged = delegate { };
+
+		protected void NotifyPropertyChanged(string propertyName)
+		{
+			this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+		}
+		#endregion
+
 		#region お試し
 
 		private void MenuItemFilter_Click(object sender, RoutedEventArgs e)
 		{
-			dataGridQuestions.Items.Filter = (q) => { return ((SweetQuestion)q).Category == "tanuki"; };
-			dataGridQuestions.Items.SortDescriptions.Add(
-				new SortDescription { Direction = ListSortDirection.Ascending, PropertyName = "No" }
-			);
+			//dataGridQuestions.Items.Filter = (q) => { return ((SweetQuestion)q).Category == "tanuki"; };
+			//dataGridQuestions.Items.SortDescriptions.Add(
+			//	new SortDescription { Direction = ListSortDirection.Ascending, PropertyName = "No" }
+			//);
+			var song = dataGridQuestions.SelectedItem as SweetQuestion;
+			if (song != null)
+			{
+				MediaCommands.Play.Execute(song, this);
+				this.expanderSongPlayer.IsExpanded = true;
+			}
 		}
 
 		#endregion
+
 
 	}
 
