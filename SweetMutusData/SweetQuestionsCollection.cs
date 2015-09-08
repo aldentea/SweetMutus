@@ -10,6 +10,7 @@ using System.Collections.Specialized;
 using GrandMutus.Data;
 using System.Xml.Linq;
 using System.IO;
+using Aldentea.Wpf.Document;
 
 namespace Aldentea.SweetMutus.Data
 {

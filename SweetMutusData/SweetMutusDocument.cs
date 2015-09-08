@@ -4,11 +4,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-//using Aldentea.Wpf.Document;
+using Aldentea.Wpf.Document;
 using System.Xml;
 using System.Xml.Linq;
 using GrandMutus.Data;
 using System.IO;
+
 
 namespace Aldentea.SweetMutus.Data
 {
@@ -291,9 +292,10 @@ namespace Aldentea.SweetMutus.Data
 
 		#region DocumentBase実装
 
-		protected override void Initialize()
+		// (0.1.0)基底クラスのメソッド名の変更を反映．
+		protected override void InitializeDocument()
 		{
-			base.Initialize();
+			base.InitializeDocument();
 			Questions.Initialize();
 		}
 

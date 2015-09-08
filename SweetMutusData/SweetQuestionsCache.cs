@@ -12,7 +12,7 @@ namespace Aldentea.SweetMutus.Data
 	// ほとんどQuestionsCacheのコピペ．
 
 	#region [abstract]SweetQuestionsCacheクラス
-	public abstract class SweetQuestionsCache : GrandMutus.Data.IOperationCache
+	public abstract class SweetQuestionsCache : IOperationCache
 	{
 
 		public SweetMutusDocument Document { get; protected set; }
@@ -27,7 +27,7 @@ namespace Aldentea.SweetMutus.Data
 		}
 
 		public abstract void Reverse();
-		public abstract bool CanCancelWith(GrandMutus.Data.IOperationCache other);
+		public abstract bool CanCancelWith(IOperationCache other);
 
 		/// <summary>
 		/// Questionsプロパティの中身が同一であればtrueを返します．
@@ -61,7 +61,7 @@ namespace Aldentea.SweetMutus.Data
 			Document.RemoveQuestions(this.Questions);
 		}
 
-		public override bool CanCancelWith(GrandMutus.Data.IOperationCache other)
+		public override bool CanCancelWith(IOperationCache other)
 		{
 			//return false;
 			return other is SweetQuestionsRemovedCache
@@ -86,7 +86,7 @@ namespace Aldentea.SweetMutus.Data
 			Document.AddQuestions(this.Questions);
 		}
 
-		public override bool CanCancelWith(GrandMutus.Data.IOperationCache other)
+		public override bool CanCancelWith(IOperationCache other)
 		{
 			return other is SweetQuestionsAddedCache
 				&& ((SweetQuestionsCache)other).Document == this.Document
@@ -112,7 +112,7 @@ namespace Aldentea.SweetMutus.Data
 			_questionsCollection.RootDirectory = this._previousValue;
 		}
 
-		public override bool CanCancelWith(GrandMutus.Data.IOperationCache other)
+		public override bool CanCancelWith(IOperationCache other)
 		{
 			var other_cache = other as RootDirectoryChangedCache;
 			if (other_cache == null)
@@ -165,7 +165,7 @@ namespace Aldentea.SweetMutus.Data
 		// そもそもoperationCache.Reverse(); だけでアンドゥできる仕組みだったのに，
 		// 実装側のコードが複雑になってしまっては意味がないのではないか？
 
-		public override bool CanCancelWith(GrandMutus.Data.IOperationCache other)
+		public override bool CanCancelWith(IOperationCache other)
 		{
 			var other_cache = other as QuestionTitleChangedCache;
 			if (other_cache == null)
@@ -203,7 +203,7 @@ namespace Aldentea.SweetMutus.Data
 			_question.Artist = _previousValue;
 		}
 
-		public override bool CanCancelWith(GrandMutus.Data.IOperationCache other)
+		public override bool CanCancelWith(IOperationCache other)
 		{
 			var other_cache = other as QuestionArtistChangedCache;
 			if (other_cache == null)
@@ -236,7 +236,7 @@ namespace Aldentea.SweetMutus.Data
 			_question.SabiPos = _previousValue;
 		}
 
-		public override bool CanCancelWith(GrandMutus.Data.IOperationCache other)
+		public override bool CanCancelWith(IOperationCache other)
 		{
 			var other_cache = other as QuestionSabiPosChangedCache;
 			if (other_cache == null)
@@ -269,7 +269,7 @@ namespace Aldentea.SweetMutus.Data
 			_question.No = this._previousValue;
 		}
 
-		public override bool CanCancelWith(GrandMutus.Data.IOperationCache other)
+		public override bool CanCancelWith(IOperationCache other)
 		{
 			if (other is QuestionNoChangedCache)
 			{
