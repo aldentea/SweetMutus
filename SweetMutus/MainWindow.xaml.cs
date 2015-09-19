@@ -76,6 +76,14 @@ namespace Aldentea.SweetMutus
 		}
 		#endregion
 
+		// (0.0.2)
+		#region SaveAsMtq
+		private void SaveAsMtq_Executed(object sender, ExecutedRoutedEventArgs e)
+		{
+			this.SaveAsMtq();
+		}
+		#endregion
+
 		#region Undo
 
 		private void Undo_Executed(object sender, ExecutedRoutedEventArgs e)
@@ -268,6 +276,18 @@ namespace Aldentea.SweetMutus
 
 		#endregion
 
+
+		void SaveAsMtq()
+		{
+			var dialog = new Microsoft.Win32.SaveFileDialog { Filter = "mtqファイル(*.mtq)|*.mtq", DefaultExt = ".mtq" };
+			if (dialog.ShowDialog() == true)
+			{
+				this.Document.SaveCopyAs(dialog.FileName);
+
+			}
+		}
+
+
 		void Export()
 		{
 			// ファイル名選択
@@ -445,6 +465,7 @@ namespace Aldentea.SweetMutus
 				CurrentSong.SabiPos += TimeSpan.FromSeconds(-0.1);
 			}
 		}
+
 		#endregion
 
 		//	#endregion
@@ -484,25 +505,5 @@ namespace Aldentea.SweetMutus
 
 
 
-	// とりあえずここに置いておく．
-	public static class Commands
-	{
-		/// <summary>
-		/// 曲ファイルを選択して問題を追加します．
-		/// </summary>
-		//public static RoutedCommand AddQuestionsCommand = new RoutedCommand();
-
-		/// <summary>
-		/// 出題曲をエクスポートします．
-		/// </summary>
-		public static RoutedCommand ExportCommand = new RoutedCommand();
-
-		/// <summary>
-		/// 新たなカテゴリを追加します。
-		/// </summary>
-		public static RoutedCommand AddCategoryCommand = new RoutedCommand();
-
-		//public static RoutedCommand SetSabiPosCommand = new RoutedCommand();
-	}
 
 }
