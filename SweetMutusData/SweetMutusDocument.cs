@@ -363,7 +363,8 @@ namespace Aldentea.SweetMutus.Data
 			switch (ext)
 			{
 				case ".mtu":
-					return SaveMtuDocument(destination);
+				case ".mtq":
+					return SaveMtqDocument(destination);
 				default:
 					return SaveSmtDocument(destination);
 			}
@@ -382,7 +383,7 @@ namespace Aldentea.SweetMutus.Data
 			return true;
 		}
 
-		bool SaveMtuDocument(string destination)
+		bool SaveMtqDocument(string destination)
 		{
 			using (XmlWriter writer = XmlWriter.Create(destination, this.WriterSettings))
 			{
