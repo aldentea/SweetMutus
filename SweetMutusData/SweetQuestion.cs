@@ -195,8 +195,41 @@ namespace Aldentea.SweetMutus.Data
 		/// <returns></returns>
 		public XElement GenerateElement(string songs_root, bool exporting = false)
 		{
-			var element = new XElement(ELEMENT_NAME);
-			element.Add(new XAttribute(ID_ATTRIBUTE, this.ID));
+			var element = new XElement(ELEMENT_NAME,
+				new XAttribute(ID_ATTRIBUTE, this.ID)
+			);
+			return AddSongProperty(AddIntroQuestionProperty(element), songs_root, exporting);
+		}
+		#endregion
+
+		// (0.1.1)
+		#region Mtuファイル出力用メソッド
+
+		public XElement GenerateQuestionElement()
+		{
+			var element = new XElement(GrandMutus.Data.IntroQuestion.ELEMENT_NAME
+				, new XAttribute("id", this.ID), new XAttribute("song_id", this.ID)
+			);
+
+			return AddIntroQuestionProperty(element);
+		}
+
+		public XElement GenerateSongElement(string songs_root, bool exporting = false)
+		{
+			var element = new XElement(GrandMutus.Data.Song.ELEMENT_NAME,
+				new XAttribute("id", this.ID)
+			);
+			return AddSongProperty(element, songs_root, exporting);
+		}
+
+		#endregion
+
+		#region プロパティをXElementに出力
+
+		XElement AddIntroQuestionProperty(XElement element)
+		{
+			// ※IDやSongIDはここでは追加しない！
+
 			if (this.No.HasValue)
 			{
 				element.Add(new XAttribute(NO_ATTRIBUTE, this.No));
@@ -205,11 +238,19 @@ namespace Aldentea.SweetMutus.Data
 			{
 				element.Add(new XAttribute(CATEGORY_ATTRIBUTE, this.Category));
 			}
-			// (0.3.3)とりあえず従前のように秒数を出力しておく．
 			if (this.PlayPos > TimeSpan.Zero)
 			{
 				element.Add(new XAttribute(PLAY_POS_ATTRIBUTE, this.PlayPos.TotalSeconds));
 			}
+
+			// ☆answer要素はどうする？
+			return element;
+		}
+
+		XElement AddSongProperty(XElement element, string songs_root, bool exporting = false)
+		{
+			// ※IDはここでは追加しない！
+
 			if (this.SabiPos > TimeSpan.Zero)
 			{
 				element.Add(new XAttribute(SABI_POS_ATTRIBUTE, this.SabiPos.TotalSeconds));
@@ -231,11 +272,11 @@ namespace Aldentea.SweetMutus.Data
 				file_name = file_full_name;
 			}
 			element.Add(new XElement(FILE_NAME_ELEMENT, file_name));
+
 			return element;
 		}
+
 		#endregion
-
-
 
 		// (0.3.3)
 		#region *[static]XML要素からオブジェクトを生成(Generate)

@@ -272,6 +272,26 @@ namespace Aldentea.SweetMutus.Data
 		}
 		#endregion
 
+		// (0.1.1)
+		#region *HyperMutusのXMLを生成(GenerateMtuXML)
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="destination_directory">出力されるXMLファイルのディレクトリのフルパスを与えます．</param>
+		/// <param name="exported_songs_root">エクスポートするときは，その曲を格納するディレクトリの名前を与えます．
+		/// そうでなければnullを与えます．</param>
+		/// <returns></returns>
+		public XDocument GenerateMtuXml(string destination_directory, string exported_songs_root = null)
+		{
+			XDocument xdoc = new XDocument(new XElement(ROOT_ELEMENT_NAME, new XAttribute(VERSION_ATTERIBUTE, "3.0")));
+
+			xdoc.Root.Add(Questions.GenerateQuestionsElement());
+			xdoc.Root.Add(Questions.GenerateSongsElement(destination_directory, exported_songs_root));
+
+			return xdoc;
+		}
+		#endregion
+
 		#endregion
 
 		/// <summary>
@@ -336,6 +356,23 @@ namespace Aldentea.SweetMutus.Data
 
 		protected override bool SaveDocument(string destination)
 		{
+			
+			// 拡張子に応じてフォーマットを決める。
+			var ext = Path.GetExtension(destination);	// extには"."を含む。
+
+			switch (ext)
+			{
+				case ".mtu":
+					return SaveMtuDocument(destination);
+				default:
+					return SaveSmtDocument(destination);
+			}
+
+		}
+		#endregion
+
+		bool SaveSmtDocument(string destination)
+		{
 			using (XmlWriter writer = XmlWriter.Create(destination, this.WriterSettings))
 			{
 				GenerateXml(System.IO.Path.GetDirectoryName(destination)).WriteTo(writer);
@@ -344,7 +381,15 @@ namespace Aldentea.SweetMutus.Data
 			// falseを返すべきなのは，保存する前にキャンセルした時とかかな？
 			return true;
 		}
-		#endregion
+
+		bool SaveMtuDocument(string destination)
+		{
+			using (XmlWriter writer = XmlWriter.Create(destination, this.WriterSettings))
+			{
+				GenerateMtuXml(System.IO.Path.GetDirectoryName(destination)).WriteTo(writer);
+			}
+			return true;
+		}
 
 
 		#endregion

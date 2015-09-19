@@ -394,7 +394,6 @@ namespace Aldentea.SweetMutus.Data
 		/// <returns></returns>
 		public XElement GenerateElement(string destination_directory, string export_songs_root = null)
 		{
-			XElement element = new XElement(ELEMENT_NAME);
 
 			// path属性について，以下の3つのパターンがある．
 			// 1. 絶対パスを記述．
@@ -402,8 +401,51 @@ namespace Aldentea.SweetMutus.Data
 			// 3. 記述なし．
 
 			bool exporting = !string.IsNullOrEmpty(export_songs_root);
-			var songs_root =  exporting ? export_songs_root : this.RootDirectory;
+			var songs_root = exporting ? export_songs_root : this.RootDirectory;
 
+			XElement element = AddRootDirectoryProperty(new XElement(ELEMENT_NAME), destination_directory, songs_root);
+
+			foreach (var question in this.Items)
+			{
+				element.Add(question.GenerateElement(songs_root, exporting));
+			}
+
+			return element;
+		}
+		#endregion
+
+		#region HyperMutus用ドキュメント出力関係
+
+		// (0.1.1)
+		public XElement GenerateSongsElement(string destination_directory, string export_songs_root = null)
+		{
+			bool exporting = !string.IsNullOrEmpty(export_songs_root);
+			var songs_root = exporting ? export_songs_root : this.RootDirectory;
+
+			XElement element = AddRootDirectoryProperty(new XElement("songs"), destination_directory, songs_root);
+			foreach (var question in this.Items)
+			{
+				element.Add(question.GenerateSongElement(songs_root, exporting));
+			}
+			return element;
+		}
+
+		// (0.1.1)
+		public XElement GenerateQuestionsElement()
+		{
+			var element = new XElement("questions");
+			foreach (var question in this.Items)
+			{
+				element.Add(question.GenerateQuestionElement());
+			}
+			return element;
+		}
+
+		#endregion
+
+		// (0.1.1)GenerateXMLから分離。
+		XElement AddRootDirectoryProperty(XElement element, string destination_directory, string songs_root)
+		{
 			if (songs_root.Contains(destination_directory))
 			{
 				if (songs_root == destination_directory)
@@ -426,15 +468,8 @@ namespace Aldentea.SweetMutus.Data
 					element.Add(new XAttribute(PATH_ATTRIBUTE, songs_root));
 				}
 			}
-
-			foreach (var question in this.Items)
-			{
-				element.Add(question.GenerateElement(songs_root, exporting));
-			}
-
 			return element;
 		}
-		#endregion
 
 		#region *questionsElementを読み込む(LoadElement)
 		public void LoadElement(XElement questionsElement, string source_directory)
