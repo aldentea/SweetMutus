@@ -32,6 +32,8 @@
 										Executed="Export_Executed" CanExecute="Always_CanExecute" />
 		<CommandBinding Command="{x:Static grand:Commands.SetRootDirectoryCommand}"
 										Executed="SetRootDirectory_Executed" CanExecute="Always_CanExecute" />
+		<CommandBinding Command="{x:Static local:Commands.SaveAsMtqCommand}"
+										Executed="SaveAsMtq_Executed" CanExecute="Always_CanExecute" />
 		<CommandBinding Command="Play"
 										Executed="Play_Executed"
 										CanExecute="Play_CanExecute" />
@@ -75,6 +77,8 @@
 				<MenuItem Header="保存(_S)" Command="Save" />
 				<MenuItem Header="名前をつけて保存(_A)" Command="SaveAs" />
 				<MenuItem Header="エクスポート(_E)" Command="{x:Static local:Commands.ExportCommand}" />
+				<MenuItem Header="HyperMutus用に保存(_M)" Command="{x:Static local:Commands.SaveAsMtqCommand}" />
+				<Separator />
 				<MenuItem Header="終了(_X)" Command="Close" />
 			</MenuItem>
 			<MenuItem Header="編集(_E)">
@@ -138,7 +142,13 @@
 																									Converter={StaticResource fileNameVisibilityConverter}}"
 														/>
 				<DataGridTextColumn Header="Start" Binding="{Binding Path=PlayPos, Converter={StaticResource timeSpanDoubleConverter}}"
-														/>
+														>
+					<DataGridTextColumn.CellStyle>
+						<Style TargetType="DataGridCell">
+							<Setter Property="HorizontalContentAlignment" Value="Right" />
+						</Style>
+					</DataGridTextColumn.CellStyle>
+				</DataGridTextColumn>
 				<DataGridTextColumn Header="Sabi" Binding="{Binding Path=SabiPos, Converter={StaticResource timeSpanDoubleConverter}}" />
 			</DataGrid.Columns>
 		</DataGrid>
