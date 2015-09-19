@@ -17,8 +17,9 @@
 		<grand:NullableIntConverter x:Key="noConverter" />
 		<grand:VisibilityConverter x:Key="categoryVisibilityConverter" />
 		<grand:VisibilityConverter x:Key="fileNameVisibilityConverter" />
-		<Style TargetType="DataGridCell" x:Key="numericCellStyle">
+		<Style TargetType="TextBlock" x:Key="numericCellStyle">
 			<Setter Property="HorizontalAlignment" Value="Right" />
+			<Setter Property="Padding" Value="4,0" />
 		</Style>
 	</Window.Resources>
 	<Window.Title>
@@ -57,6 +58,9 @@
 		<CommandBinding Command="{x:Static local:Commands.SaveSongInformationCommand}"
 										Executed="SaveSongInformation_Executed"
 										CanExecute="SaveSongInformation_CanExecute" />
+		<CommandBinding Command="{x:Static local:Commands.ChangeFileNameCommand}"
+										Executed="ChangeFileName_Executed"
+										CanExecute="ChangeFileName_CanExecute" />
 	</Window.CommandBindings>
 	<Window.InputBindings>
 		<KeyBinding Key="F7" Modifiers="Shift" Command="{x:Static hypermutus:Commands.SeekRelativeCommand}" CommandParameter="30" />
@@ -65,6 +69,8 @@
 		<KeyBinding Key="F4" Modifiers="Shift" Command="{x:Static hypermutus:Commands.SeekRelativeCommand}" CommandParameter="-30" />
 		<KeyBinding Key="F6" Command="{x:Static hypermutus:Commands.SeekSabiCommand}" />
 		<KeyBinding Key="I" Modifiers="Control" Command="{x:Static local:Commands.SaveSongInformationCommand}"
+								CommandParameter="{Binding ElementName=dataGridQuestions, Path=SelectedItem}" />
+		<KeyBinding Key="R" Modifiers="Control" Command="{x:Static local:Commands.ChangeFileNameCommand}"
 								CommandParameter="{Binding ElementName=dataGridQuestions, Path=SelectedItem}" />
 	</Window.InputBindings>
 
@@ -140,23 +146,21 @@
 							>
 			<DataGrid.Columns>
 				<DataGridTextColumn Header="#" Binding="{Binding Path=ID}" IsReadOnly="True"
-														CellStyle="{StaticResource numericCellStyle}" />
+														ElementStyle="{StaticResource numericCellStyle}" />
 				<DataGridTextColumn Header="No" Binding="{Binding Path=No, Converter={StaticResource noConverter}}"
-														CellStyle="{StaticResource numericCellStyle}" />
+														ElementStyle="{StaticResource numericCellStyle}" />
 				<DataGridTextColumn Header="Title" Binding="{Binding Path=Title}" Width="*" />
 				<DataGridTextColumn Header="Artist" Binding="{Binding Path=Artist}" Width="*" />
 				<!-- このVisibilityのバインディングが機能していない。
 				たぶんXAMLのスコープの話だと思うが、どうすればいいのかはよくわからない。-->
-<!--				<DataGridTextColumn Header="FileName" Binding="{Binding Path=RelativeFileName}" IsReadOnly="True"
+				<DataGridTextColumn Header="FileName" Binding="{Binding Path=RelativeFileName}" IsReadOnly="True"
 														Visibility="{Binding ElementName=menuItemFileNameColumnVisible, Path=IsChecked,
 																									Converter={StaticResource fileNameVisibilityConverter}}"
 														/>
--->				<DataGridTextColumn Header="FileName" Binding="{Binding Path=RelativeFileName}" IsReadOnly="True"
-														Visibility="Collapsed"		/>
 				<DataGridTextColumn Header="Start" Binding="{Binding Path=PlayPos, Converter={StaticResource timeSpanDoubleConverter}}"
-														CellStyle="{StaticResource numericCellStyle}" MinWidth="60" />
+														ElementStyle="{StaticResource numericCellStyle}" MinWidth="60" />
 				<DataGridTextColumn Header="Sabi" Binding="{Binding Path=SabiPos, Converter={StaticResource timeSpanDoubleConverter}}"
-														CellStyle="{StaticResource numericCellStyle}" MinWidth="60" />
+														ElementStyle="{StaticResource numericCellStyle}" MinWidth="60" />
 			</DataGrid.Columns>
 		</DataGrid>
 

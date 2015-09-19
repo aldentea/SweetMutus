@@ -184,6 +184,7 @@ namespace Aldentea.SweetMutus.Data
 		string _titleCache = string.Empty;	// 手抜き．Songオブジェクト自体もキャッシュするべき．
 		string _artistCache = string.Empty;
 		TimeSpan _sabiPosCache = TimeSpan.Zero;
+		string _fileNameCache = string.Empty;
 
 		void Question_PropertyChanging(object sender, System.ComponentModel.PropertyChangingEventArgs e)
 		{
@@ -198,6 +199,9 @@ namespace Aldentea.SweetMutus.Data
 					break;
 				case "SabiPos":
 					this._sabiPosCache = song.SabiPos;
+					break;
+				case "FileName":
+					this._fileNameCache = song.FileName;
 					break;
 			}
 		}
@@ -228,6 +232,13 @@ namespace Aldentea.SweetMutus.Data
 						Item = new QuestionSabiPosChangedCache(song, _sabiPosCache, song.SabiPos)
 					});
 					_sabiPosCache = TimeSpan.Zero;
+					break;
+				case "FileName":
+					this.ItemChanged(this, new ItemEventArgs<IOperationCache>
+					{
+						Item = new QuestionFileNameChangedCache(song, _fileNameCache, song.FileName)
+					});
+					_fileNameCache = string.Empty;
 					break;
 				case "No":
 					// 整番処理は複雑なのでここでは行わない(Question_NoChangedで行う)。

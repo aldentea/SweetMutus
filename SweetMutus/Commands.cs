@@ -29,6 +29,9 @@ namespace Aldentea.SweetMutus
 		//public static RoutedCommand SetSabiPosCommand = new RoutedCommand();
 
 		public static RoutedCommand SaveSongInformationCommand = new RoutedCommand();
+
+		public static RoutedCommand ChangeFileNameCommand = new RoutedCommand();
+
 	}
 
 }

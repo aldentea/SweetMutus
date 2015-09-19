@@ -183,6 +183,39 @@ namespace Aldentea.SweetMutus
 		{
 			e.CanExecute = (e.Parameter is SweetQuestion);
 		}
+	
+		#endregion
+
+		#region ChangeFileName
+
+		private void ChangeFileName_Executed(object sender, ExecutedRoutedEventArgs e)
+		{
+			if (e.Parameter is SweetQuestion)
+			{
+				SweetQuestion question = (SweetQuestion)e.Parameter;
+				// 手抜きだがここに処理を書く。
+				var dialog = new ChangeFileNameDialog { FileName = question.FileName };
+				if (dialog.ShowDialog() == true)
+				{
+					try
+					{
+						System.IO.File.Move(question.FileName, dialog.FileName);
+						question.FileName = dialog.FileName;
+					}
+					catch (System.IO.IOException ex)
+					{
+						MessageBox.Show(ex.Message);
+					}
+				}
+			}
+
+		}
+
+		private void ChangeFileName_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+		{
+			e.CanExecute = (e.Parameter is SweetQuestion);
+		}
+
 		#endregion
 
 

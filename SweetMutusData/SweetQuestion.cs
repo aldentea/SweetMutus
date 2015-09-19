@@ -39,6 +39,7 @@ namespace Aldentea.SweetMutus.Data
 		string _title = string.Empty;
 		#endregion
 
+		// (0.1.2)RelativeFileNameプロパティの変更を通知。
 		#region *FileNameプロパティ
 		/// <summary>
 		/// 曲のファイル名を(とりあえずフルパスで)取得／設定します．
@@ -53,8 +54,10 @@ namespace Aldentea.SweetMutus.Data
 			{
 				if (FileName != value)
 				{
+					NotifyPropertyChanging("FileName");
 					this._fileName = value;
 					NotifyPropertyChanged("FileName");
+					NotifyPropertyChanged("RelativeFileName");
 				}
 			}
 		}
