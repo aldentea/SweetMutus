@@ -134,6 +134,66 @@ namespace Aldentea.SweetMutus.Data
 			this.NotifyPropertyChanged("RelativeFileName");
 		}
 
+		// (0.1.2)
+		#region *SongTagプロパティ
+		/// <summary>
+		/// 予め指定した形式で，曲ファイルのメタデータのオブジェクトを取得します．
+		/// ※いまのところは常にID3v23を返すようになっています．
+		/// </summary>
+		public SPP.Aldente.IID3Tag SongTag
+		{
+			get
+			{
+				// とりあえずID3v23を生成する．
+				return new SPP.Aldente.ID3v23Tag {
+					Title = this.Title,
+					Artist = this.Artist,
+					SabiPos = Convert.ToDecimal(this.SabiPos.TotalSeconds),
+					StartPos = Convert.ToDecimal(this.PlayPos.TotalSeconds)
+				};
+			}
+		}
+		#endregion
+
+		// (0.1.2)
+		// 08/19/2013 by aldentea : ★★RealFileNameプロパティの廃止に対応．
+		// 09/29/2011 by aldentea
+		#region *曲情報を曲ファイルに保存(SaveInfomation)
+		/// <summary>
+		/// 曲情報を曲ファイルのメタデータとして保存します．再生開始位置と再生停止位置は0.0で置き換えるので注意して下さい．
+		/// </summary>
+		public int SaveInformation()
+		{
+			// startPosとStopPosは0.0Mで書き換える！
+			if (File.Exists(this.FileName))
+			{ 
+//			int ret = 0;
+//			while (true)
+//			{
+//				try
+//				{
+					// ひどいAPIだね．
+					//aldente.AldenteMP3TagAccessor.UpdateInfo(this.Title, this.Artist, this.SabiPos, 0.0M, 0.0M, this.RealFileName, 88);
+					//AldenteMP3TagAccessor.UpdateInfo(this.Title, this.Artist, this.SabiPos, 0.0M, 0.0M, this.FileName, 88);
+
+					// ※それでは，どうすればいいか？
+					// IID3Tagの基礎的な実装をしたクラスを用意する(ただしI/Oは未実装)．
+					// で，それをUpdateInfoに渡す．
+					SPP.Aldente.AldenteMP3TagAccessor.UpdateInfo(this.FileName, this.SongTag);
+
+
+//					break;
+//				}
+//				catch (IOException ex)
+//				{
+//					ret += 1;
+//					if (ret > 100) { throw ex; }
+//				}
+			}
+//			return ret;
+					return 0;
+		}
+		#endregion
 
 		#endregion
 

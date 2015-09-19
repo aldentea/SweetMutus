@@ -163,6 +163,29 @@ namespace Aldentea.SweetMutus
 		
 		#endregion
 
+
+		#region SaveSongInformation
+
+		private void SaveSongInformation_Executed(object sender, ExecutedRoutedEventArgs e)
+		{
+			if (e.Parameter is SweetQuestion)
+			{
+				SweetQuestion question = (SweetQuestion)e.Parameter;
+				if (this.SongPlayer.MediaSource == new Uri(question.FileName))
+				{
+					this.SongPlayer.Close();
+				}
+				question.SaveInformation();
+			}
+		}
+
+		private void SaveSongInformation_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+		{
+			e.CanExecute = (e.Parameter is SweetQuestion);
+		}
+		#endregion
+
+
 		#endregion
 
 
@@ -172,6 +195,10 @@ namespace Aldentea.SweetMutus
 		{
 			this.comboBoxCategories.Items.Clear();
 			this.comboBoxCategories.Items.Add(string.Empty);
+
+			this.SongPlayer.Close();
+			this.CurrentSong = null;
+			this.expanderSongPlayer.IsExpanded = false;
 		}
 
 		void MyDocument_Opened(object sender, EventArgs e)

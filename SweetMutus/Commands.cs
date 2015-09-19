@@ -27,6 +27,8 @@ namespace Aldentea.SweetMutus
 		public static RoutedCommand AddCategoryCommand = new RoutedCommand();
 
 		//public static RoutedCommand SetSabiPosCommand = new RoutedCommand();
+
+		public static RoutedCommand SaveSongInformationCommand = new RoutedCommand();
 	}
 
 }

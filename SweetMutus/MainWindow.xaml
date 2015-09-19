@@ -54,6 +54,9 @@
 		<CommandBinding Command="{x:Static hypermutus:Commands.SeekRelativeCommand}"
 										Executed="SeekRelative_executed"
 										CanExecute="SongPlayer_CanExecute" />
+		<CommandBinding Command="{x:Static local:Commands.SaveSongInformationCommand}"
+										Executed="SaveSongInformation_Executed"
+										CanExecute="SaveSongInformation_CanExecute" />
 	</Window.CommandBindings>
 	<Window.InputBindings>
 		<KeyBinding Key="F7" Modifiers="Shift" Command="{x:Static hypermutus:Commands.SeekRelativeCommand}" CommandParameter="30" />
@@ -61,6 +64,8 @@
 		<KeyBinding Key="F4" Command="{x:Static hypermutus:Commands.SeekRelativeCommand}" CommandParameter="-5" />
 		<KeyBinding Key="F4" Modifiers="Shift" Command="{x:Static hypermutus:Commands.SeekRelativeCommand}" CommandParameter="-30" />
 		<KeyBinding Key="F6" Command="{x:Static hypermutus:Commands.SeekSabiCommand}" />
+		<KeyBinding Key="I" Modifiers="Control" Command="{x:Static local:Commands.SaveSongInformationCommand}"
+								CommandParameter="{Binding ElementName=dataGridQuestions, Path=SelectedItem}" />
 	</Window.InputBindings>
 
 	<Grid>
