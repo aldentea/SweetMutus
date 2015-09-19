@@ -17,6 +17,9 @@
 		<grand:NullableIntConverter x:Key="noConverter" />
 		<grand:VisibilityConverter x:Key="categoryVisibilityConverter" />
 		<grand:VisibilityConverter x:Key="fileNameVisibilityConverter" />
+		<Style TargetType="DataGridCell" x:Key="numericCellStyle">
+			<Setter Property="HorizontalAlignment" Value="Right" />
+		</Style>
 	</Window.Resources>
 	<Window.Title>
 		<MultiBinding Converter="{StaticResource captionConverter}">
@@ -131,25 +134,24 @@
 							Name="dataGridQuestions"
 							>
 			<DataGrid.Columns>
-				<DataGridTextColumn Header="#" Binding="{Binding Path=ID}" IsReadOnly="True" />
-				<DataGridTextColumn Header="No" Binding="{Binding Path=No, Converter={StaticResource noConverter}}" />
-				<DataGridTextColumn Header="Title" Binding="{Binding Path=Title}" />
-				<DataGridTextColumn Header="Artist" Binding="{Binding Path=Artist}" />
+				<DataGridTextColumn Header="#" Binding="{Binding Path=ID}" IsReadOnly="True"
+														CellStyle="{StaticResource numericCellStyle}" />
+				<DataGridTextColumn Header="No" Binding="{Binding Path=No, Converter={StaticResource noConverter}}"
+														CellStyle="{StaticResource numericCellStyle}" />
+				<DataGridTextColumn Header="Title" Binding="{Binding Path=Title}" Width="*" />
+				<DataGridTextColumn Header="Artist" Binding="{Binding Path=Artist}" Width="*" />
 				<!-- このVisibilityのバインディングが機能していない。
 				たぶんXAMLのスコープの話だと思うが、どうすればいいのかはよくわからない。-->
-				<DataGridTextColumn Header="FileName" Binding="{Binding Path=RelativeFileName}" IsReadOnly="True"
+<!--				<DataGridTextColumn Header="FileName" Binding="{Binding Path=RelativeFileName}" IsReadOnly="True"
 														Visibility="{Binding ElementName=menuItemFileNameColumnVisible, Path=IsChecked,
 																									Converter={StaticResource fileNameVisibilityConverter}}"
 														/>
+-->				<DataGridTextColumn Header="FileName" Binding="{Binding Path=RelativeFileName}" IsReadOnly="True"
+														Visibility="Collapsed"		/>
 				<DataGridTextColumn Header="Start" Binding="{Binding Path=PlayPos, Converter={StaticResource timeSpanDoubleConverter}}"
-														>
-					<DataGridTextColumn.CellStyle>
-						<Style TargetType="DataGridCell">
-							<Setter Property="HorizontalContentAlignment" Value="Right" />
-						</Style>
-					</DataGridTextColumn.CellStyle>
-				</DataGridTextColumn>
-				<DataGridTextColumn Header="Sabi" Binding="{Binding Path=SabiPos, Converter={StaticResource timeSpanDoubleConverter}}" />
+														CellStyle="{StaticResource numericCellStyle}" MinWidth="60" />
+				<DataGridTextColumn Header="Sabi" Binding="{Binding Path=SabiPos, Converter={StaticResource timeSpanDoubleConverter}}"
+														CellStyle="{StaticResource numericCellStyle}" MinWidth="60" />
 			</DataGrid.Columns>
 		</DataGrid>
 
