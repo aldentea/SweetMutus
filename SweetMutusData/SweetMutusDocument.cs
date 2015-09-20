@@ -54,6 +54,7 @@ namespace Aldentea.SweetMutus.Data
 		}
 		#endregion
 
+		// (0.1.2.1)QuestionCategoryChangedイベントを発生。
 		// (0.2.0)Songs以外でも共通に使えるのではなかろうか？
 		void Songs_ItemChanged(object sender, ItemEventArgs<IOperationCache> e) // Aldentea.Wpf.DocumentにもIOperationCacheがある．
 		{
@@ -61,6 +62,10 @@ namespace Aldentea.SweetMutus.Data
 			if (operationCache != null)
 			{
 				this.AddOperationHistory(operationCache);
+				if (operationCache is QuestionCategoryChangedCache)
+				{
+					this.QuestionCategoryChanged(this, EventArgs.Empty);
+				}
 			}
 		}
 
@@ -238,6 +243,15 @@ namespace Aldentea.SweetMutus.Data
 		{
 			this.AddOperationHistory(new RootDirectoryChangedCache(this.Questions, e.PreviousValue, e.CurrentValue));
 		}
+
+		void Questions_QuestionCategoryChanged(object sender, EventArgs e)
+		{
+
+		}
+		/// <summary>
+		/// 問題のカテゴリ変更があったときに発生します。
+		/// </summary>
+		public event EventHandler QuestionCategoryChanged = delegate { };
 
 		#endregion
 

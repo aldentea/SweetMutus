@@ -32,6 +32,11 @@ namespace Aldentea.SweetMutus
 
 		public static RoutedCommand ChangeFileNameCommand = new RoutedCommand();
 
+		/// <summary>
+		/// 問題のカテゴリを変更します。パラメータには変更先のカテゴリ名をとります。
+		/// </summary>
+		public static RoutedCommand ChangeCategoryCommand = new RoutedCommand();
+
 	}
 
 }

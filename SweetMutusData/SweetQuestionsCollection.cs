@@ -185,6 +185,7 @@ namespace Aldentea.SweetMutus.Data
 		string _artistCache = string.Empty;
 		TimeSpan _sabiPosCache = TimeSpan.Zero;
 		string _fileNameCache = string.Empty;
+		string _categoryCache = null;
 
 		void Question_PropertyChanging(object sender, System.ComponentModel.PropertyChangingEventArgs e)
 		{
@@ -202,6 +203,10 @@ namespace Aldentea.SweetMutus.Data
 					break;
 				case "FileName":
 					this._fileNameCache = song.FileName;
+					break;
+				case "Category":
+					this._categoryCache = song.Category;
+					// Noは？
 					break;
 			}
 		}
@@ -239,6 +244,13 @@ namespace Aldentea.SweetMutus.Data
 						Item = new QuestionFileNameChangedCache(song, _fileNameCache, song.FileName)
 					});
 					_fileNameCache = string.Empty;
+					break;
+				case "Category":
+					this.ItemChanged(this, new ItemEventArgs<IOperationCache>
+					{
+						Item = new QuestionCategoryChangedCache(song, _categoryCache, song.Category)
+					});
+					_fileNameCache = null;
 					break;
 				case "No":
 					// 整番処理は複雑なのでここでは行わない(Question_NoChangedで行う)。

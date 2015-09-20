@@ -16,6 +16,7 @@ using System.Windows.Shapes;
 using Aldentea.Wpf.Application;
 using System.ComponentModel;
 using HyperMutus;
+using System.Collections.ObjectModel;
 
 namespace Aldentea.SweetMutus
 {
@@ -34,6 +35,17 @@ namespace Aldentea.SweetMutus
 			get { return (SweetMutusDocument)App.Current.Document; }
 		}
 
+		#region *Categoriesプロパティ
+		public ObservableCollection<string> Categories
+		{
+			get
+			{
+				return _categories;
+			}
+		}
+		ObservableCollection<string> _categories = new ObservableCollection<string>(new string[] {string.Empty});
+		#endregion
+
 		#endregion
 
 		public MainWindow()
@@ -44,6 +56,7 @@ namespace Aldentea.SweetMutus
 
 			MyDocument.Initialized += MyDocument_Initialized;
 			MyDocument.Opened += MyDocument_Opened;
+			MyDocument.QuestionCategoryChanged += MyDocument_QuestionCategoryChanged;
 
 			//複数曲追加
 			//this.MyDocument.AddSongsAction = this.AddSongsParallel;
@@ -148,19 +161,37 @@ namespace Aldentea.SweetMutus
 		{
 			if (e.Parameter is string)
 			{
-				string category = (string)e.Parameter;
-				if (!comboBoxCategories.Items.Contains(category))
-				{
-					comboBoxCategories.Items.Add(category);
-				}
+				this.AddCategory((string)e.Parameter);
 			}
 		}
 
 		private void AddCategory_CanExecute(object sender, CanExecuteRoutedEventArgs e)
 		{
-			e.CanExecute = (e.Parameter is string) && !comboBoxCategories.Items.Contains((string)e.Parameter);
+			e.CanExecute = (e.Parameter is string) && !this.Categories.Contains((string)e.Parameter);
 		}
-		
+
+		#endregion
+
+		#region ChangeCategory
+
+		private void ChangeCategory_Executed(object sender, ExecutedRoutedEventArgs e)
+		{
+			if (e.Parameter is string && (string)e.Parameter != this.CurrentCategory)
+			{
+				foreach (var question in this.dataGridQuestions.SelectedItems.Cast<SweetQuestion>().ToArray())
+				{
+					question.Category = (string)e.Parameter;
+				}
+			}
+		}
+
+		private void ChangeCategory_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+		{
+			e.CanExecute = (e.Parameter is string) && (string)e.Parameter != this.CurrentCategory
+				&& this.dataGridQuestions.SelectedItems.Count > 0;
+		}
+
+
 		#endregion
 
 
@@ -226,8 +257,10 @@ namespace Aldentea.SweetMutus
 
 		void MyDocument_Initialized(object sender, EventArgs e)
 		{
-			this.comboBoxCategories.Items.Clear();
-			this.comboBoxCategories.Items.Add(string.Empty);
+			Categories.Clear();
+			AddCategory(string.Empty);
+			//this.comboBoxCategories.Items.Clear();
+			//this.comboBoxCategories.Items.Add(string.Empty);
 
 			this.SongPlayer.Close();
 			this.CurrentSong = null;
@@ -236,31 +269,37 @@ namespace Aldentea.SweetMutus
 
 		void MyDocument_Opened(object sender, EventArgs e)
 		{
-			this.comboBoxCategories.Items.Clear();
+			Categories.Clear();
 			foreach (var category in MyDocument.Questions.Categories)
 			{
-				this.comboBoxCategories.Items.Add(category);
+				this.AddCategory(category);
 			}
 
 			// ☆将来的にはリボンにするのがいいのかな？
+
 			// カテゴリグループボックスを表示。
-			if (this.comboBoxCategories.Items.Count > 1)
+			if (Categories.Count > 1)
 			{
 				this.menuItemCategoryVisible.IsChecked = true;
 			}
 			else
 			{
+				if (Categories.Count < 1)
+				{
+					this.AddCategory(string.Empty);
+				}
 				this.menuItemCategoryVisible.IsChecked = false;
 			}
 			this.comboBoxCategories.SelectedIndex = 0;
+			this.comboBoxDestinationCategory.SelectedIndex = 0;
 
 		}
 
-		private void comboBoxCategories_SelectionChanged(object sender, SelectionChangedEventArgs e)
-		{
-			dataGridQuestions.Items.Filter = q => ((SweetQuestion)q).Category == (string)comboBoxCategories.SelectedItem;
+		//private void comboBoxCategories_SelectionChanged(object sender, SelectionChangedEventArgs e)
+		//{
+		//	dataGridQuestions.Items.Filter = q => ((SweetQuestion)q).Category == (string)comboBoxCategories.SelectedItem;
 			
-		}
+		//}
 
 
 
@@ -278,7 +317,38 @@ namespace Aldentea.SweetMutus
 		static void CurrentCategoryChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
 		{
 			var window = (MainWindow)d;
-			window.dataGridQuestions.Items.Filter = q => ((SweetQuestion)q).Category == (string)e.NewValue;
+			//window.dataGridQuestions.Items.Filter = q => ((SweetQuestion)q).Category == (string)e.NewValue;
+			window.UpdateFilter((string)e.NewValue);
+		}
+
+		internal void UpdateFilter(string category)
+		{
+			this.dataGridQuestions.Items.Filter = q => ((SweetQuestion)q).Category == category;
+		}
+
+
+		void MyDocument_QuestionCategoryChanged(object sender, EventArgs e)
+		{
+			UpdateFilter(CurrentCategory);
+		}
+
+
+		/// <summary>
+		/// カテゴリを追加します。
+		/// </summary>
+		/// <param name="category"></param>
+		bool AddCategory(string category)
+		{
+			if (!Categories.Contains(category))
+			{
+				Categories.Add(category);
+				//this.NotifyPropertyChanged("Categories");
+				return true;
+			}
+			else
+			{
+				return false;
+			}
 		}
 
 		#region 問題リスト関連
