@@ -14,6 +14,7 @@
 	<Window.Resources>
 		<util:CaptionConverter x:Key="captionConverter" ApplicationName="SweetMutus" />
 		<util:TimeSpanDoubleConverter x:Key="timeSpanDoubleConverter" />
+		<local:DurationConverter x:Key="sabiPosConverter" />
 		<grand:NullableIntConverter x:Key="noConverter" />
 		<grand:VisibilityConverter x:Key="categoryVisibilityConverter" />
 		<grand:VisibilityConverter x:Key="fileNameVisibilityConverter" />
@@ -157,9 +158,11 @@
 														Visibility="{Binding ElementName=menuItemFileNameColumnVisible, Path=IsChecked,
 																									Converter={StaticResource fileNameVisibilityConverter}}"
 														/>
-				<DataGridTextColumn Header="Start" Binding="{Binding Path=PlayPos, Converter={StaticResource timeSpanDoubleConverter}}"
+				<DataGridTextColumn Header="Start"
+														Binding="{Binding Path=PlayPos, Converter={StaticResource sabiPosConverter}, ConverterParameter=2}"
 														ElementStyle="{StaticResource numericCellStyle}" MinWidth="60" />
-				<DataGridTextColumn Header="Sabi" Binding="{Binding Path=SabiPos, Converter={StaticResource timeSpanDoubleConverter}}"
+				<DataGridTextColumn Header="Sabi"
+														Binding="{Binding Path=SabiPos, Converter={StaticResource sabiPosConverter}, ConverterParameter=2}"
 														ElementStyle="{StaticResource numericCellStyle}" MinWidth="60" />
 			</DataGrid.Columns>
 		</DataGrid>
@@ -181,7 +184,7 @@
 								HorizontalAlignment="Left" VerticalAlignment="Top" Margin="290,5,0,5"
 								Command="{x:Static grand:Commands.SetSabiPosCommand}" />
 				<TextBox HorizontalAlignment="Left" Grid.Row="0" Height="30" Margin="385,5,0,5"
-									TextWrapping="Wrap" Text="{Binding Path=SabiPos, StringFormat=m\\:ss\\.ff}"
+									TextWrapping="Wrap" Text="{Binding Path=SabiPos, Converter={StaticResource sabiPosConverter}, ConverterParameter=2}"
 									VerticalAlignment="Top" Width="77" HorizontalContentAlignment="Right" VerticalContentAlignment="Center"/>
 				<ud:UpDownControl Grid.Row="0" Height="30" Width="36" Margin="462,5,0,5" HorizontalAlignment="Left" VerticalAlignment="Top"
 									UpClick="UpDownControl_UpClick" DownClick="UpDownControl_DownClick" />

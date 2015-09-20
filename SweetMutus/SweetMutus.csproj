@@ -95,6 +95,7 @@
       <DependentUpon>ChangeFileNameDialog.xaml</DependentUpon>
     </Compile>
     <Compile Include="Commands.cs" />
+    <Compile Include="Converters.cs" />
     <Compile Include="Helpers.cs" />
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
