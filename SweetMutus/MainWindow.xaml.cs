@@ -248,6 +248,12 @@ namespace Aldentea.SweetMutus
 			{
 				this.menuItemCategoryVisible.IsChecked = true;
 			}
+			else
+			{
+				this.menuItemCategoryVisible.IsChecked = false;
+			}
+			this.comboBoxCategories.SelectedIndex = 0;
+
 		}
 
 		private void comboBoxCategories_SelectionChanged(object sender, SelectionChangedEventArgs e)
