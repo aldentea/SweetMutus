@@ -472,7 +472,8 @@ namespace Aldentea.SweetMutus.Data
 		{
 			if (songs_root.Contains(destination_directory))
 			{
-				if (songs_root == destination_directory)
+				// (0.1.3.2)TrimEndを追加．
+				if (songs_root.TrimEnd('\\') == destination_directory)
 				{
 					// ↓記述することにした．
 					// 記述なし．

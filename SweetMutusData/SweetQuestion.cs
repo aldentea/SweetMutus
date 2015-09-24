@@ -227,6 +227,33 @@ namespace Aldentea.SweetMutus.Data
 		TimeSpan _playPos = TimeSpan.Zero;
 		#endregion
 
+		// (0.1.3.1)器だけ作っておく．設定のUIや機能は未実装．
+		#region *StopPosプロパティ
+		/// <summary>
+		/// 出題時の再生停止位置を取得／設定します．
+		/// TimeSpan.Zeroであれば，停止しないことを意味します．
+		/// </summary>
+		public TimeSpan StopPos
+		{
+			get
+			{
+				return _stopPos;
+			}
+			set
+			{
+				if (this.StopPos != value)
+				{
+					// 負の値でないことをここでチェックした方がいいかな？
+
+					NotifyPropertyChanging("StopPos");
+					this._stopPos = value;
+					NotifyPropertyChanged("StopPos");
+				}
+			}
+		}
+		TimeSpan _stopPos = TimeSpan.Zero;
+		#endregion
+
 		#endregion
 
 
@@ -238,6 +265,7 @@ namespace Aldentea.SweetMutus.Data
 		const string NO_ATTRIBUTE = "no";
 		const string CATEGORY_ATTRIBUTE = "category";
 		const string PLAY_POS_ATTRIBUTE = "play_pos";
+		const string STOP_POS_ATTRIBUTE = "stop_pos";
 
 		// どこに置くかは未定．
 		// ここに置くか，XML生成専用のクラスを作成するか...
@@ -304,6 +332,10 @@ namespace Aldentea.SweetMutus.Data
 			if (this.PlayPos > TimeSpan.Zero)
 			{
 				element.Add(new XAttribute(PLAY_POS_ATTRIBUTE, this.PlayPos.TotalSeconds));
+			}
+			if (this.StopPos > TimeSpan.Zero)
+			{
+				element.Add(new XAttribute(STOP_POS_ATTRIBUTE, this.StopPos.TotalSeconds));
 			}
 
 			// ☆answer要素はどうする？
@@ -381,6 +413,11 @@ namespace Aldentea.SweetMutus.Data
 			{
 				question.PlayPos = TimeSpan.FromSeconds(play_pos.Value);
 			}
+			var stop_pos = (double?)questionElement.Attribute(STOP_POS_ATTRIBUTE);
+			if (stop_pos.HasValue)
+			{
+				question.StopPos = TimeSpan.FromSeconds(stop_pos.Value);
+			}
 
 			return question;
 		}
@@ -433,13 +470,11 @@ namespace Aldentea.SweetMutus.Data
 			{
 				question.PlayPos = TimeSpan.FromSeconds(play_pos.Value);
 			}
-
-			// ★停止位置も一応読み込む？
-			//var stop_pos = (double?)songElement.Attribute("stoppos");
-			//if (stop_pos.HasValue)
-			//{
-				//question.StopPos = TimeSpan.FromSeconds(stop_pos.Value);
-			//}
+			var stop_pos = (double?)songElement.Attribute("stoppos");
+			if (stop_pos.HasValue)
+			{
+				question.StopPos = TimeSpan.FromSeconds(stop_pos.Value);
+			}
 
 			return question;
 
