@@ -467,6 +467,7 @@ namespace Aldentea.SweetMutus.Data
 		#endregion
 
 		// (0.1.1)GenerateXMLから分離。
+		#region *RootDirectoryPropertyを追加(AddRootDirectoryProperty)
 		XElement AddRootDirectoryProperty(XElement element, string destination_directory, string songs_root)
 		{
 			if (songs_root.Contains(destination_directory))
@@ -493,6 +494,7 @@ namespace Aldentea.SweetMutus.Data
 			}
 			return element;
 		}
+		#endregion
 
 		#region *questionsElementを読み込む(LoadElement)
 		public void LoadElement(XElement questionsElement, string source_directory)
@@ -536,6 +538,32 @@ namespace Aldentea.SweetMutus.Data
 			}
 		}
 		#endregion
+
+		// (0.1.3)
+		#region *mutus2のsongs要素を読み込む(LoadMutus2SongsElement)
+		public void LoadMutus2SongsElement(XElement songsElement /*, string source_directory*/)
+		{
+			var root = (string)songsElement.Attribute("current_directory");
+			if (!string.IsNullOrEmpty(root) && Path.IsPathRooted(root))
+			{
+				this.RootDirectory = root;
+			}
+			// これってどうなってるんだっけ？
+			// 1. current_directoryに絶対パスが入っている．
+			// 2. current_directoryがなくて，各曲のファイル名がフルパス．
+			// 1と2のとちらかだったと思ったけど...
+
+			foreach (var category in songsElement.Elements("category"))
+			{
+				var category_name = (string)category.Attribute("name");
+				foreach (var song in category.Elements("song"))
+				{
+					this.Add(SweetQuestion.GenerateFromMutus2(song, root, category_name));
+				}
+			}
+		}
+		#endregion
+
 
 		#endregion
 

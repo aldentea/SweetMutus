@@ -8,7 +8,7 @@
 				xmlns:grand="clr-namespace:GrandMutus.Base;assembly=GrandMutusBase"
 				xmlns:local="clr-namespace:Aldentea.SweetMutus"
 				xmlns:ud="clr-namespace:Aldentea.Wpf.Controls;assembly=UpDownControl"
-				OpenFileDialogFilter="SweetMutusファイル(*.smt)|*.smt"
+				OpenFileDialogFilter="SweetMutusファイル(*.smt)|*.smt|mutus2ファイル(*.mtu)|*.mtu"
 				SaveFileDialogFilter="SweetMutusファイル(*.smt)|*.smt"
         Height="600" Width="800">
 	<Window.Resources>

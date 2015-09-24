@@ -333,6 +333,7 @@ namespace Aldentea.SweetMutus.Data
 			Questions.Initialize();
 		}
 
+		// (0.1.3)mutus2のファイルに対応？
 		// (0.4.0.1)Songs.RootDirectoryの設定を追加。
 		protected override bool LoadDocument(string fileName)
 		{
@@ -361,6 +362,30 @@ namespace Aldentea.SweetMutus.Data
 							}
 							return true;
 						}
+						else if (version >= 2.0M)
+						{
+							// mutus2のファイル？
+							var songs = root.Element("songs");
+							if (Confirm("mutus2のファイルを読み込みます．保存するときにSweetMutusの形式に変換することになります(情報の一部が失われることがあります)．\n"
+								+ "処理を続行しますか？"))
+							{
+								NowLoading = true;
+								try
+								{
+									this.Questions.LoadMutus2SongsElement(songs/*, Path.GetDirectoryName(fileName)*/);
+									this.IsConverted = true;
+								}
+								finally
+								{
+									NowLoading = false;
+								}
+								return true;
+							}
+							else
+							{
+								return false;
+							}
+						}
 					}
 				}
 
@@ -386,6 +411,8 @@ namespace Aldentea.SweetMutus.Data
 		}
 		#endregion
 
+		#region 保存関連メソッド
+
 		bool SaveSmtDocument(string destination)
 		{
 			using (XmlWriter writer = XmlWriter.Create(destination, this.WriterSettings))
@@ -406,6 +433,7 @@ namespace Aldentea.SweetMutus.Data
 			return true;
 		}
 
+		#endregion
 
 		#endregion
 

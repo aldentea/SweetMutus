@@ -48,12 +48,19 @@ namespace Aldentea.SweetMutus
 
 		#endregion
 
+		// (0.0.6)
+		bool Confirm(string message)
+		{
+			return MessageBox.Show(message, "確認", MessageBoxButton.YesNo) == MessageBoxResult.Yes;
+		}
+
 		public MainWindow()
 		{
 			InitializeComponent();
 			this.FileHistoryShortcutParent = menuItemHistory;
 
 
+			MyDocument.Confirmer = (message) => this.Confirm(message);
 			MyDocument.Initialized += MyDocument_Initialized;
 			MyDocument.Opened += MyDocument_Opened;
 			MyDocument.QuestionCategoryChanged += MyDocument_QuestionCategoryChanged;

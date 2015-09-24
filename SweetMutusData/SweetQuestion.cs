@@ -386,11 +386,71 @@ namespace Aldentea.SweetMutus.Data
 		}
 		#endregion
 
+
+		// (0.1.3)
+		#region *[static]mutus2のsong要素からオブジェクトを生成する(GenerateFromMutus2)
+		public static SweetQuestion GenerateFromMutus2(XElement songElement, string songsRoot, string category)
+		{
+			//	<song id="6" sabipos="21.7">
+			//		<title>誰もいない海</title>
+			//		<artist>トワエモア</artist>
+			//		<filename>intro\JOY02554.mp3</filename>
+			//	</song>
+
+			var question = new SweetQuestion();
+
+			// XMLからインスタンスを生成するならばIDは常にあるのでは？
+			// →songをインポートする時とかはそうではないかもしれない？ので一応有無をチェックする．
+			// →でも，インポートする時はXML経由ではなくオブジェクト経由で行った方がいいのでは？(ファイル名のパスの扱いとか...)
+			var id_attribute = songElement.Attribute(ID_ATTRIBUTE);
+			if (id_attribute != null)
+			{
+				question.ID = (int)id_attribute;
+			}
+			question.Category = category;
+
+			question.No = (int?)songElement.Attribute(NO_ATTRIBUTE);
+
+			question.Title = (string)songElement.Element(TITLE_ELEMENT);
+			question.Artist = (string)songElement.Element(ARTIST_ELEMENT);
+			var file_name = (string)songElement.Element("filename");	// 相対パスをフルパスに直す作業が必要！
+			if (!Path.IsPathRooted(file_name))
+			{
+				file_name = Path.Combine(songsRoot, file_name);
+				if (!Path.IsPathRooted(file_name))
+				{
+					throw new ArgumentException("ファイル名が相対パスで記録されています．songsRootには，絶対パスを指定して下さい．", "songsRoot");
+				}
+			}
+			question.FileName = file_name;
+			var sabi_pos = (double?)songElement.Attribute("sabipos");
+			if (sabi_pos.HasValue)
+			{
+				question.SabiPos = TimeSpan.FromSeconds(sabi_pos.Value);
+			}
+			var play_pos = (double?)songElement.Attribute("playpos");
+			if (play_pos.HasValue)
+			{
+				question.PlayPos = TimeSpan.FromSeconds(play_pos.Value);
+			}
+
+			// ★停止位置も一応読み込む？
+			//var stop_pos = (double?)songElement.Attribute("stoppos");
+			//if (stop_pos.HasValue)
+			//{
+				//question.StopPos = TimeSpan.FromSeconds(stop_pos.Value);
+			//}
+
+			return question;
+
+		}
+		#endregion
+
 		#endregion
 
 
 		#region IEditable実装
-/*
+		/*
 		XElement _backup = null;
 		
 		public void BeginEdit()
