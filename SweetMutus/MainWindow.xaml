@@ -165,6 +165,9 @@
 							ItemsSource="{Binding Questions}" AutoGenerateColumns="False"
 							CanUserAddRows="False" CanUserSortColumns="False"
 							Name="dataGridQuestions"
+							AllowDrop="True"
+							DragOver="dataGridQuestions_DragOver"
+							Drop="dataGridQuestions_Drop"
 							>
 			<DataGrid.Columns>
 				<DataGridTextColumn Header="#" Binding="{Binding Path=ID}" IsReadOnly="True"

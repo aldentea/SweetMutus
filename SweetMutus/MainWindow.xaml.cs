@@ -464,6 +464,7 @@ namespace Aldentea.SweetMutus
 			}
 		}
 
+		#region カテゴリ関連
 
 		private void Expander_Expanded(object sender, RoutedEventArgs e)
 		{
@@ -480,6 +481,52 @@ namespace Aldentea.SweetMutus
 				expander.ToolTip = "カテゴリを追加するにはクリックして下さい．";
 			}
 		}
+
+		#endregion
+
+		// (0.0.6.1)曲ファイルのドロップ処理を実装．
+		#region ドラッグドロップ関連
+
+		private void dataGridQuestions_DragOver(object sender, DragEventArgs e)
+		{
+			if (e.Data.GetDataPresent(DataFormats.FileDrop))
+			{
+				var files = ((DataObject)e.Data).GetFileDropList();
+
+				for (int i=0; i<files.Count; i++)
+				{
+					if (files[i].EndsWith(".mp3"))
+					{
+						e.Effects = DragDropEffects.Copy;
+						return;
+					}
+				}
+			}
+			e.Effects = DragDropEffects.None;
+			e.Handled = true;
+		}
+
+		private void dataGridQuestions_Drop(object sender, DragEventArgs e)
+		{
+			List<string> songFileNames = new List<string>();
+
+			if (e.Data.GetDataPresent(DataFormats.FileDrop))
+			{
+				var files = ((DataObject)e.Data).GetFileDropList();
+
+				for (int i = 0; i < files.Count; i++)
+				{
+					if (files[i].EndsWith(".mp3"))
+					{
+						songFileNames.Add(files[i]);
+					}
+				}
+			}
+			MyDocument.AddQuestions(songFileNames);
+	
+		}
+
+		#endregion
 
 
 		#region 曲再生関連
