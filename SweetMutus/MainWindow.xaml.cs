@@ -417,6 +417,17 @@ namespace Aldentea.SweetMutus
 		}
 		#endregion
 
+		// (0.0.6.2)GrandMutusからコピペ．
+		// (0.3.4.1)既定の動作をオーバーライドする．
+		private void DeleteQuestions_Executed(object sender, ExecutedRoutedEventArgs e)
+		{
+			var items = ((System.Collections.IList)((DataGrid)sender).SelectedItems).Cast<SweetQuestion>();
+			if (items != null)
+			{
+				this.MyDocument.RemoveQuestions(items);
+			}
+		}
+
 		#endregion
 
 

@@ -189,6 +189,10 @@
 														Binding="{Binding Path=SabiPos, Converter={StaticResource sabiPosConverter}, ConverterParameter=2}"
 														ElementStyle="{StaticResource numericCellStyle}" MinWidth="60" />
 			</DataGrid.Columns>
+			<DataGrid.CommandBindings>
+				<CommandBinding Command="Delete"
+												Executed="DeleteQuestions_Executed" />
+			</DataGrid.CommandBindings>
 		</DataGrid>
 
 		<Expander Header="曲再生" Name="expanderSongPlayer" Margin="0" Grid.Row="3"

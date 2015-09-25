@@ -37,7 +37,7 @@ namespace Aldentea.SweetMutus.Data
 		{
 			// Questions関連処理
 			_questions = new SweetQuestionsCollection(this);
-			_questions.QuestionsRemoved += Questions_QuestionsRemoved;
+			//_questions.QuestionsRemoved += Questions_QuestionsRemoved;
 			_questions.ItemChanged += Songs_ItemChanged;
 			_questions.RootDirectoryChanged += Questions_RootDirectoryChanged;
 			_questions.QuestionNoChanged += Questions_QuestionNoChanged;
@@ -146,27 +146,29 @@ namespace Aldentea.SweetMutus.Data
 		//	RemoveSongs(fileNames.Select(fileName => _songs.FirstOrDefault(s => s.FileName == fileName)).Where(s => s != null));
 		//}
 
+		// (0.0.6.3)UIから削除する場合も，このメソッドを経由することにしたので，OperationCacheの追加はここで行う．
 		// (0.3.1)OperationCacheの追加はQuestionsRemovedイベントハンドラで行うことにする
 		// (曲の削除はUIから直接行われることが想定されるため)．
 		// (0.3.0)
 		public void RemoveQuestions(IEnumerable<SweetQuestion> questions)
 		{
-			IList<string> removed_song_files = new List<string>();
+			IList<SweetQuestion> removed_questions = new List<SweetQuestion>();
 			foreach (var question in questions)
 			{
 				if (_questions.Remove(question))
 				{
-					removed_song_files.Add(question.FileName);
+					removed_questions.Add(question);
 				}
 			}
+			AddOperationHistory(new SweetQuestionsRemovedCache(this, removed_questions));
 		}
 		#endregion
 
 		// (0.3.1)
-		void Questions_QuestionsRemoved(object sender, ItemEventArgs<IEnumerable<SweetQuestion>> e)
-		{
-			AddOperationHistory(new SweetQuestionsRemovedCache(this, e.Item));
-		}
+		//void Questions_QuestionsRemoved(object sender, ItemEventArgs<IEnumerable<SweetQuestion>> e)
+		//{
+		//	AddOperationHistory(new SweetQuestionsRemovedCache(this, e.Item));
+		//}
 
 		// HyperMutusからのパクリ．古いメソッドだけど，とりあえずそのまま使う．
 		// 場所も未定．とりあえずstatic化してここに置いておく．
