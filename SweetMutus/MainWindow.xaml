@@ -225,8 +225,7 @@
 												Executed="DeleteQuestions_Executed" />
 			</DataGrid.CommandBindings>
 				<DataGrid.InputBindings>
-					<!-- ↓ElementNameじゃなくてRelativeSourceで指定する方法はないのか？ -->
-					<KeyBinding Key="F5" Command="Play" CommandParameter="{Binding ElementName=dataGridQuestions, Path=SelectedItem}"	/>
+					<KeyBinding Key="F5" Command="Play" CommandParameter="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=DataGrid}, Path=SelectedItem}"	/>
 				</DataGrid.InputBindings>
 		</DataGrid>
 			

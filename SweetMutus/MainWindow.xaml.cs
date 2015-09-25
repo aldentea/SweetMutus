@@ -742,8 +742,8 @@ namespace Aldentea.SweetMutus
 
 		void Play_CanExecute(object sender, CanExecuteRoutedEventArgs e)
 		{
-			e.CanExecute = true;
-			//e.CanExecute = e.Parameter is SweetQuestion;
+			//e.CanExecute = true;
+			e.CanExecute = e.Parameter is SweetQuestion;
 		}
 		#endregion
 
