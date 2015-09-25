@@ -37,6 +37,11 @@ namespace Aldentea.SweetMutus
 		/// </summary>
 		public static RoutedCommand ChangeCategoryCommand = new RoutedCommand();
 
+		public static RoutedCommand IncrementNoCommand = new RoutedCommand();
+		public static RoutedCommand DecrementNoCommand = new RoutedCommand();
+		public static RoutedCommand OmitQuestionsCommand = new RoutedCommand();
+		public static RoutedCommand EnterQuestionsCommand = new RoutedCommand();
+
 	}
 
 }

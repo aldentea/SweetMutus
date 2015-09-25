@@ -65,6 +65,18 @@
 		<CommandBinding Command="{x:Static local:Commands.ChangeFileNameCommand}"
 										Executed="ChangeFileName_Executed"
 										CanExecute="ChangeFileName_CanExecute" />
+		<CommandBinding Command="{x:Static local:Commands.IncrementNoCommand}"
+										Executed="IncrementNo_Executed"
+										CanExecute="IncrementNo_CanExecute" />
+		<CommandBinding Command="{x:Static local:Commands.DecrementNoCommand}"
+										Executed="DecrementNo_Executed"
+										CanExecute="IncrementNo_CanExecute" />
+		<CommandBinding Command="{x:Static local:Commands.OmitQuestionsCommand}"
+										Executed="OmitQuestions_Executed"
+										CanExecute="IncrementNo_CanExecute" />
+		<CommandBinding Command="{x:Static local:Commands.EnterQuestionsCommand}"
+										Executed="EnterQuestions_Executed"
+										CanExecute="IncrementNo_CanExecute" />
 	</Window.CommandBindings>
 	<Window.InputBindings>
 		<KeyBinding Key="F7" Modifiers="Shift" Command="{x:Static hypermutus:Commands.SeekRelativeCommand}" CommandParameter="30" />
@@ -86,6 +98,11 @@
 			<RowDefinition Height="Auto" />
 			<RowDefinition Height="Auto" />
 		</Grid.RowDefinitions>
+		
+		<Grid.ColumnDefinitions>
+			<ColumnDefinition Width="*" />
+			<ColumnDefinition Width="Auto" />
+		</Grid.ColumnDefinitions>
 
 		<Menu Name="MainMenu" Grid.Row="0" HorizontalAlignment="Stretch">
 			<MenuItem Header="ファイル(_F)">
@@ -161,7 +178,12 @@
 			</GroupBox>
 		</StackPanel>
 
-		<DataGrid Margin="10" Grid.Row="2"
+		<Grid Grid.Row="2">
+			<Grid.ColumnDefinitions>
+				<ColumnDefinition Width="*" />
+				<ColumnDefinition Width="Auto" />
+			</Grid.ColumnDefinitions>
+		<DataGrid Grid.Column="0" Margin="10"
 							ItemsSource="{Binding Questions}" AutoGenerateColumns="False"
 							CanUserAddRows="False" CanUserSortColumns="False"
 							Name="dataGridQuestions"
@@ -194,7 +216,23 @@
 												Executed="DeleteQuestions_Executed" />
 			</DataGrid.CommandBindings>
 		</DataGrid>
-
+			
+			<StackPanel Grid.Column="1" Orientation="Vertical" VerticalAlignment="Center" Margin="0,61,0,107">
+				<StackPanel.Resources>
+					<Style TargetType="{x:Type Button}">
+						<Setter Property="Width" Value="36" />
+						<Setter Property="Height" Value="36" />
+						<Setter Property="Margin" Value="10" />
+						<Setter Property="CommandParameter" Value="{Binding ElementName=dataGridQuestions, Path=SelectedItems}" />
+					</Style>
+				</StackPanel.Resources>
+				<Button Content="入" Command="{x:Static local:Commands.EnterQuestionsCommand}" />
+				<Button Content="除" Command="{x:Static local:Commands.OmitQuestionsCommand}" />
+				<Button Content="↑" Command="{x:Static local:Commands.DecrementNoCommand}" />
+				<Button Content="↓" Command="{x:Static local:Commands.IncrementNoCommand}" />
+			</StackPanel>
+		</Grid>
+		
 		<Expander Header="曲再生" Name="expanderSongPlayer" Margin="0" Grid.Row="3"
 							DataContext="{Binding RelativeSource={RelativeSource AncestorType=Window}, Path=CurrentSong}">
 			<Grid>

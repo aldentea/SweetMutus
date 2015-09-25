@@ -64,6 +64,7 @@ namespace Aldentea.SweetMutus
 			MyDocument.Initialized += MyDocument_Initialized;
 			MyDocument.Opened += MyDocument_Opened;
 			MyDocument.QuestionCategoryChanged += MyDocument_QuestionCategoryChanged;
+			MyDocument.QuestionNoChanged += MyDocument_QuestionCategoryChanged;
 
 			//複数曲追加
 			//this.MyDocument.AddSongsAction = this.AddSongsParallel;
@@ -279,6 +280,115 @@ namespace Aldentea.SweetMutus
 
 		#endregion
 
+		// (0.0.8)
+		#region IncrementNo
+
+		private void IncrementNo_Executed(object sender, ExecutedRoutedEventArgs e)
+		{
+			var items = e.Parameter as System.Collections.IList;
+			if (items != null)
+			{
+				var questions = items.Cast<SweetQuestion>();
+				// 何かいい方法はないかなぁ？
+				// (questionsに直接foreachすると，要素を変更してしまうので...)
+				var ids = questions.Where(q => q.No.HasValue).OrderByDescending(q => q.No).Select(q => q.ID).ToArray();
+				foreach(var id in ids)
+				{
+					var question = MyDocument.FindQuestion(id);
+					question.No += 1;
+				}
+				// ソートし直す．
+				UpdateFilter();
+			}
+		}
+
+		private void IncrementNo_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+		{
+			var items = e.Parameter as System.Collections.IList;
+			e.CanExecute = items != null && items.Count > 0;
+		}
+
+		#endregion
+
+		// (0.0.8)
+		#region DecrementNo
+
+		private void DecrementNo_Executed(object sender, ExecutedRoutedEventArgs e)
+		{
+			var items = e.Parameter as System.Collections.IList;
+			if (items != null)
+			{
+				var questions = items.Cast<SweetQuestion>();
+				// 何かいい方法はないかなぁ？
+				// (questionsに直接foreachすると，要素を変更してしまうので...)
+				var ids = questions.Where(q => q.No.HasValue).OrderBy(q => q.No).Select(q => q.ID).ToArray();
+				int i = 1;
+				foreach (var id in ids)
+				{
+					var question = MyDocument.FindQuestion(id);
+					if (question.No == i)
+					{
+						i++;
+					}
+					else
+					{
+						question.No -= 1;
+					}
+				}
+				// ソートし直す．
+				UpdateFilter();
+			}
+		}
+
+		#endregion
+
+		// (0.0.8)
+		#region OmitQuestions
+
+		private void OmitQuestions_Executed(object sender, ExecutedRoutedEventArgs e)
+		{
+			var items = e.Parameter as System.Collections.IList;
+			if (items != null)
+			{
+				var questions = items.Cast<SweetQuestion>();
+				// 何かいい方法はないかなぁ？
+				// (questionsに直接foreachすると，要素を変更してしまうので...)
+				var ids = questions.Where(q => q.No.HasValue).OrderByDescending(q => q.No).Select(q => q.ID).ToArray();
+				foreach (var id in ids)
+				{
+					var question = MyDocument.FindQuestion(id);
+					question.No = null;
+				}
+				// ソートし直す．
+				UpdateFilter();
+			}
+		}
+
+		#endregion
+
+		// (0.0.8)
+		#region EnterQuestions
+
+		private void EnterQuestions_Executed(object sender, ExecutedRoutedEventArgs e)
+		{
+			var items = e.Parameter as System.Collections.IList;
+			if (items != null)
+			{
+				var questions = items.Cast<SweetQuestion>();
+				// 何かいい方法はないかなぁ？
+				// (questionsに直接foreachすると，要素を変更してしまうので...)
+				var ids = questions.Where(q => !q.No.HasValue).Select(q => q.ID).ToArray();
+				foreach (var id in ids)
+				{
+					var question = MyDocument.FindQuestion(id);
+					question.No = MyDocument.Questions.Count(q => q.Category == question.Category && q.No.HasValue) + 1;
+				}
+				// ソートし直す．
+				UpdateFilter();
+			}
+		}
+
+		#endregion
 
 		#endregion
 
@@ -349,6 +459,12 @@ namespace Aldentea.SweetMutus
 			var window = (MainWindow)d;
 			//window.dataGridQuestions.Items.Filter = q => ((SweetQuestion)q).Category == (string)e.NewValue;
 			window.UpdateFilter((string)e.NewValue);
+		}
+
+		// (0.0.8)
+		internal void UpdateFilter()
+		{
+			UpdateFilter(CurrentCategory);
 		}
 
 		internal void UpdateFilter(string category)

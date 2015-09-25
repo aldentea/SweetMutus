@@ -54,6 +54,7 @@ namespace Aldentea.SweetMutus.Data
 		}
 		#endregion
 
+		// (0.1.4)QuestionNoChangedイベントを発生。
 		// (0.1.2.1)QuestionCategoryChangedイベントを発生。
 		// (0.2.0)Songs以外でも共通に使えるのではなかろうか？
 		void Songs_ItemChanged(object sender, ItemEventArgs<IOperationCache> e) // Aldentea.Wpf.DocumentにもIOperationCacheがある．
@@ -65,6 +66,11 @@ namespace Aldentea.SweetMutus.Data
 				if (operationCache is QuestionCategoryChangedCache)
 				{
 					this.QuestionCategoryChanged(this, EventArgs.Empty);
+				}
+				// ★ここに書くと，Undoのときにイベントが発生しないのでは...
+				if (operationCache is QuestionNoChangedCache)
+				{
+					this.QuestionNoChanged(this, EventArgs.Empty);
 				}
 			}
 		}
@@ -191,6 +197,19 @@ namespace Aldentea.SweetMutus.Data
 
 		#region 問題関連
 
+		// (0.1.4)
+		#region *IDから問題を取得(FindQuestion)
+		/// <summary>
+		/// 与えられたIDに対応する問題を返します(内部でSingleメソッドを使っています)．
+		/// </summary>
+		/// <param name="id"></param>
+		/// <returns></returns>
+		public SweetQuestion FindQuestion(int id)
+		{
+			return _questions.Single(q => q.ID == id);
+		}
+		#endregion
+
 		// (0.3.4)とりあえず．
 		/*public void AddSweetQuestions(IEnumerable<Song> songs)
 		{
@@ -254,6 +273,11 @@ namespace Aldentea.SweetMutus.Data
 		/// 問題のカテゴリ変更があったときに発生します。
 		/// </summary>
 		public event EventHandler QuestionCategoryChanged = delegate { };
+
+		/// <summary>
+		/// 問題のNo変更があったときに発生します。
+		/// </summary>
+		public event EventHandler QuestionNoChanged = delegate { };
 
 		#endregion
 
