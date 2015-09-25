@@ -84,6 +84,11 @@ namespace Aldentea.SweetMutus
 				new CommandBinding(ApplicationCommands.Undo,
 					Undo_Executed, Undo_CanExecute)
 			);
+			// (0.0.7)
+			CommandBindings.Add(
+				new CommandBinding(ApplicationCommands.Redo,
+					Redo_Executed, Redo_CanExecute)
+			);
 		}
 
 		#region コマンドハンドラ
@@ -117,6 +122,24 @@ namespace Aldentea.SweetMutus
 		private void Undo_CanExecute(object sender, CanExecuteRoutedEventArgs e)
 		{
 			e.CanExecute = MyDocument.CanUndo;
+		}
+
+		#endregion
+
+		// (0.0.7)
+		#region Redo
+
+		private void Redo_Executed(object sender, ExecutedRoutedEventArgs e)
+		{
+			if (MyDocument.CanRedo)
+			{
+				MyDocument.Redo();
+			}
+		}
+
+		private void Redo_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+		{
+			e.CanExecute = MyDocument.CanRedo;
 		}
 
 		#endregion
