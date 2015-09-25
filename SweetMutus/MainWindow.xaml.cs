@@ -735,12 +735,15 @@ namespace Aldentea.SweetMutus
 				//_songPlayerTimer.IsEnabled = true;
 				this.CurrentSong = song;
 				_songPlayer.Play();
+
+				this.expanderSongPlayer.IsExpanded = true;	// ←これはここに書くべきものなのか？
 			}
 		}
 
 		void Play_CanExecute(object sender, CanExecuteRoutedEventArgs e)
 		{
-			e.CanExecute = e.Parameter is SweetQuestion;
+			e.CanExecute = true;
+			//e.CanExecute = e.Parameter is SweetQuestion;
 		}
 		#endregion
 
@@ -790,6 +793,17 @@ namespace Aldentea.SweetMutus
 		}
 		#endregion
 
+		// (0.0.8.2)
+		#region SetPlayPosコマンド
+		void SetPlayPos_Executed(object sender, ExecutedRoutedEventArgs e)
+		{
+			if (_songPlayer.CurrentState != SongPlayer.State.Inactive)
+			{
+				_currentSong.PlayPos = _songPlayer.CurrentPosition;
+			}
+		}
+		#endregion
+
 		private void UpDownControl_UpClick(object sender, RoutedEventArgs e)
 		{
 			if (CurrentSong != null)
@@ -802,7 +816,24 @@ namespace Aldentea.SweetMutus
 		{
 			if (CurrentSong != null)
 			{
-				CurrentSong.SabiPos += TimeSpan.FromSeconds(-0.1);
+				var new_position = CurrentSong.SabiPos.Add(TimeSpan.FromSeconds(-0.1));
+				CurrentSong.SabiPos = new_position > TimeSpan.Zero ? new_position : TimeSpan.Zero;
+			}
+		}
+		private void UpDownControlPlayPos_UpClick(object sender, RoutedEventArgs e)
+		{
+			if (CurrentSong != null)
+			{
+				CurrentSong.PlayPos += TimeSpan.FromSeconds(0.1);
+			}
+		}
+
+		private void UpDownControlPlayPos_DownClick(object sender, RoutedEventArgs e)
+		{
+			if (CurrentSong != null)
+			{
+				var new_position = CurrentSong.PlayPos.Add(TimeSpan.FromSeconds(-0.1));
+				CurrentSong.PlayPos = new_position > TimeSpan.Zero ? new_position : TimeSpan.Zero;
 			}
 		}
 
@@ -822,7 +853,7 @@ namespace Aldentea.SweetMutus
 
 		#region お試し
 
-		private void MenuItemFilter_Click(object sender, RoutedEventArgs e)
+/*		private void MenuItemFilter_Click(object sender, RoutedEventArgs e)
 		{
 			//dataGridQuestions.Items.Filter = (q) => { return ((SweetQuestion)q).Category == "tanuki"; };
 			//dataGridQuestions.Items.SortDescriptions.Add(
@@ -835,7 +866,7 @@ namespace Aldentea.SweetMutus
 				this.expanderSongPlayer.IsExpanded = true;
 			}
 		}
-
+*/
 		#endregion
 
 

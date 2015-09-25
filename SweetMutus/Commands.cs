@@ -21,6 +21,8 @@ namespace Aldentea.SweetMutus
 		/// </summary>
 		public static RoutedCommand ExportCommand = new RoutedCommand();
 
+		public static RoutedCommand SetPlayPosCommand = new RoutedCommand();
+
 		/// <summary>
 		/// 新たなカテゴリを追加します。
 		/// </summary>

@@ -15,6 +15,7 @@
 		<util:CaptionConverter x:Key="captionConverter" ApplicationName="SweetMutus" />
 		<util:TimeSpanDoubleConverter x:Key="timeSpanDoubleConverter" />
 		<local:DurationConverter x:Key="sabiPosConverter" />
+		<local:DurationConverter x:Key="playPosConverter" />
 		<grand:NullableIntConverter x:Key="noConverter" />
 		<grand:VisibilityConverter x:Key="categoryVisibilityConverter" />
 		<grand:VisibilityConverter x:Key="fileNameVisibilityConverter" />
@@ -53,6 +54,9 @@
 		<CommandBinding Command="{x:Static grand:Commands.SetSabiPosCommand}"
 										Executed="SetSabiPos_Executed"
 										CanExecute="SongPlayer_CanExecute" />
+		<CommandBinding Command="{x:Static local:Commands.SetPlayPosCommand}"
+										Executed="SetPlayPos_Executed"
+										CanExecute="SongPlayer_CanExecute" />
 		<CommandBinding Command="{x:Static hypermutus:Commands.SeekRelativeCommand}"
 										Executed="SeekRelative_executed"
 										CanExecute="SongPlayer_CanExecute" />
@@ -84,6 +88,8 @@
 		<KeyBinding Key="F4" Command="{x:Static hypermutus:Commands.SeekRelativeCommand}" CommandParameter="-5" />
 		<KeyBinding Key="F4" Modifiers="Shift" Command="{x:Static hypermutus:Commands.SeekRelativeCommand}" CommandParameter="-30" />
 		<KeyBinding Key="F6" Command="{x:Static hypermutus:Commands.SeekSabiCommand}" />
+		<KeyBinding Key="F6" Modifiers="Shift" Command="{x:Static grand:Commands.SetSabiPosCommand}" />
+		<KeyBinding Key="F6" Modifiers="Ctrl" Command="{x:Static local:Commands.SetPlayPosCommand}" />
 		<KeyBinding Key="I" Modifiers="Control" Command="{x:Static local:Commands.SaveSongInformationCommand}"
 								CommandParameter="{Binding ElementName=dataGridQuestions, Path=SelectedItem}" />
 		<KeyBinding Key="R" Modifiers="Control" Command="{x:Static local:Commands.ChangeFileNameCommand}"
@@ -99,11 +105,6 @@
 			<RowDefinition Height="Auto" />
 		</Grid.RowDefinitions>
 		
-		<Grid.ColumnDefinitions>
-			<ColumnDefinition Width="*" />
-			<ColumnDefinition Width="Auto" />
-		</Grid.ColumnDefinitions>
-
 		<Menu Name="MainMenu" Grid.Row="0" HorizontalAlignment="Stretch">
 			<MenuItem Header="ファイル(_F)">
 				<MenuItem Header="新規作成(_N)" Command="New" />
@@ -134,8 +135,9 @@
 				<MenuItem Name="menuItemCategoryVisible" Header="カテゴリ" IsCheckable="True" IsChecked="True" />
 				<MenuItem Name="menuItemFileNameColumnVisible" Header="ファイル名列" IsCheckable="True" IsChecked="False" />
 			</MenuItem>
-			<MenuItem Header="お試し">
-				<MenuItem Header="フィルタ" Click="MenuItemFilter_Click" />
+			<MenuItem Header="曲再生(_P)">
+				<MenuItem Header="再生開始" Command="Play"
+									CommandParameter="{Binding ElementName=dataGridQuestions, Path=SelectedItem}" />
 			</MenuItem>
 		</Menu>
 
@@ -173,7 +175,8 @@
 					</ComboBox>
 					<Button Content="移動" VerticalAlignment="Top" Height="30" Margin="0,40,0,5"
 									Command="{x:Static local:Commands.ChangeCategoryCommand}"
-									CommandParameter="{Binding ElementName=comboBoxDestinationCategory, Path=SelectedItem}" />
+									CommandParameter="{Binding ElementName=comboBoxDestinationCategory, Path=SelectedItem}"
+									ToolTip="選択中の問題を、上で指定したカテゴリに移動します。" />
 				</Grid>
 			</GroupBox>
 		</StackPanel>
@@ -193,18 +196,24 @@
 							>
 			<DataGrid.Columns>
 				<DataGridTextColumn Header="#" Binding="{Binding Path=ID}" IsReadOnly="True"
-														ElementStyle="{StaticResource numericCellStyle}" />
+														ElementStyle="{StaticResource numericCellStyle}" Visibility="Collapsed" />
 				<DataGridTextColumn Header="No" Binding="{Binding Path=No, Converter={StaticResource noConverter}}"
 														ElementStyle="{StaticResource numericCellStyle}" />
-				<DataGridTextColumn Header="Title" Binding="{Binding Path=Title}" Width="*" />
-				<DataGridTextColumn Header="Artist" Binding="{Binding Path=Artist}" Width="*" />
+				<DataGridTextColumn Header="曲名" Binding="{Binding Path=Title}" Width="*" />
+				<DataGridTextColumn Header="アーティスト" Binding="{Binding Path=Artist}" Width="*" />
 				<!-- このVisibilityのバインディングが機能していない。
 				たぶんXAMLのスコープの話だと思うが、どうすればいいのかはよくわからない。-->
-				<DataGridTextColumn Header="FileName" Binding="{Binding Path=RelativeFileName}" IsReadOnly="True"
+					<DataGridTextColumn Header="ファイル名" Binding="{Binding Path=RelativeFileName}" IsReadOnly="True"
 														Visibility="{Binding ElementName=menuItemFileNameColumnVisible, Path=IsChecked,
 																									Converter={StaticResource fileNameVisibilityConverter}}"
-														/>
-				<DataGridTextColumn Header="Start"
+														>
+						<DataGridTextColumn.ElementStyle>
+							<Style TargetType="TextBlock">
+								<Setter Property="ToolTip" Value="{Binding Path=FileName}" />
+							</Style>
+						</DataGridTextColumn.ElementStyle>
+					</DataGridTextColumn>
+					<DataGridTextColumn Header="Start"
 														Binding="{Binding Path=PlayPos, Converter={StaticResource sabiPosConverter}, ConverterParameter=2}"
 														ElementStyle="{StaticResource numericCellStyle}" MinWidth="60" />
 				<DataGridTextColumn Header="Sabi"
@@ -215,6 +224,10 @@
 				<CommandBinding Command="Delete"
 												Executed="DeleteQuestions_Executed" />
 			</DataGrid.CommandBindings>
+				<DataGrid.InputBindings>
+					<!-- ↓ElementNameじゃなくてRelativeSourceで指定する方法はないのか？ -->
+					<KeyBinding Key="F5" Command="Play" CommandParameter="{Binding ElementName=dataGridQuestions, Path=SelectedItem}"	/>
+				</DataGrid.InputBindings>
 		</DataGrid>
 			
 			<StackPanel Grid.Column="1" Orientation="Vertical" VerticalAlignment="Center" Margin="0,61,0,107">
@@ -226,10 +239,14 @@
 						<Setter Property="CommandParameter" Value="{Binding ElementName=dataGridQuestions, Path=SelectedItems}" />
 					</Style>
 				</StackPanel.Resources>
-				<Button Content="入" Command="{x:Static local:Commands.EnterQuestionsCommand}" />
-				<Button Content="除" Command="{x:Static local:Commands.OmitQuestionsCommand}" />
-				<Button Content="↑" Command="{x:Static local:Commands.DecrementNoCommand}" />
-				<Button Content="↓" Command="{x:Static local:Commands.IncrementNoCommand}" />
+				<Button Content="入" Command="{x:Static local:Commands.EnterQuestionsCommand}"
+								ToolTip="選択した問題にNoをつけます。" />
+				<Button Content="除" Command="{x:Static local:Commands.OmitQuestionsCommand}"
+								ToolTip="選択した問題の番号を外します。" />
+				<Button Content="↑" Command="{x:Static local:Commands.DecrementNoCommand}"
+								ToolTip="選択した問題の番号を1つ減らします。" />
+				<Button Content="↓" Command="{x:Static local:Commands.IncrementNoCommand}"
+								ToolTip="選択した問題のNoを1つ増やします。" />
 			</StackPanel>
 		</Grid>
 		
@@ -246,18 +263,37 @@
 				<Button Content="サビ" Grid.Row="0" Height="30" Width="75"
 								HorizontalAlignment="Left" VerticalAlignment="Top" Margin="99,5,0,5"
 								Command="{x:Static hypermutus:Commands.SeekSabiCommand}" />
-				<Button Content="サビ設定" Grid.Row="0" Height="30" Width="75"
-								HorizontalAlignment="Left" VerticalAlignment="Top" Margin="290,5,0,5"
+				<TabControl Grid.Row="0" Margin="240,0,0,0" Width="300" Height="75" HorizontalAlignment="Left"
+										TabStripPlacement="Left">
+					<TabItem Header="サビ">
+						<Grid>
+						<Button Content="サビ設定" Grid.Row="0" Height="40" Width="75"
+								HorizontalAlignment="Left" Margin="0,0,0,0"
 								Command="{x:Static grand:Commands.SetSabiPosCommand}" />
-				<TextBox HorizontalAlignment="Left" Grid.Row="0" Height="30" Margin="385,5,0,5"
+						<TextBox HorizontalAlignment="Left" Grid.Row="0" Height="40" Margin="100,0,0,0"
 									TextWrapping="Wrap" Text="{Binding Path=SabiPos, Converter={StaticResource sabiPosConverter}, ConverterParameter=2}"
-									VerticalAlignment="Top" Width="77" HorizontalContentAlignment="Right" VerticalContentAlignment="Center"/>
-				<ud:UpDownControl Grid.Row="0" Height="30" Width="36" Margin="462,5,0,5" HorizontalAlignment="Left" VerticalAlignment="Top"
+									Width="100" HorizontalContentAlignment="Right" VerticalContentAlignment="Center"/>
+						<ud:UpDownControl Grid.Row="0" Height="40" Width="36" Margin="200,0,0,0" HorizontalAlignment="Left"
 									UpClick="UpDownControl_UpClick" DownClick="UpDownControl_DownClick" />
+						</Grid>
+					</TabItem>
+					<TabItem Header="開始">
+						<Grid>
+							<Button Content="開始位置設定" Grid.Row="0" Height="40" Width="85"
+								HorizontalAlignment="Left" VerticalAlignment="Center" Margin="0,5,0,5"
+								Command="{x:Static local:Commands.SetPlayPosCommand}" />
+							<TextBox HorizontalAlignment="Left" Grid.Row="0" Height="40" Margin="100,5,0,5"
+									TextWrapping="Wrap" Text="{Binding Path=PlayPos, Converter={StaticResource playPosConverter}, ConverterParameter=2}"
+									VerticalAlignment="Center" Width="100" HorizontalContentAlignment="Right" VerticalContentAlignment="Center"/>
+							<ud:UpDownControl Grid.Row="0" Height="40" Width="36" Margin="200,5,0,5" HorizontalAlignment="Left" VerticalAlignment="Center"
+									UpClick="UpDownControlPlayPos_UpClick" DownClick="UpDownControlPlayPos_DownClick" />
+						</Grid>
+					</TabItem>
+				</TabControl>
 				<Slider HorizontalAlignment="Left" Grid.Row="0" Margin="590,12,0,5" VerticalAlignment="Top" Width="166" ToolTip="音量"
 								Value="{Binding RelativeSource={RelativeSource AncestorType=local:MainWindow}, Path=SongPlayer.Volume}"
 								Maximum="1" Minimum="0" SmallChange="0.01" LargeChange="0.1" />
-				<Slider HorizontalAlignment="Left" Grid.Row="1" Height="41" Margin="31,12,0,0" VerticalAlignment="Top" Width="324"
+				<Slider HorizontalAlignment="Left" Grid.Row="1" Height="36" Margin="31,0,0,0" VerticalAlignment="Center" Width="360"
 								TickFrequency="60" Maximum="100" Minimum="0" Name="sliderSeekSong" TickPlacement="BottomRight"
 								LargeChange="30" SmallChange="5"
 								Value="{Binding RelativeSource={RelativeSource AncestorType=Window},
@@ -266,10 +302,10 @@
 								Content="{Binding RelativeSource={RelativeSource AncestorType=Window},
 													Path=SongPlayer.CurrentPosition, Mode=OneWay}" ContentStringFormat="m\:ss"
 								HorizontalAlignment="Left"
-								Margin="421,23,0,0" VerticalAlignment="Top"/>
+								Margin="421,0,0,0" VerticalAlignment="Center"/>
 				<Label Name="labelDuration"
 								HorizontalAlignment="Left" ContentStringFormat="m\:ss" Content="{x:Static sys:TimeSpan.Zero}"
-								Margin="521,23,0,0" Grid.Row="1" VerticalAlignment="Top"/>
+								Margin="521,0,0,0" Grid.Row="1" VerticalAlignment="Center"/>
 			</Grid>
 		</Expander>
 
