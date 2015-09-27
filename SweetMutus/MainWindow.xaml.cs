@@ -228,6 +228,7 @@ namespace Aldentea.SweetMutus
 
 		#region SaveSongInformation
 
+		// (0.0.8.4)気休めにTask.Delayを追加。
 		private void SaveSongInformation_Executed(object sender, ExecutedRoutedEventArgs e)
 		{
 			if (e.Parameter is SweetQuestion)
@@ -236,6 +237,8 @@ namespace Aldentea.SweetMutus
 				if (this.SongPlayer.MediaSource == new Uri(question.FileName))
 				{
 					this.SongPlayer.Close();
+					// 無意味にSleepする。
+					Task.Delay(140);
 				}
 				question.SaveInformation();
 			}
