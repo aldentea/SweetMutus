@@ -83,6 +83,7 @@
 										CanExecute="IncrementNo_CanExecute" />
 	</Window.CommandBindings>
 	<Window.InputBindings>
+		<KeyBinding Key="F5" Command="{x:Static  hypermutus:Commands.SwitchPlayPauseCommand}" />
 		<KeyBinding Key="F7" Modifiers="Shift" Command="{x:Static hypermutus:Commands.SeekRelativeCommand}" CommandParameter="30" />
 		<KeyBinding Key="F7" Command="{x:Static hypermutus:Commands.SeekRelativeCommand}" CommandParameter="5" />
 		<KeyBinding Key="F4" Command="{x:Static hypermutus:Commands.SeekRelativeCommand}" CommandParameter="-5" />
@@ -225,7 +226,13 @@
 												Executed="DeleteQuestions_Executed" />
 			</DataGrid.CommandBindings>
 				<DataGrid.InputBindings>
-					<KeyBinding Key="F5" Command="Play" CommandParameter="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=DataGrid}, Path=SelectedItem}"	/>
+					<KeyBinding 
+						Key="F5" 
+						Command="Play"
+						CommandParameter="{Binding
+							RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=DataGrid},
+							Path=SelectedItem}"
+					/>
 				</DataGrid.InputBindings>
 		</DataGrid>
 			
@@ -238,6 +245,9 @@
 						<Setter Property="CommandParameter" Value="{Binding ElementName=dataGridQuestions, Path=SelectedItems}" />
 					</Style>
 				</StackPanel.Resources>
+				<Button Content="○"  Command="Play"
+								CommandParameter="{Binding ElementName=dataGridQuestions, Path=SelectedItem}"
+								ToolTip="再生を開始します。" />
 				<Button Content="入" Command="{x:Static local:Commands.EnterQuestionsCommand}"
 								ToolTip="選択した問題にNoをつけます。" />
 				<Button Content="除" Command="{x:Static local:Commands.OmitQuestionsCommand}"
