@@ -58,7 +58,7 @@
 										Executed="SetPlayPos_Executed"
 										CanExecute="SongPlayer_CanExecute" />
 		<CommandBinding Command="{x:Static hypermutus:Commands.SeekRelativeCommand}"
-										Executed="SeekRelative_executed"
+										Executed="SeekRelative_Executed"
 										CanExecute="SongPlayer_CanExecute" />
 		<CommandBinding Command="{x:Static local:Commands.SaveSongInformationCommand}"
 										Executed="SaveSongInformation_Executed"

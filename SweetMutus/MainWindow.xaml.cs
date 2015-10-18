@@ -750,6 +750,23 @@ namespace Aldentea.SweetMutus
 		}
 		#endregion
 
+		void NextTrack_Executed(object sender, ExecutedRoutedEventArgs e)
+		{ 
+		}
+
+		void NextTrack_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+		{
+
+		}
+
+		void PreviousTrack_Executed(object sender, ExecutedRoutedEventArgs e)
+		{
+		}
+
+		void PreviousTrack_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+		{
+
+		}
 
 		#region SwitchPlayPauseコマンド
 
@@ -776,7 +793,7 @@ namespace Aldentea.SweetMutus
 
 		#endregion
 
-		void SeekRelative_executed(object sender, ExecutedRoutedEventArgs e)
+		void SeekRelative_Executed(object sender, ExecutedRoutedEventArgs e)
 		{
 			if (_songPlayer.CurrentState != SongPlayer.State.Inactive)
 			{
@@ -889,10 +906,5 @@ namespace Aldentea.SweetMutus
 
 
 	}
-
-
-
-
-
 
 }
