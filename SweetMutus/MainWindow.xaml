@@ -46,7 +46,7 @@
 		<CommandBinding
 										Command="{x:Static hypermutus:Commands.SwitchPlayPauseCommand}"
 										Executed="SwitchPlayPause_Executed"
-										CanExecute="SongPlayer_CanExecute" />
+										CanExecute="SwitchPlayPause_CanExecute" />
 		<CommandBinding
 										Command="{x:Static hypermutus:Commands.SeekSabiCommand}"
 										Executed="SeekSabi_Executed"
@@ -228,7 +228,7 @@
 				<DataGrid.InputBindings>
 					<KeyBinding 
 						Key="F5" 
-						Command="Play"
+						Command="{x:Static hypermutus:Commands.SwitchPlayPauseCommand}"
 						CommandParameter="{Binding
 							RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=DataGrid},
 							Path=SelectedItem}"

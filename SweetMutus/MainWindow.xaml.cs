@@ -752,13 +752,28 @@ namespace Aldentea.SweetMutus
 
 
 		#region SwitchPlayPauseコマンド
+
+		// 動作を2つ用意する．
+		// 曲をパラメータとしてとり，現在の曲と違ったら，Playの動作をするようにする？
+
 		void SwitchPlayPause_Executed(object sender, ExecutedRoutedEventArgs e)
 		{
-			if (_songPlayer.CurrentState != SongPlayer.State.Inactive)
+			SweetQuestion q = e.Parameter as SweetQuestion;
+			if (q != null && q != CurrentSong)
+			{
+				MediaCommands.Play.Execute(q, this);
+			}
+			else if (_songPlayer.CurrentState != SongPlayer.State.Inactive)
 			{
 				_songPlayer.TogglePlayPause();
 			}
 		}
+
+		void SwitchPlayPause_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+		{
+			e.CanExecute = (e.Parameter is SweetQuestion) || _songPlayer.CurrentState != SongPlayer.State.Inactive;
+		}
+
 		#endregion
 
 		void SeekRelative_executed(object sender, ExecutedRoutedEventArgs e)
