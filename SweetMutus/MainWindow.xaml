@@ -60,6 +60,12 @@
 		<CommandBinding Command="{x:Static hypermutus:Commands.SeekRelativeCommand}"
 										Executed="SeekRelative_Executed"
 										CanExecute="SongPlayer_CanExecute" />
+		<CommandBinding Command="NextTrack"
+										Executed="NextTrack_Executed"
+										CanExecute="SongPlayer_CanExecute" />
+		<CommandBinding Command="PreviousTrack"
+										Executed="PreviousTrack_Executed"
+										CanExecute="SongPlayer_CanExecute" />
 		<CommandBinding Command="{x:Static local:Commands.SaveSongInformationCommand}"
 										Executed="SaveSongInformation_Executed"
 										CanExecute="SaveSongInformation_CanExecute" />
@@ -91,6 +97,8 @@
 		<KeyBinding Key="F6" Command="{x:Static hypermutus:Commands.SeekSabiCommand}" />
 		<KeyBinding Key="F6" Modifiers="Shift" Command="{x:Static grand:Commands.SetSabiPosCommand}" />
 		<KeyBinding Key="F6" Modifiers="Ctrl" Command="{x:Static local:Commands.SetPlayPosCommand}" />
+		<KeyBinding Key="F3" Command="PreviousTrack" />
+		<KeyBinding Key="F8" Command="NextTrack" />
 		<KeyBinding Key="I" Modifiers="Control" Command="{x:Static local:Commands.SaveSongInformationCommand}"
 								CommandParameter="{Binding ElementName=dataGridQuestions, Path=SelectedItem}" />
 		<KeyBinding Key="R" Modifiers="Control" Command="{x:Static local:Commands.ChangeFileNameCommand}"

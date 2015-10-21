@@ -750,23 +750,56 @@ namespace Aldentea.SweetMutus
 		}
 		#endregion
 
+
+		// (0.0.8.7)
+		#region NextTrack
 		void NextTrack_Executed(object sender, ExecutedRoutedEventArgs e)
-		{ 
-		}
-
-		void NextTrack_CanExecute(object sender, CanExecuteRoutedEventArgs e)
 		{
-
+			var index = dataGridQuestions.Items.IndexOf(this.CurrentSong);
+			if (index >= 0 && index < dataGridQuestions.Items.Count - 1)
+			{
+				var song = (SweetQuestion)dataGridQuestions.Items.GetItemAt(index + 1);
+				System.Windows.Input.MediaCommands.Play.Execute(song, this);
+				dataGridQuestions.SelectedItem = song;
+			}
 		}
 
+		//void NextTrack_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+		//{
+		//}
+		#endregion
+
+		// (0.0.8.7)
+		#region PreviousTrack
 		void PreviousTrack_Executed(object sender, ExecutedRoutedEventArgs e)
 		{
+			if (_songPlayer.CurrentPosition > CurrentSong.PlayPos + TimeSpan.FromSeconds(1.5))
+			{
+				// 再生開始位置へ．
+				_songPlayer.CurrentPosition = CurrentSong.PlayPos;
+			}
+			else if (_songPlayer.CurrentPosition > TimeSpan.FromSeconds(1))
+			{
+				// 曲冒頭へ．
+				_songPlayer.CurrentPosition = TimeSpan.Zero;
+			}
+			else
+			{
+				var index = dataGridQuestions.Items.IndexOf(this.CurrentSong);
+				if (index >= 1 && index < dataGridQuestions.Items.Count)
+				{
+					var song = (SweetQuestion)dataGridQuestions.Items.GetItemAt(index - 1);
+					System.Windows.Input.MediaCommands.Play.Execute(song, this);
+					dataGridQuestions.SelectedItem = song;
+				}
+			}
 		}
 
-		void PreviousTrack_CanExecute(object sender, CanExecuteRoutedEventArgs e)
-		{
+		//void PreviousTrack_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+		//{
 
-		}
+		//}
+		#endregion
 
 		#region SwitchPlayPauseコマンド
 
