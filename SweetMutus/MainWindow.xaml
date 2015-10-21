@@ -113,7 +113,7 @@
 			<RowDefinition Height="Auto" />
 			<RowDefinition Height="Auto" />
 		</Grid.RowDefinitions>
-		
+
 		<Menu Name="MainMenu" Grid.Row="0" HorizontalAlignment="Stretch" Padding="3">
 			<MenuItem Header="ファイル(_F)">
 				<MenuItem Header="新規作成(_N)" Command="New" />
@@ -195,7 +195,7 @@
 				<ColumnDefinition Width="*" />
 				<ColumnDefinition Width="Auto" />
 			</Grid.ColumnDefinitions>
-		<DataGrid Grid.Column="0" Margin="10" VerticalAlignment="Stretch"
+			<DataGrid Grid.Column="0" Margin="10" VerticalAlignment="Stretch"
 							ItemsSource="{Binding Questions}" AutoGenerateColumns="False"
 							CanUserAddRows="False" CanUserSortColumns="False"
 							Name="dataGridQuestions"
@@ -203,14 +203,14 @@
 							DragOver="dataGridQuestions_DragOver"
 							Drop="dataGridQuestions_Drop"
 							>
-			<DataGrid.Columns>
-				<DataGridTextColumn Header="#" Binding="{Binding Path=ID}" IsReadOnly="True"
+				<DataGrid.Columns>
+					<DataGridTextColumn Header="#" Binding="{Binding Path=ID}" IsReadOnly="True"
 														ElementStyle="{StaticResource numericCellStyle}" Visibility="Collapsed" />
-				<DataGridTextColumn Header="No" Binding="{Binding Path=No, Converter={StaticResource noConverter}}"
+					<DataGridTextColumn Header="No" Binding="{Binding Path=No, Converter={StaticResource noConverter}}"
 														ElementStyle="{StaticResource numericCellStyle}" />
-				<DataGridTextColumn Header="曲名" Binding="{Binding Path=Title}" Width="*" />
-				<DataGridTextColumn Header="アーティスト" Binding="{Binding Path=Artist}" Width="*" />
-				<!-- このVisibilityのバインディングが機能していない。
+					<DataGridTextColumn Header="曲名" Binding="{Binding Path=Title}" Width="*" />
+					<DataGridTextColumn Header="アーティスト" Binding="{Binding Path=Artist}" Width="*" />
+					<!-- このVisibilityのバインディングが機能していない。
 				たぶんXAMLのスコープの話だと思うが、どうすればいいのかはよくわからない。-->
 					<DataGridTextColumn Header="ファイル名" Binding="{Binding Path=RelativeFileName}" IsReadOnly="True" Width="*"
 														Visibility="{Binding ElementName=menuItemFileNameColumnVisible, Path=IsChecked,
@@ -225,14 +225,14 @@
 					<DataGridTextColumn Header="開始"
 														Binding="{Binding Path=PlayPos, Converter={StaticResource sabiPosConverter}, ConverterParameter=2}"
 														ElementStyle="{StaticResource numericCellStyle}" MinWidth="60" />
-				<DataGridTextColumn Header="サビ"
+					<DataGridTextColumn Header="サビ"
 														Binding="{Binding Path=SabiPos, Converter={StaticResource sabiPosConverter}, ConverterParameter=2}"
 														ElementStyle="{StaticResource numericCellStyle}" MinWidth="60" />
-			</DataGrid.Columns>
-			<DataGrid.CommandBindings>
-				<CommandBinding Command="Delete"
+				</DataGrid.Columns>
+				<DataGrid.CommandBindings>
+					<CommandBinding Command="Delete"
 												Executed="DeleteQuestions_Executed" />
-			</DataGrid.CommandBindings>
+				</DataGrid.CommandBindings>
 				<DataGrid.InputBindings>
 					<KeyBinding 
 						Key="F5" 
@@ -242,8 +242,8 @@
 							Path=SelectedItem}"
 					/>
 				</DataGrid.InputBindings>
-		</DataGrid>
-			
+			</DataGrid>
+
 			<StackPanel Grid.Column="1" Orientation="Vertical" VerticalAlignment="Center" Margin="0">
 				<StackPanel.Resources>
 					<Style TargetType="{x:Type Button}">
@@ -266,7 +266,7 @@
 								ToolTip="選択した問題のNoを1つ増やします。" />
 			</StackPanel>
 		</Grid>
-		
+
 		<Expander Header="曲再生" Name="expanderSongPlayer" Margin="0" Grid.Row="3"
 							DataContext="{Binding RelativeSource={RelativeSource AncestorType=Window}, Path=CurrentSong}">
 			<Grid>
@@ -280,17 +280,17 @@
 				<Button Content="サビ" Grid.Row="0" Height="40" Width="75"
 								HorizontalAlignment="Left" VerticalAlignment="Center" Margin="99,5,0,5"
 								Command="{x:Static hypermutus:Commands.SeekSabiCommand}" />
-				<TabControl Grid.Row="0" Margin="240,0,0,0" Width="300" Height="60" HorizontalAlignment="Left"
+				<TabControl Grid.Row="0" Margin="200,0,0,0" Width="270" Height="60" HorizontalAlignment="Left"
 										TabStripPlacement="Left">
 					<TabItem Header="サビ">
 						<Grid>
-						<Button Content="サビ設定" Grid.Row="0" Height="34" Width="75"
+							<Button Content="サビ設定" Grid.Row="0" Height="34" Width="75"
 								HorizontalAlignment="Left" Margin="0,0,0,0"
 								Command="{x:Static grand:Commands.SetSabiPosCommand}" />
-						<TextBox HorizontalAlignment="Left" Grid.Row="0" Height="34" Margin="100,0,0,0"
+							<TextBox HorizontalAlignment="Left" Grid.Row="0" Height="34" Margin="100,0,0,0"
 									TextWrapping="Wrap" Text="{Binding Path=SabiPos, Converter={StaticResource sabiPosConverter}, ConverterParameter=2}"
-									Width="100" HorizontalContentAlignment="Right" VerticalContentAlignment="Center"/>
-						<ud:UpDownControl Grid.Row="0" Height="34" Width="32" Margin="200,0,0,0" HorizontalAlignment="Left"
+									Width="80" HorizontalContentAlignment="Right" VerticalContentAlignment="Center"/>
+							<ud:UpDownControl Grid.Row="0" Height="34" Width="32" Margin="180,0,0,0" HorizontalAlignment="Left"
 									UpClick="UpDownControl_UpClick" DownClick="UpDownControl_DownClick" />
 						</Grid>
 					</TabItem>
@@ -307,10 +307,10 @@
 						</Grid>
 					</TabItem>
 				</TabControl>
-				<Slider HorizontalAlignment="Left" Grid.Row="0" Margin="590,0,0,0" VerticalAlignment="Center" Width="180" ToolTip="音量"
+				<Slider Grid.Row="0" Margin="490,21,20,21" VerticalAlignment="Center" ToolTip="音量"
 								Value="{Binding RelativeSource={RelativeSource AncestorType=local:MainWindow}, Path=SongPlayer.Volume}"
 								Maximum="1" Minimum="0" SmallChange="0.01" LargeChange="0.1" AutoToolTipPrecision="2" IsSelectionRangeEnabled="True" AutoToolTipPlacement="BottomRight" />
-				
+
 				<Slider HorizontalAlignment="Left" Grid.Row="1" Height="36" Margin="31,4,0,0" VerticalAlignment="Center" Width="360"
 								TickFrequency="60" Maximum="100" Minimum="0" Name="sliderSeekSong" TickPlacement="BottomRight"
 								LargeChange="30" SmallChange="5"
