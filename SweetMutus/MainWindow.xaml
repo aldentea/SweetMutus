@@ -284,8 +284,8 @@
 										TabStripPlacement="Left">
 					<TabItem Header="サビ">
 						<Grid>
-							<Button Content="サビ設定" Grid.Row="0" Height="34" Width="75"
-								HorizontalAlignment="Left" Margin="0,0,0,0"
+							<Button Content="サビ設定" Grid.Row="0" Height="34" Width="80"
+								HorizontalAlignment="Left" Margin="5,0,0,0"
 								Command="{x:Static grand:Commands.SetSabiPosCommand}" />
 							<TextBox HorizontalAlignment="Left" Grid.Row="0" Height="34" Margin="100,0,0,0"
 									TextWrapping="Wrap" Text="{Binding Path=SabiPos, Converter={StaticResource sabiPosConverter}, ConverterParameter=2}"
@@ -296,13 +296,13 @@
 					</TabItem>
 					<TabItem Header="開始">
 						<Grid>
-							<Button Content="開始位置設定" Grid.Row="0" Height="34" Width="85"
-								HorizontalAlignment="Left" VerticalAlignment="Center" Margin="0,5,0,5"
+							<Button Content="開始位置設定" Grid.Row="0" Height="34" Width="80"
+								HorizontalAlignment="Left" VerticalAlignment="Center" Margin="5,5,0,5"
 								Command="{x:Static local:Commands.SetPlayPosCommand}" />
 							<TextBox HorizontalAlignment="Left" Grid.Row="0" Height="34" Margin="100,5,0,5"
 									TextWrapping="Wrap" Text="{Binding Path=PlayPos, Converter={StaticResource playPosConverter}, ConverterParameter=2}"
-									VerticalAlignment="Center" Width="100" HorizontalContentAlignment="Right" VerticalContentAlignment="Center"/>
-							<ud:UpDownControl Grid.Row="0" Height="34" Width="32" Margin="200,5,0,5" HorizontalAlignment="Left" VerticalAlignment="Center"
+									VerticalAlignment="Center" Width="80" HorizontalContentAlignment="Right" VerticalContentAlignment="Center"/>
+							<ud:UpDownControl Grid.Row="0" Height="34" Width="32" Margin="180,5,0,5" HorizontalAlignment="Left" VerticalAlignment="Center"
 									UpClick="UpDownControlPlayPos_UpClick" DownClick="UpDownControlPlayPos_DownClick" />
 						</Grid>
 					</TabItem>
