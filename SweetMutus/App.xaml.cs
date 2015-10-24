@@ -88,6 +88,16 @@ namespace Aldentea.SweetMutus
 
 		#endregion
 
+		// (0.0.5)
+		private void Application_Startup(object sender, StartupEventArgs e)
+		{
+			if (MySettings.RequireUpgrade)
+			{
+				MySettings.Upgrade();
+				MySettings.RequireUpgrade = false;
+			}
+		}
+
 
 	}
 }

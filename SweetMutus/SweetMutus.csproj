@@ -35,6 +35,10 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="AldenteaFolderTreeView, Version=1.1.0.2, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\external\AldenteaFolderTreeView.dll</HintPath>
+    </Reference>
     <Reference Include="AldenteaWpfApplication">
       <HintPath>..\external\AldenteaWpfApplication.dll</HintPath>
     </Reference>
@@ -43,6 +47,9 @@
     </Reference>
     <Reference Include="AldenteaWpfUtility">
       <HintPath>..\..\GrandMutus\GrandMutusClassic\external\AldenteaWpfUtility.dll</HintPath>
+    </Reference>
+    <Reference Include="GrandMutusBase">
+      <HintPath>..\external\GrandMutusBase.dll</HintPath>
     </Reference>
     <Reference Include="GrandMutusData">
       <HintPath>..\external\GrandMutusData.dll</HintPath>
@@ -60,6 +67,9 @@
     <Reference Include="System.Xaml">
       <RequiredTargetFramework>4.0</RequiredTargetFramework>
     </Reference>
+    <Reference Include="UpDownControl">
+      <HintPath>..\external\UpDownControl.dll</HintPath>
+    </Reference>
     <Reference Include="WindowsBase" />
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
@@ -69,6 +79,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Page Include="ChangeFileNameDialog.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -77,6 +91,12 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="ChangeFileNameDialog.xaml.cs">
+      <DependentUpon>ChangeFileNameDialog.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Commands.cs" />
+    <Compile Include="Converters.cs" />
+    <Compile Include="Helpers.cs" />
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>

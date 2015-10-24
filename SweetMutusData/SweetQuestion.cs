@@ -11,7 +11,7 @@ using System.IO;
 namespace Aldentea.SweetMutus.Data
 {
 
-	public class SweetQuestion : GrandMutus.Data.QuestionBase<SweetQuestionsCollection>
+	public class SweetQuestion : GrandMutus.Data.QuestionBase<SweetQuestionsCollection>/*, IEditableObject*/
 	{
 
 		#region Songのコピペ
@@ -39,6 +39,7 @@ namespace Aldentea.SweetMutus.Data
 		string _title = string.Empty;
 		#endregion
 
+		// (0.1.2)RelativeFileNameプロパティの変更を通知。
 		#region *FileNameプロパティ
 		/// <summary>
 		/// 曲のファイル名を(とりあえずフルパスで)取得／設定します．
@@ -53,8 +54,10 @@ namespace Aldentea.SweetMutus.Data
 			{
 				if (FileName != value)
 				{
+					NotifyPropertyChanging("FileName");
 					this._fileName = value;
 					NotifyPropertyChanged("FileName");
+					NotifyPropertyChanged("RelativeFileName");
 				}
 			}
 		}
@@ -128,6 +131,72 @@ namespace Aldentea.SweetMutus.Data
 		}
 		#endregion
 
+		// (0.4.3)
+		internal void UpdateRelativeFileName()
+		{
+			this.NotifyPropertyChanged("RelativeFileName");
+		}
+
+		// (0.1.2)
+		#region *SongTagプロパティ
+		/// <summary>
+		/// 予め指定した形式で，曲ファイルのメタデータのオブジェクトを取得します．
+		/// ※いまのところは常にID3v23を返すようになっています．
+		/// </summary>
+		public SPP.Aldente.IID3Tag SongTag
+		{
+			get
+			{
+				// とりあえずID3v23を生成する．
+				return new SPP.Aldente.ID3v23Tag {
+					Title = this.Title,
+					Artist = this.Artist,
+					SabiPos = Convert.ToDecimal(this.SabiPos.TotalSeconds),
+					StartPos = Convert.ToDecimal(this.PlayPos.TotalSeconds)
+				};
+			}
+		}
+		#endregion
+
+		// (0.1.2)
+		// 08/19/2013 by aldentea : ★★RealFileNameプロパティの廃止に対応．
+		// 09/29/2011 by aldentea
+		#region *曲情報を曲ファイルに保存(SaveInfomation)
+		/// <summary>
+		/// 曲情報を曲ファイルのメタデータとして保存します．再生開始位置と再生停止位置は0.0で置き換えるので注意して下さい．
+		/// </summary>
+		public int SaveInformation()
+		{
+			// startPosとStopPosは0.0Mで書き換える！
+			if (File.Exists(this.FileName))
+			{ 
+//			int ret = 0;
+//			while (true)
+//			{
+//				try
+//				{
+					// ひどいAPIだね．
+					//aldente.AldenteMP3TagAccessor.UpdateInfo(this.Title, this.Artist, this.SabiPos, 0.0M, 0.0M, this.RealFileName, 88);
+					//AldenteMP3TagAccessor.UpdateInfo(this.Title, this.Artist, this.SabiPos, 0.0M, 0.0M, this.FileName, 88);
+
+					// ※それでは，どうすればいいか？
+					// IID3Tagの基礎的な実装をしたクラスを用意する(ただしI/Oは未実装)．
+					// で，それをUpdateInfoに渡す．
+					SPP.Aldente.AldenteMP3TagAccessor.UpdateInfo(this.FileName, this.SongTag);
+
+
+//					break;
+//				}
+//				catch (IOException ex)
+//				{
+//					ret += 1;
+//					if (ret > 100) { throw ex; }
+//				}
+			}
+//			return ret;
+					return 0;
+		}
+		#endregion
 
 		#endregion
 
@@ -158,6 +227,33 @@ namespace Aldentea.SweetMutus.Data
 		TimeSpan _playPos = TimeSpan.Zero;
 		#endregion
 
+		// (0.1.3.1)器だけ作っておく．設定のUIや機能は未実装．
+		#region *StopPosプロパティ
+		/// <summary>
+		/// 出題時の再生停止位置を取得／設定します．
+		/// TimeSpan.Zeroであれば，停止しないことを意味します．
+		/// </summary>
+		public TimeSpan StopPos
+		{
+			get
+			{
+				return _stopPos;
+			}
+			set
+			{
+				if (this.StopPos != value)
+				{
+					// 負の値でないことをここでチェックした方がいいかな？
+
+					NotifyPropertyChanging("StopPos");
+					this._stopPos = value;
+					NotifyPropertyChanged("StopPos");
+				}
+			}
+		}
+		TimeSpan _stopPos = TimeSpan.Zero;
+		#endregion
+
 		#endregion
 
 
@@ -169,6 +265,7 @@ namespace Aldentea.SweetMutus.Data
 		const string NO_ATTRIBUTE = "no";
 		const string CATEGORY_ATTRIBUTE = "category";
 		const string PLAY_POS_ATTRIBUTE = "play_pos";
+		const string STOP_POS_ATTRIBUTE = "stop_pos";
 
 		// どこに置くかは未定．
 		// ここに置くか，XML生成専用のクラスを作成するか...
@@ -189,8 +286,41 @@ namespace Aldentea.SweetMutus.Data
 		/// <returns></returns>
 		public XElement GenerateElement(string songs_root, bool exporting = false)
 		{
-			var element = new XElement(ELEMENT_NAME);
-			element.Add(new XAttribute(ID_ATTRIBUTE, this.ID));
+			var element = new XElement(ELEMENT_NAME,
+				new XAttribute(ID_ATTRIBUTE, this.ID)
+			);
+			return AddSongProperty(AddIntroQuestionProperty(element), songs_root, exporting);
+		}
+		#endregion
+
+		// (0.1.1)
+		#region Mtuファイル出力用メソッド
+
+		public XElement GenerateQuestionElement()
+		{
+			var element = new XElement(GrandMutus.Data.IntroQuestion.ELEMENT_NAME
+				, new XAttribute("id", this.ID), new XAttribute("song_id", this.ID)
+			);
+
+			return AddIntroQuestionProperty(element);
+		}
+
+		public XElement GenerateSongElement(string songs_root, bool exporting = false)
+		{
+			var element = new XElement(GrandMutus.Data.Song.ELEMENT_NAME,
+				new XAttribute("id", this.ID)
+			);
+			return AddSongProperty(element, songs_root, exporting);
+		}
+
+		#endregion
+
+		#region プロパティをXElementに出力
+
+		XElement AddIntroQuestionProperty(XElement element)
+		{
+			// ※IDやSongIDはここでは追加しない！
+
 			if (this.No.HasValue)
 			{
 				element.Add(new XAttribute(NO_ATTRIBUTE, this.No));
@@ -199,11 +329,23 @@ namespace Aldentea.SweetMutus.Data
 			{
 				element.Add(new XAttribute(CATEGORY_ATTRIBUTE, this.Category));
 			}
-			// (0.3.3)とりあえず従前のように秒数を出力しておく．
 			if (this.PlayPos > TimeSpan.Zero)
 			{
 				element.Add(new XAttribute(PLAY_POS_ATTRIBUTE, this.PlayPos.TotalSeconds));
 			}
+			if (this.StopPos > TimeSpan.Zero)
+			{
+				element.Add(new XAttribute(STOP_POS_ATTRIBUTE, this.StopPos.TotalSeconds));
+			}
+
+			// ☆answer要素はどうする？
+			return element;
+		}
+
+		XElement AddSongProperty(XElement element, string songs_root, bool exporting = false)
+		{
+			// ※IDはここでは追加しない！
+
 			if (this.SabiPos > TimeSpan.Zero)
 			{
 				element.Add(new XAttribute(SABI_POS_ATTRIBUTE, this.SabiPos.TotalSeconds));
@@ -225,11 +367,11 @@ namespace Aldentea.SweetMutus.Data
 				file_name = file_full_name;
 			}
 			element.Add(new XElement(FILE_NAME_ELEMENT, file_name));
+
 			return element;
 		}
+
 		#endregion
-
-
 
 		// (0.3.3)
 		#region *[static]XML要素からオブジェクトを生成(Generate)
@@ -245,8 +387,9 @@ namespace Aldentea.SweetMutus.Data
 			{
 				question.ID = (int)id_attribute;
 			}
-			question.No = (int?)questionElement.Attribute(NO_ATTRIBUTE);
 			question.Category = (string)questionElement.Attribute(CATEGORY_ATTRIBUTE);
+			
+			question.No = (int?)questionElement.Attribute(NO_ATTRIBUTE);
 
 			question.Title = (string)questionElement.Element(TITLE_ELEMENT);
 			question.Artist = (string)questionElement.Element(ARTIST_ELEMENT);
@@ -270,14 +413,118 @@ namespace Aldentea.SweetMutus.Data
 			{
 				question.PlayPos = TimeSpan.FromSeconds(play_pos.Value);
 			}
+			var stop_pos = (double?)questionElement.Attribute(STOP_POS_ATTRIBUTE);
+			if (stop_pos.HasValue)
+			{
+				question.StopPos = TimeSpan.FromSeconds(stop_pos.Value);
+			}
 
 			return question;
+		}
+		#endregion
+
+
+		// (0.1.3)
+		#region *[static]mutus2のsong要素からオブジェクトを生成する(GenerateFromMutus2)
+		public static SweetQuestion GenerateFromMutus2(XElement songElement, string songsRoot, string category)
+		{
+			//	<song id="6" sabipos="21.7">
+			//		<title>誰もいない海</title>
+			//		<artist>トワエモア</artist>
+			//		<filename>intro\JOY02554.mp3</filename>
+			//	</song>
+
+			var question = new SweetQuestion();
+
+			// XMLからインスタンスを生成するならばIDは常にあるのでは？
+			// →songをインポートする時とかはそうではないかもしれない？ので一応有無をチェックする．
+			// →でも，インポートする時はXML経由ではなくオブジェクト経由で行った方がいいのでは？(ファイル名のパスの扱いとか...)
+			var id_attribute = songElement.Attribute(ID_ATTRIBUTE);
+			if (id_attribute != null)
+			{
+				question.ID = (int)id_attribute;
+			}
+			question.Category = category;
+
+			question.No = (int?)songElement.Attribute(NO_ATTRIBUTE);
+
+			question.Title = (string)songElement.Element(TITLE_ELEMENT);
+			question.Artist = (string)songElement.Element(ARTIST_ELEMENT);
+			var file_name = (string)songElement.Element("filename");	// 相対パスをフルパスに直す作業が必要！
+			if (!Path.IsPathRooted(file_name))
+			{
+				file_name = Path.Combine(songsRoot, file_name);
+				if (!Path.IsPathRooted(file_name))
+				{
+					throw new ArgumentException("ファイル名が相対パスで記録されています．songsRootには，絶対パスを指定して下さい．", "songsRoot");
+				}
+			}
+			question.FileName = file_name;
+			var sabi_pos = (double?)songElement.Attribute("sabipos");
+			if (sabi_pos.HasValue)
+			{
+				question.SabiPos = TimeSpan.FromSeconds(sabi_pos.Value);
+			}
+			var play_pos = (double?)songElement.Attribute("playpos");
+			if (play_pos.HasValue)
+			{
+				question.PlayPos = TimeSpan.FromSeconds(play_pos.Value);
+			}
+			var stop_pos = (double?)songElement.Attribute("stoppos");
+			if (stop_pos.HasValue)
+			{
+				question.StopPos = TimeSpan.FromSeconds(stop_pos.Value);
+			}
+
+			return question;
+
 		}
 		#endregion
 
 		#endregion
 
 
+		#region IEditable実装
+		/*
+		XElement _backup = null;
+		
+		public void BeginEdit()
+		{
+			// 通常、このメソッドは、DataRowView の BeginEdit のセマンティクスを取り込むために使用されます。
+			// 既に編集されているオブジェクトで BeginEdit を呼び出した場合、2 番目以降の呼び出しは無視されます。
+
+			// 実装時の注意
+			// このインターフェイスを実装しているオブジェクトは、BeginEdit が呼び出された後で行われた更新内容を格納しておき、
+			// CancelEdit が呼び出された場合にそれらの更新を破棄できるようにしておく必要があります。
+			if (_backup == null)
+			{
+				_backup = GenerateElement(string.Empty);
+			}
+		}
+		
+		public void CancelEdit()
+		{
+			// 最後に BeginEdit が呼び出された後に行われた変更を破棄します。
+			// 解説
+			// 通常、このメソッドは、DataRowView の CancelEdit のセマンティクスを取り込むために使用されます。
+			// 編集中ではないオブジェクトで呼び出した場合、このメソッドは無視されます。
+			// 所有側のリストが IBindingList を実装している場合、IBindingList.AddNew を使用して作成されたオブジェクトに対して
+			// CancelEdit を呼び出すと、そのオブジェクトは破棄されます。
+			Generate(_backup);
+		}
+
+		public void EndEdit()
+		{
+			// 対象となるオブジェクトに、最後に BeginEdit または IBindingList.AddNew を呼び出した後に行われた変更を適用します。
+			
+			// 解説
+			// 通常、このメソッドは、DataRowView の EndEdit のセマンティクスを取り込むために使用されます。
+			// 編集中ではないオブジェクトで呼び出した場合、このメソッドは無視されます。
+
+			_backup = null;
+		}
+		*/
+		#endregion
 
 	}
 
