@@ -446,8 +446,7 @@ namespace Aldentea.SweetMutus
 
 			Categories.Clear();
 			AddCategory(string.Empty);
-			//this.comboBoxCategories.Items.Clear();
-			//this.comboBoxCategories.Items.Add(string.Empty);
+			this.CurrentCategory = string.Empty;
 
 			this.SongPlayer.Close();
 			this.CurrentSong = null;
@@ -485,11 +484,15 @@ namespace Aldentea.SweetMutus
 		//private void comboBoxCategories_SelectionChanged(object sender, SelectionChangedEventArgs e)
 		//{
 		//	dataGridQuestions.Items.Filter = q => ((SweetQuestion)q).Category == (string)comboBoxCategories.SelectedItem;
-			
+
 		//}
 
 
+		#region *[dependency]CurrentCategoryプロパティ
 
+		/// <summary>
+		/// 現在のカテゴリを取得／設定します。
+		/// </summary>
 		public string CurrentCategory
 		{
 			get { return (string)GetValue(CurrentCategoryProperty); }
@@ -507,6 +510,8 @@ namespace Aldentea.SweetMutus
 			//window.dataGridQuestions.Items.Filter = q => ((SweetQuestion)q).Category == (string)e.NewValue;
 			window.UpdateFilter((string)e.NewValue);
 		}
+
+		#endregion
 
 		// (0.0.8)
 		internal void UpdateFilter()
