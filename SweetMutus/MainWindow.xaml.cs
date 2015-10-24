@@ -54,6 +54,7 @@ namespace Aldentea.SweetMutus
 			return MessageBox.Show(message, "確認", MessageBoxButton.YesNo) == MessageBoxResult.Yes;
 		}
 
+		#region *コンストラクタ(MainWindow)
 		public MainWindow()
 		{
 			InitializeComponent();
@@ -91,6 +92,38 @@ namespace Aldentea.SweetMutus
 					Redo_Executed, Redo_CanExecute)
 			);
 		}
+		#endregion
+
+		// (0.0.8.9)
+		#region *ウインドウ初期化時(MainWindow_Initialized)
+		private void MainWindow_Initialized(object sender, EventArgs e)
+		{
+			// 窓の位置やサイズを復元。
+			if (MySettings.WindowMaximized)
+			{
+				this.WindowState = System.Windows.WindowState.Maximized;
+			}
+			if (MySettings.WindowSize != new Size(0, 0))
+			{
+				this.Left = MySettings.WindowPosition.X;
+				this.Top = MySettings.WindowPosition.Y;
+				this.Width = MySettings.WindowSize.Width;
+				this.Height = MySettings.WindowSize.Height;
+			}
+		}
+		#endregion
+
+		// (0.0.8.9)
+		#region *ウインドウクローズ時(MainWindow_Closed)
+		private void MainWindow_Closed(object sender, EventArgs e)
+		{
+			// 窓の位置やサイズを保存。
+			MySettings.WindowMaximized = this.WindowState == System.Windows.WindowState.Maximized;
+			MySettings.WindowPosition = new Point(this.Left, this.Top);
+			MySettings.WindowSize = new System.Windows.Size(this.Width, this.Height);
+		}
+		#endregion
+
 
 		#region コマンドハンドラ
 
@@ -395,11 +428,22 @@ namespace Aldentea.SweetMutus
 
 		#endregion
 
+		// (0.0.8.9)
+		#region *MySettingsプロパティ
+		Properties.Settings MySettings
+		{
+			get
+			{
+				return App.Current.MySettings;
+			}
+		}
+		#endregion
 
 		// カレントカテゴリ関連
 
 		void MyDocument_Initialized(object sender, EventArgs e)
 		{
+
 			Categories.Clear();
 			AddCategory(string.Empty);
 			//this.comboBoxCategories.Items.Clear();
@@ -918,6 +962,7 @@ namespace Aldentea.SweetMutus
 			this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
 		}
 		#endregion
+
 
 		#region お試し
 

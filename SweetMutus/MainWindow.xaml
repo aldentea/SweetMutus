@@ -10,7 +10,9 @@
 				xmlns:ud="clr-namespace:Aldentea.Wpf.Controls;assembly=UpDownControl"
 				OpenFileDialogFilter="SweetMutusファイル(*.smt)|*.smt|mutus2ファイル(*.mtu)|*.mtu"
 				SaveFileDialogFilter="SweetMutusファイル(*.smt)|*.smt"
-        Height="600" Width="800">
+        Height="600" Width="800"
+				Initialized="MainWindow_Initialized"
+				Closed="MainWindow_Closed">
 	<Window.Resources>
 		<util:CaptionConverter x:Key="captionConverter" ApplicationName="SweetMutus" />
 		<util:TimeSpanDoubleConverter x:Key="timeSpanDoubleConverter" />
