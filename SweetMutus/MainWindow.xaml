@@ -313,7 +313,7 @@
 								Value="{Binding RelativeSource={RelativeSource AncestorType=local:MainWindow}, Path=SongPlayer.Volume}"
 								Maximum="1" Minimum="0" SmallChange="0.01" LargeChange="0.1" AutoToolTipPrecision="2" IsSelectionRangeEnabled="True" AutoToolTipPlacement="BottomRight" />
 
-				<Slider HorizontalAlignment="Left" Grid.Row="1" Height="36" Margin="31,4,0,0" VerticalAlignment="Center" Width="360"
+				<Slider Grid.Row="1" Height="36" Margin="31,4,200,1" VerticalAlignment="Center"
 								TickFrequency="60" Maximum="100" Minimum="0" Name="sliderSeekSong" TickPlacement="BottomRight"
 								LargeChange="30" SmallChange="5"
 								Value="{Binding RelativeSource={RelativeSource AncestorType=Window},
@@ -321,11 +321,11 @@
 				<Label Name="labelCurrentPosition"  Grid.Row="1"
 								Content="{Binding RelativeSource={RelativeSource AncestorType=Window},
 													Path=SongPlayer.CurrentPosition, Mode=OneWay}" ContentStringFormat="m\:ss"
-								HorizontalAlignment="Left"
-								Margin="421,0,0,0" VerticalAlignment="Center"/>
-				<Label Name="labelDuration"
-								HorizontalAlignment="Left" ContentStringFormat="m\:ss" Content="{x:Static sys:TimeSpan.Zero}"
-								Margin="521,0,0,0" Grid.Row="1" VerticalAlignment="Center"/>
+								HorizontalAlignment="Right" HorizontalContentAlignment="Right"
+								Margin="0,16,99,15" VerticalAlignment="Center"/>
+				<Label Name="labelDuration" HorizontalContentAlignment="Right"
+								HorizontalAlignment="Right" ContentStringFormat="m\:ss" Content="{x:Static sys:TimeSpan.Zero}"
+								Margin="0,8,31,8" Grid.Row="1" VerticalAlignment="Center"/>
 			</Grid>
 		</Expander>
 
