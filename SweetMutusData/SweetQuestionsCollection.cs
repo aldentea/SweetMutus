@@ -540,6 +540,7 @@ namespace Aldentea.SweetMutus.Data
 		}
 		#endregion
 
+		// (0.1.5)Noの処理をここで行うようにする．
 		// (0.1.3)
 		#region *mutus2のsongs要素を読み込む(LoadMutus2SongsElement)
 		public void LoadMutus2SongsElement(XElement songsElement /*, string source_directory*/)
@@ -557,9 +558,21 @@ namespace Aldentea.SweetMutus.Data
 			foreach (var category in songsElement.Elements("category"))
 			{
 				var category_name = (string)category.Attribute("name");
+				int n = 1;
 				foreach (var song in category.Elements("song"))
 				{
-					this.Add(SweetQuestion.GenerateFromMutus2(song, root, category_name));
+					// ちょっといびつかもしれないが，Noはここで管理してみる．
+
+					// no属性は，番号がついている場合には存在せず，
+					// 番号が付されていない場合は"practice"という値が与えられている，
+					// 他の値はとらない，という仕様でいいんだっけ？
+
+					var question = SweetQuestion.GenerateFromMutus2(song, root, category_name);
+					if (song.Attribute("no") == null)
+					{
+						question.No = n++;
+					}
+					this.Add(question);
 				}
 			}
 		}
