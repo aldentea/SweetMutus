@@ -83,4 +83,35 @@ namespace Aldentea.SweetMutus
 	}
 	#endregion
 
+
+	// (0.0.9)
+	#region DurationValidationRuleクラス
+	public class DurationValidationRule : System.Windows.Controls.ValidationRule
+	{
+		public override System.Windows.Controls.ValidationResult Validate(object value, System.Globalization.CultureInfo cultureInfo)
+		{
+			string message = "valueには 'm:ss.ff' 形式の文字列を与えて下さい。";
+			if (value is string)
+			{
+				var parts = ((string)value).Split(':');
+				int min;
+				double second;
+
+				switch (parts.Length)
+				{
+					case 2:
+						return new System.Windows.Controls.ValidationResult(
+							int.TryParse(parts[0], out min) && double.TryParse(parts[1], out second),
+							message);
+					case 1:
+						return new System.Windows.Controls.ValidationResult(double.TryParse(parts[0], out second), message);
+					default:
+						return new System.Windows.Controls.ValidationResult(false, message);
+				}
+			}
+			return new System.Windows.Controls.ValidationResult(false, "こんなん文字列に決まってるやろ！");
+		}
+	}
+	#endregion
+
 }
