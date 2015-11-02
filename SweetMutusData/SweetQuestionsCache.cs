@@ -48,7 +48,7 @@ namespace Aldentea.SweetMutus.Data
 	}
 	#endregion
 
-	// (0.3.4)
+	// (*0.3.4)
 	#region SweetQuestionsAddedCacheクラス
 	public class SweetQuestionsAddedCache : SweetQuestionsCache
 	{
@@ -72,7 +72,7 @@ namespace Aldentea.SweetMutus.Data
 	#endregion
 
 
-	// (0.4.1)
+	// (*0.4.1)
 	#region QuestionsRemovedCacheクラス
 	public class SweetQuestionsRemovedCache : SweetQuestionsCache
 	{
@@ -132,7 +132,7 @@ namespace Aldentea.SweetMutus.Data
 
 	// 以下，個々のアイテムの変更用．
 
-	// (0.2.0)
+	// (*0.2.0)
 	#region QuestionTitleChangedCacheクラス
 	public class QuestionTitleChangedCache : GrandMutus.Data.PropertyChangedCache<string>
 	{
@@ -186,7 +186,7 @@ namespace Aldentea.SweetMutus.Data
 	}
 	#endregion
 
-	// (0.2.0)
+	// (*0.2.0)
 	#region QuestionArtistChangedCacheクラス
 	public class QuestionArtistChangedCache : GrandMutus.Data.PropertyChangedCache<string>
 	{
@@ -219,7 +219,40 @@ namespace Aldentea.SweetMutus.Data
 	}
 	#endregion
 
-	// (0.4.2)
+	// (0.1.6)ほとんどSabiPosのコピペ．
+	#region QuestionPlayPosChangedCacheクラス
+	public class QuestionPlayPosChangedCache : GrandMutus.Data.PropertyChangedCache<TimeSpan>
+	{
+		SweetQuestion _question;
+
+		public QuestionPlayPosChangedCache(SweetQuestion question, TimeSpan from, TimeSpan to)
+			: base(from, to)
+		{
+			this._question = question;
+		}
+
+		public override void Reverse()
+		{
+			_question.PlayPos = _previousValue;
+		}
+
+		public override bool CanCancelWith(IOperationCache other)
+		{
+			var other_cache = other as QuestionPlayPosChangedCache;
+			if (other_cache == null)
+			{ return false; }
+			else
+			{
+				return other_cache._question == this._question &&
+					other_cache._previousValue == this._currentValue &&
+					other_cache._currentValue == this._previousValue;
+			}
+		}
+
+	}
+	#endregion
+
+	// (*0.4.2)
 	#region QuestionSabiPosChangedCacheクラス
 	public class QuestionSabiPosChangedCache : GrandMutus.Data.PropertyChangedCache<TimeSpan>
 	{
@@ -252,7 +285,7 @@ namespace Aldentea.SweetMutus.Data
 	}
 	#endregion
 
-	// (0.4.5.1)
+	// (*0.4.5.1)
 	#region QuestionNoChangedCacheクラス
 	public class QuestionNoChangedCache : GrandMutus.Data.PropertyChangedCache<int?>
 	{
