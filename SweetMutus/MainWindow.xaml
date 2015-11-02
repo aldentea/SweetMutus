@@ -16,8 +16,7 @@
 	<Window.Resources>
 		<util:CaptionConverter x:Key="captionConverter" ApplicationName="SweetMutus" />
 		<util:TimeSpanDoubleConverter x:Key="timeSpanDoubleConverter" />
-		<local:DurationConverter x:Key="sabiPosConverter" />
-		<local:DurationConverter x:Key="playPosConverter" />
+		<local:DurationConverter x:Key="durationConverter" />
 		<grand:NullableIntConverter x:Key="noConverter" />
 		<grand:VisibilityConverter x:Key="categoryVisibilityConverter" />
 		<grand:VisibilityConverter x:Key="fileNameVisibilityConverter" />
@@ -208,8 +207,16 @@
 				<DataGrid.Columns>
 					<DataGridTextColumn Header="#" Binding="{Binding Path=ID}" IsReadOnly="True"
 														ElementStyle="{StaticResource numericCellStyle}" Visibility="Collapsed" />
-					<DataGridTextColumn Header="No" Binding="{Binding Path=No, Converter={StaticResource noConverter}}"
-														ElementStyle="{StaticResource numericCellStyle}" />
+					<DataGridTextColumn Header="No" ElementStyle="{StaticResource numericCellStyle}"
+					>
+						<DataGridTextColumn.Binding>
+							<Binding Path="No" Converter="{StaticResource noConverter}">
+								<Binding.ValidationRules>
+									<grand:NullableIntValidationRule />
+								</Binding.ValidationRules>
+							</Binding>
+						</DataGridTextColumn.Binding>
+					</DataGridTextColumn>
 					<DataGridTextColumn Header="曲名" Binding="{Binding Path=Title}" Width="*" />
 					<DataGridTextColumn Header="アーティスト" Binding="{Binding Path=Artist}" Width="*" />
 					<!-- このVisibilityのバインディングが機能していない。
@@ -224,12 +231,24 @@
 							</Style>
 						</DataGridTextColumn.ElementStyle>
 					</DataGridTextColumn>
-					<DataGridTextColumn Header="開始"
-														Binding="{Binding Path=PlayPos, Converter={StaticResource sabiPosConverter}, ConverterParameter=2}"
-														ElementStyle="{StaticResource numericCellStyle}" MinWidth="60" />
-					<DataGridTextColumn Header="サビ"
-														Binding="{Binding Path=SabiPos, Converter={StaticResource sabiPosConverter}, ConverterParameter=2}"
-														ElementStyle="{StaticResource numericCellStyle}" MinWidth="60" />
+					<DataGridTextColumn Header="開始" ElementStyle="{StaticResource numericCellStyle}" MinWidth="60">
+						<DataGridTextColumn.Binding>
+							<Binding Path="PlayPos" Converter="{StaticResource durationConverter}" ConverterParameter="2">
+								<Binding.ValidationRules>
+									<local:DurationValidationRule />
+								</Binding.ValidationRules>
+							</Binding> 
+						</DataGridTextColumn.Binding>
+					</DataGridTextColumn>
+					<DataGridTextColumn Header="サビ"	ElementStyle="{StaticResource numericCellStyle}" MinWidth="60">
+						<DataGridTextColumn.Binding>
+							<Binding Path="SabiPos" Converter="{StaticResource durationConverter}" ConverterParameter="2">
+								<Binding.ValidationRules>
+									<local:DurationValidationRule />
+								</Binding.ValidationRules>
+							</Binding>
+						</DataGridTextColumn.Binding>
+					</DataGridTextColumn>
 				</DataGrid.Columns>
 				<DataGrid.CommandBindings>
 					<CommandBinding Command="Delete"
@@ -290,8 +309,15 @@
 								HorizontalAlignment="Left" Margin="5,0,0,0"
 								Command="{x:Static grand:Commands.SetSabiPosCommand}" />
 							<TextBox HorizontalAlignment="Left" Grid.Row="0" Height="34" Margin="100,0,0,0"
-									TextWrapping="Wrap" Text="{Binding Path=SabiPos, Converter={StaticResource sabiPosConverter}, ConverterParameter=2}"
-									Width="80" HorizontalContentAlignment="Right" VerticalContentAlignment="Center"/>
+									TextWrapping="Wrap"	Width="80" HorizontalContentAlignment="Right" VerticalContentAlignment="Center">
+								<TextBox.Text>
+									<Binding Path="SabiPos" Converter="{StaticResource durationConverter}" ConverterParameter="2">
+										<Binding.ValidationRules>
+											<local:DurationValidationRule />
+										</Binding.ValidationRules>
+									</Binding>
+								</TextBox.Text>
+							</TextBox>
 							<ud:UpDownControl Grid.Row="0" Height="34" Width="32" Margin="180,0,0,0" HorizontalAlignment="Left"
 									UpClick="UpDownControl_UpClick" DownClick="UpDownControl_DownClick" />
 						</Grid>
@@ -301,9 +327,17 @@
 							<Button Content="開始位置設定" Grid.Row="0" Height="34" Width="80"
 								HorizontalAlignment="Left" VerticalAlignment="Center" Margin="5,5,0,5"
 								Command="{x:Static local:Commands.SetPlayPosCommand}" />
-							<TextBox HorizontalAlignment="Left" Grid.Row="0" Height="34" Margin="100,5,0,5"
-									TextWrapping="Wrap" Text="{Binding Path=PlayPos, Converter={StaticResource playPosConverter}, ConverterParameter=2}"
-									VerticalAlignment="Center" Width="80" HorizontalContentAlignment="Right" VerticalContentAlignment="Center"/>
+							<TextBox HorizontalAlignment="Left" Grid.Row="0" Width="80" Height="34" Margin="100,5,0,5"
+									TextWrapping="Wrap" VerticalAlignment="Center" HorizontalContentAlignment="Right" VerticalContentAlignment="Center">
+								<TextBox.Text>
+									<Binding Path="PlayPos" Converter="{StaticResource durationConverter}" ConverterParameter="2">
+										<Binding.ValidationRules>
+											<local:DurationValidationRule />
+										</Binding.ValidationRules>
+									</Binding>
+								</TextBox.Text>
+
+							</TextBox>
 							<ud:UpDownControl Grid.Row="0" Height="34" Width="32" Margin="180,5,0,5" HorizontalAlignment="Left" VerticalAlignment="Center"
 									UpClick="UpDownControlPlayPos_UpClick" DownClick="UpDownControlPlayPos_DownClick" />
 						</Grid>

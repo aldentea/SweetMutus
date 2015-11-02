@@ -423,7 +423,7 @@ namespace Aldentea.SweetMutus.Data
 		}
 		#endregion
 
-
+		// (0.1.5)Noの処理は，1つ上(SweetQuestionsCollectionクラス)で行うようにする．
 		// (0.1.3)
 		#region *[static]mutus2のsong要素からオブジェクトを生成する(GenerateFromMutus2)
 		public static SweetQuestion GenerateFromMutus2(XElement songElement, string songsRoot, string category)
@@ -446,7 +446,8 @@ namespace Aldentea.SweetMutus.Data
 			}
 			question.Category = category;
 
-			question.No = (int?)songElement.Attribute(NO_ATTRIBUTE);
+			// mutus2のNoは，それ以降のものとかなり仕様が違うのであった！
+			//question.No = (int?)songElement.Attribute(NO_ATTRIBUTE);
 
 			question.Title = (string)songElement.Element(TITLE_ELEMENT);
 			question.Artist = (string)songElement.Element(ARTIST_ELEMENT);

@@ -183,6 +183,7 @@ namespace Aldentea.SweetMutus.Data
 
 		string _titleCache = string.Empty;	// 手抜き．Songオブジェクト自体もキャッシュするべき．
 		string _artistCache = string.Empty;
+		TimeSpan _playPosCache = TimeSpan.Zero;
 		TimeSpan _sabiPosCache = TimeSpan.Zero;
 		string _fileNameCache = string.Empty;
 		string _categoryCache = null;
@@ -197,6 +198,9 @@ namespace Aldentea.SweetMutus.Data
 					break;
 				case "Artist":
 					this._artistCache = song.Artist;
+					break;
+				case "PlayPos":
+					this._playPosCache = song.PlayPos;
 					break;
 				case "SabiPos":
 					this._sabiPosCache = song.SabiPos;
@@ -230,6 +234,13 @@ namespace Aldentea.SweetMutus.Data
 						Item = new QuestionArtistChangedCache(song, _artistCache, song.Artist)
 					});
 					_artistCache = string.Empty;
+					break;
+				case "PlayPos":
+					this.ItemChanged(this, new ItemEventArgs<IOperationCache>
+					{
+						Item = new QuestionPlayPosChangedCache(song, _playPosCache, song.PlayPos)
+					});
+					_playPosCache = TimeSpan.Zero;
 					break;
 				case "SabiPos":
 					this.ItemChanged(this, new ItemEventArgs<IOperationCache>
@@ -540,6 +551,7 @@ namespace Aldentea.SweetMutus.Data
 		}
 		#endregion
 
+		// (0.1.5)Noの処理をここで行うようにする．
 		// (0.1.3)
 		#region *mutus2のsongs要素を読み込む(LoadMutus2SongsElement)
 		public void LoadMutus2SongsElement(XElement songsElement /*, string source_directory*/)
@@ -557,9 +569,21 @@ namespace Aldentea.SweetMutus.Data
 			foreach (var category in songsElement.Elements("category"))
 			{
 				var category_name = (string)category.Attribute("name");
+				int n = 1;
 				foreach (var song in category.Elements("song"))
 				{
-					this.Add(SweetQuestion.GenerateFromMutus2(song, root, category_name));
+					// ちょっといびつかもしれないが，Noはここで管理してみる．
+
+					// no属性は，番号がついている場合には存在せず，
+					// 番号が付されていない場合は"practice"という値が与えられている，
+					// 他の値はとらない，という仕様でいいんだっけ？
+
+					var question = SweetQuestion.GenerateFromMutus2(song, root, category_name);
+					if (song.Attribute("no") == null)
+					{
+						question.No = n++;
+					}
+					this.Add(question);
 				}
 			}
 		}
