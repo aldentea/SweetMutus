@@ -183,6 +183,7 @@ namespace Aldentea.SweetMutus.Data
 
 		string _titleCache = string.Empty;	// 手抜き．Songオブジェクト自体もキャッシュするべき．
 		string _artistCache = string.Empty;
+		TimeSpan _playPosCache = TimeSpan.Zero;
 		TimeSpan _sabiPosCache = TimeSpan.Zero;
 		string _fileNameCache = string.Empty;
 		string _categoryCache = null;
@@ -197,6 +198,9 @@ namespace Aldentea.SweetMutus.Data
 					break;
 				case "Artist":
 					this._artistCache = song.Artist;
+					break;
+				case "PlayPos":
+					this._playPosCache = song.PlayPos;
 					break;
 				case "SabiPos":
 					this._sabiPosCache = song.SabiPos;
@@ -230,6 +234,13 @@ namespace Aldentea.SweetMutus.Data
 						Item = new QuestionArtistChangedCache(song, _artistCache, song.Artist)
 					});
 					_artistCache = string.Empty;
+					break;
+				case "PlayPos":
+					this.ItemChanged(this, new ItemEventArgs<IOperationCache>
+					{
+						Item = new QuestionPlayPosChangedCache(song, _playPosCache, song.PlayPos)
+					});
+					_playPosCache = TimeSpan.Zero;
 					break;
 				case "SabiPos":
 					this.ItemChanged(this, new ItemEventArgs<IOperationCache>
