@@ -184,7 +184,15 @@ namespace Aldentea.SweetMutus.Data
 		/// </summary>
 		static void LoadInformation(SweetQuestion question)
 		{
-			SPP.Aldente.IID3Tag tag = SPP.Aldente.AldenteMP3TagAccessor.ReadFile(question.FileName);
+			SPP.Aldente.IID3Tag tag;
+			try
+			{
+				tag = SPP.Aldente.AldenteMP3TagAccessor.ReadFile(question.FileName);
+			}
+			catch (ApplicationException)
+			{
+				tag = null;
+			}
 			question.Title = tag == null ? string.Empty : tag.Title;
 			question.Artist = tag == null ? string.Empty : tag.Artist;
 			question.SabiPos = tag == null ? TimeSpan.Zero : TimeSpan.FromSeconds(Convert.ToDouble(tag.SabiPos));
