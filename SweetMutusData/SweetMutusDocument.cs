@@ -176,6 +176,7 @@ namespace Aldentea.SweetMutus.Data
 		//	AddOperationHistory(new SweetQuestionsRemovedCache(this, e.Item));
 		//}
 
+		// (0.1.7)再生開始位置もロードするように変更．
 		// HyperMutusからのパクリ．古いメソッドだけど，とりあえずそのまま使う．
 		// 場所も未定．とりあえずstatic化してここに置いておく．
 		#region *[static]ファイルからメタデータを読み込み(LoadInformation)
@@ -188,6 +189,7 @@ namespace Aldentea.SweetMutus.Data
 			question.Title = tag == null ? string.Empty : tag.Title;
 			question.Artist = tag == null ? string.Empty : tag.Artist;
 			question.SabiPos = tag == null ? TimeSpan.Zero : TimeSpan.FromSeconds(Convert.ToDouble(tag.SabiPos));
+			question.PlayPos = tag == null ? TimeSpan.Zero : TimeSpan.FromSeconds(Convert.ToDouble(tag.StartPos));
 		}
 		#endregion
 
