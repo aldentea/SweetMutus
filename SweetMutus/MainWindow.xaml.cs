@@ -91,6 +91,9 @@ namespace Aldentea.SweetMutus
 				new CommandBinding(ApplicationCommands.Redo,
 					Redo_Executed, Redo_CanExecute)
 			);
+
+			// レイアウト関係のコマンドハンドラだけど，なぜかここに記載．
+			//dataGridQuestionsFileNameColumn.Visibility
 		}
 		#endregion
 

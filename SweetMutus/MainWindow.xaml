@@ -143,7 +143,13 @@
 			</MenuItem>
 			<MenuItem Header="表示(_V)">
 				<MenuItem Name="menuItemCategoryVisible" Header="カテゴリ" IsCheckable="True" IsChecked="False" />
-				<MenuItem Name="menuItemFileNameColumnVisible" Header="ファイル名列" IsCheckable="True" IsChecked="False" Visibility="Collapsed" />
+				<Separator />
+				<MenuItem x:Name="menuItemIDColumnVisible" Header="ID列" IsCheckable="True"
+									IsChecked="{Binding ElementName=questionsIDColumn, Path=Visibility, Converter={StaticResource fileNameVisibilityConverter}}" />
+				<MenuItem Name="menuItemFileNameColumnVisible" Header="ファイル名列" IsCheckable="True"
+									IsChecked="{Binding ElementName=questionsFileNameColumn, Path=Visibility, Converter={StaticResource fileNameVisibilityConverter}}" />
+				<MenuItem Name="menuItemPlayPosColumnVisible" Header="開始位置列" IsCheckable="True"
+									IsChecked="{Binding ElementName=questionsPlayPosColumn, Path=Visibility, Converter={StaticResource fileNameVisibilityConverter}}" />
 			</MenuItem>
 			<MenuItem Header="曲再生(_P)">
 				<MenuItem Header="再生開始" Command="Play"
@@ -206,7 +212,8 @@
 							>
 				<DataGrid.Columns>
 					<DataGridTextColumn Header="#" Binding="{Binding Path=ID}" IsReadOnly="True"
-														ElementStyle="{StaticResource numericCellStyle}" Visibility="Collapsed" />
+														ElementStyle="{StaticResource numericCellStyle}"
+														x:Name="questionsIDColumn" Visibility="Collapsed" />
 					<DataGridTextColumn Header="No" ElementStyle="{StaticResource numericCellStyle}"
 					>
 						<DataGridTextColumn.Binding>
@@ -222,8 +229,7 @@
 					<!-- このVisibilityのバインディングが機能していない。
 				たぶんXAMLのスコープの話だと思うが、どうすればいいのかはよくわからない。-->
 					<DataGridTextColumn Header="ファイル名" Binding="{Binding Path=RelativeFileName}" IsReadOnly="True" Width="*"
-														Visibility="{Binding ElementName=menuItemFileNameColumnVisible, Path=IsChecked,
-																									Converter={StaticResource fileNameVisibilityConverter}}"
+														Visibility="Collapsed" x:Name="questionsFileNameColumn"
 														>
 						<DataGridTextColumn.ElementStyle>
 							<Style TargetType="TextBlock">
@@ -231,7 +237,7 @@
 							</Style>
 						</DataGridTextColumn.ElementStyle>
 					</DataGridTextColumn>
-					<DataGridTextColumn Header="開始" ElementStyle="{StaticResource numericCellStyle}" MinWidth="60">
+					<DataGridTextColumn Header="開始" x:Name="questionsPlayPosColumn" ElementStyle="{StaticResource numericCellStyle}" MinWidth="60">
 						<DataGridTextColumn.Binding>
 							<Binding Path="PlayPos" Converter="{StaticResource durationConverter}" ConverterParameter="2">
 								<Binding.ValidationRules>
