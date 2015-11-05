@@ -429,6 +429,17 @@ namespace Aldentea.SweetMutus
 
 		#endregion
 
+		// (0.0.11)
+		#region Import
+
+		private void Import_Executed(object sender, ExecutedRoutedEventArgs e)
+		{
+			ImportFrom(string.Empty);
+		}
+
+		#endregion
+
+
 		#endregion
 
 		// (0.0.8.9)
@@ -622,6 +633,80 @@ namespace Aldentea.SweetMutus
 			}
 		}
 
+		#endregion
+
+		// (0.0.11)
+		#region インポート
+
+		public void ImportFrom(string sourceFileName)
+		{
+			if (string.IsNullOrEmpty(sourceFileName))
+			{
+				sourceFileName = SelectImportSource();
+				if (string.IsNullOrEmpty(sourceFileName))
+				{
+					return;
+				}
+			}
+
+			switch(System.IO.Path.GetExtension(sourceFileName))
+			{
+				case ".mtu":
+				case ".mtq":
+					GrandMutus.Data.MutusDocument doc = new GrandMutus.Data.MutusDocument();
+					doc.Open(sourceFileName, true);
+					var dialog = new ImportDialog { DataContext = doc };
+					dialog.CommandBindings.Add(new CommandBinding(Commands.ImportCommand, DialogImport_Executed, DialogImport_CanExecute));
+					dialog.ShowDialog();
+					break;
+				default:
+					MessageBox.Show("未対応のファイルですorz");
+					break;
+			}
+
+		}
+
+		#region *インポート元のファイルを選択(SelectImportSource)
+		string SelectImportSource()
+		{
+			var file_dialog = new Microsoft.Win32.OpenFileDialog
+			{
+				Filter = "SweetMutusファイル(*.smt)|*.smt|HyperMutusファイル(*.mtu,*.mtq)|*.mtu;*.mtq",
+				ReadOnlyChecked = true,
+				Title = "インポート元ファイルを選択して下さい"
+			};
+			if (file_dialog.ShowDialog() == true)
+			{
+				return file_dialog.FileName;
+			}
+			else
+			{
+				return string.Empty;
+			}
+		}
+		#endregion
+
+		void DialogImport_Executed(object sender, ExecutedRoutedEventArgs e)
+		{
+			if (e.Parameter is System.Collections.IList)
+			{
+				var songs = ((System.Collections.IList)e.Parameter).Cast<GrandMutus.Data.ISong>();
+				MyDocument.ImportSongs(songs);
+			}
+		}
+
+		void DialogImport_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+		{
+			if (e.Parameter is System.Collections.IList)
+			{
+				e.CanExecute = ((System.Collections.IList)e.Parameter).Count > 0;
+			}
+			else
+			{
+				e.CanExecute = false;
+      }
+		}
+		
 		#endregion
 
 

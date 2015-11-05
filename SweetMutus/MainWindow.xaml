@@ -88,6 +88,10 @@
 		<CommandBinding Command="{x:Static local:Commands.EnterQuestionsCommand}"
 										Executed="EnterQuestions_Executed"
 										CanExecute="IncrementNo_CanExecute" />
+		<CommandBinding
+			Command="{x:Static local:Commands.ImportCommand}"
+			Executed="Import_Executed"
+			CanExecute="Always_CanExecute" />
 	</Window.CommandBindings>
 	<Window.InputBindings>
 		<KeyBinding Key="F5" Command="{x:Static  hypermutus:Commands.SwitchPlayPauseCommand}" />
@@ -140,7 +144,8 @@
 					</MenuItem.CommandParameter>
 				</MenuItem>
 				<MenuItem Header="ホームフォルダ変更(_H)" Command="{x:Static grand:Commands.SetRootDirectoryCommand}" />
-			</MenuItem>
+        <MenuItem Header="インポート(_I)" Command="{x:Static local:Commands.ImportCommand}" />
+      </MenuItem>
 			<MenuItem Header="表示(_V)">
 				<MenuItem Name="menuItemCategoryVisible" Header="カテゴリ" IsCheckable="True" IsChecked="False" />
 				<Separator />
