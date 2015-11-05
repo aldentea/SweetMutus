@@ -14,14 +14,25 @@ using System.IO;
 namespace Aldentea.SweetMutus.Data
 {
 
+	#region SweetMutusDocumentクラス
 	public class SweetMutusDocument : DocumentWithOperationHistory
 	{
-
-		#region MutusDocumentのコピペ
-
-		// (0.3.3)とりあえずIntroQuestionだけに対応している。
+		#region *Questionsプロパティ
+		/// <summary>
+		/// 問題のコレクションを取得します．
+		/// </summary>
 		public SweetQuestionsCollection Questions { get { return _questions; } }
 		readonly SweetQuestionsCollection _questions;
+		#endregion
+
+		// (0.1.9)
+		#region *Songsプロパティ
+		/// <summary>
+		/// Questionsプロパティと同じものを返しますが，ISongの集合として見たいとき(曲のインポートとか)に使います．
+		/// ※プロパティの変更通知はされないかもしれません．
+		/// </summary>
+		public SweetQuestionsCollection Songs { get { return _questions; } }
+		#endregion
 
 		#region *WriterSettingsプロパティ
 		public XmlWriterSettings WriterSettings
@@ -54,6 +65,7 @@ namespace Aldentea.SweetMutus.Data
 		}
 		#endregion
 
+		#region *アイテム変更時(Songs_ItemChanged)
 		// (0.1.4)QuestionNoChangedイベントを発生。
 		// (0.1.2.1)QuestionCategoryChangedイベントを発生。
 		// (0.2.0)Songs以外でも共通に使えるのではなかろうか？
@@ -74,6 +86,7 @@ namespace Aldentea.SweetMutus.Data
 				}
 			}
 		}
+		#endregion
 
 
 		#region 曲関連
@@ -251,17 +264,21 @@ namespace Aldentea.SweetMutus.Data
 
 
 		// (*0.4.5.1)
+		#region *Questionの番号変更時(Questions_NoChanged)
 		void Questions_QuestionNoChanged(object sender, ValueChangedEventArgs<int?> e)
 		{
 			var question = (SweetQuestion)sender;
 			AddOperationHistory(new QuestionNoChangedCache(question, e.PreviousValue, e.CurrentValue));
 		}
+		#endregion
 
 		// (*0.4.4)
+		#region *曲のルートディレクトリ変更時(Questions_RootDirectoryChanged)
 		void Questions_RootDirectoryChanged(object sender, ValueChangedEventArgs<string> e)
 		{
 			this.AddOperationHistory(new RootDirectoryChangedCache(this.Questions, e.PreviousValue, e.CurrentValue));
 		}
+		#endregion
 
 		void Questions_QuestionCategoryChanged(object sender, EventArgs e)
 		{
@@ -358,7 +375,8 @@ namespace Aldentea.SweetMutus.Data
 		}
 
 		// (0.1.3)mutus2のファイルに対応？
-		// (0.4.0.1)Songs.RootDirectoryの設定を追加。
+		// (*0.4.0.1)Songs.RootDirectoryの設定を追加。
+		#region *[override]ファイルからロード(LoadDocument)
 		protected override bool LoadDocument(string fileName)
 		{
 			using (XmlReader reader = XmlReader.Create(fileName))
@@ -416,7 +434,9 @@ namespace Aldentea.SweetMutus.Data
 			}
 			return false;
 		}
+		#endregion
 
+		#region *[override]ファイルに保存(SaveDocument)
 		protected override bool SaveDocument(string destination)
 		{
 			
@@ -462,5 +482,6 @@ namespace Aldentea.SweetMutus.Data
 		#endregion
 
 	}
+	#endregion
 
 }

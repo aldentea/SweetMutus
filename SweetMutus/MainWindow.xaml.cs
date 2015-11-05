@@ -635,6 +635,7 @@ namespace Aldentea.SweetMutus
 
 		#endregion
 
+		// (0.0.12)smtファイルにも対応．
 		// (0.0.11)
 		#region インポート
 
@@ -649,21 +650,26 @@ namespace Aldentea.SweetMutus
 				}
 			}
 
-			switch(System.IO.Path.GetExtension(sourceFileName))
+			var dialog = new ImportDialog();
+			dialog.CommandBindings.Add(new CommandBinding(Commands.ImportCommand, DialogImport_Executed, DialogImport_CanExecute));
+			switch (System.IO.Path.GetExtension(sourceFileName))
 			{
 				case ".mtu":
 				case ".mtq":
 					GrandMutus.Data.MutusDocument doc = new GrandMutus.Data.MutusDocument();
 					doc.Open(sourceFileName, true);
-					var dialog = new ImportDialog { DataContext = doc };
-					dialog.CommandBindings.Add(new CommandBinding(Commands.ImportCommand, DialogImport_Executed, DialogImport_CanExecute));
-					dialog.ShowDialog();
+					dialog.DataContext = doc;
+					break;
+				case ".smt":
+					SweetMutusDocument s_doc = new SweetMutusDocument();
+					s_doc.Open(sourceFileName, true);
+					dialog.DataContext = s_doc;
 					break;
 				default:
 					MessageBox.Show("未対応のファイルですorz");
-					break;
+					return;
 			}
-
+			dialog.ShowDialog();
 		}
 
 		#region *インポート元のファイルを選択(SelectImportSource)
@@ -942,6 +948,7 @@ namespace Aldentea.SweetMutus
 
 		// 動作を2つ用意する．
 		// 曲をパラメータとしてとり，現在の曲と違ったら，Playの動作をするようにする？
+		// ↑してみました．
 
 		void SwitchPlayPause_Executed(object sender, ExecutedRoutedEventArgs e)
 		{
