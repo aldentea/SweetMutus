@@ -212,30 +212,11 @@ namespace Aldentea.SweetMutus.Data
 		}
 		#endregion
 
-		// (0.3.4)とりあえず．
-		/*public void AddSweetQuestions(IEnumerable<Song> songs)
-		{
-			var added_questions = new List<SweetQuestion>();
-			foreach (var song in songs)
-			{
-				var question = new SweetQuestion(song.ID);
-				_questions.Add(question);
-				added_questions.Add(question);
-			}
-			// ここで操作履歴処理を行う．(削除の場合と異なりUIから直接，というのは考えられない．)
-			AddOperationHistory(new SweetQuestionsAddedCache(this, added_questions.ToArray()));
-		}
-		*/
-		// (0.4.1)
+		// (*0.4.1)
 		#region *問題を追加(AddQuestions)
-		//private SweetQuestion AddQuestion(SweetQuestion question)
-		//{
-		//	_questions.Add(question);	// ←失敗することは通常想定されないよね？
-		//	return question;
-		//}
-
 		/// <summary>
 		/// 問題削除をアンドゥしたときに使うことを想定しています。
+		/// (0.1.8からは，インポートの時にも使っています．)
 		/// </summary>
 		/// <param name="questions"></param>
 		public void AddQuestions(IEnumerable<SweetQuestion> questions)
@@ -252,16 +233,23 @@ namespace Aldentea.SweetMutus.Data
 		}
 		#endregion
 
-		// (0.4.1)
+		// (0.1.8)
+		#region *曲をインポート(ImportSongs)
+		public void ImportSongs(IEnumerable<GrandMutus.Data.ISong> songs)
+		{
+			this.AddQuestions(songs.Select(song => new SweetQuestion(song)));
+		}
+		#endregion
 
-		// (0.4.5.1)
+
+		// (*0.4.5.1)
 		void Questions_QuestionNoChanged(object sender, ValueChangedEventArgs<int?> e)
 		{
 			var question = (SweetQuestion)sender;
 			AddOperationHistory(new QuestionNoChangedCache(question, e.PreviousValue, e.CurrentValue));
 		}
 
-		// (0.4.4)
+		// (*0.4.4)
 		void Questions_RootDirectoryChanged(object sender, ValueChangedEventArgs<string> e)
 		{
 			this.AddOperationHistory(new RootDirectoryChangedCache(this.Questions, e.PreviousValue, e.CurrentValue));
@@ -464,137 +452,6 @@ namespace Aldentea.SweetMutus.Data
 		#endregion
 
 		#endregion
-
-
-
-
-
-		// これ以下のコードは不要になりそう！
-/*
-		void SweetMutusDocument_Opened(object sender, EventArgs e)
-		{
-			NotifyPropertyChanged("CurrentCategory");
-			NotifyPropertyChanged("CurrentCategoryQuestions");
-			NotifyPropertyChanged("CurrentUnnumberedQuestions");
-			NotifyPropertyChanged("CurrentNumberedQuestions");
-		}
-
-
-		#region カレントカテゴリ関連
-
-		// (0.1.1)
-		void Questions_QuestionNoChangeCompleted(object sender, ValueChangedEventArgs<int?> e)
-		{
-			Question question = (Question)sender;
-			if (question.Category == this.CurrentCategory)
-			{
-				NotifyPropertyChanged("CurrentCategoryQuestions");
-				NotifyPropertyChanged("CurrentNumberedQuestions");
-				if (!e.PreviousValue.HasValue || !e.CurrentValue.HasValue)
-				{
-					NotifyPropertyChanged("CurrentUnnumberedQuestions");
-				}
-			}
-		}
-
-		// (0.1.0)
-		void Questions_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
-		{
-			NotifyPropertyChanged("CurrentCategoryQuestions");
-			NotifyPropertyChanged("CurrentUnnumberedQuestions");
-			NotifyPropertyChanged("CurrentNumberedQuestions");
-		}
-
-		// (0.1.0)
-		void GrandMutusClassicDocument_Opened(object sender, EventArgs e)
-		{
-			CurrentCategory = string.Empty;
-		}
-
-		// (0.1.0)
-		void GrandMutusClassicDocument_Initialized(object sender, EventArgs e)
-		{
-			CurrentCategory = string.Empty;
-		}
-		#endregion
-
-		// (0.1.0)
-		#region *CurrentCategoryプロパティ
-		/// <summary>
-		/// 現在のカテゴリを取得／設定します．
-		/// </summary>
-		public string CurrentCategory
-		{
-			get
-			{
-				return _currentCategory;
-			}
-			set
-			{
-				if (string.IsNullOrEmpty(value))
-				{
-					value = string.Empty;
-				}
-				if (this.CurrentCategory != value)
-				{
-					this._currentCategory = value;
-					// このときは，OperationCacheをどうにかする必要がありそう？
-					// でも，View用のプロパティなんだから，そんなことしなくていいんじゃない？
-					// (実質的な変化を及ぼすものではないということ．)
-					NotifyPropertyChanged("CurrentCategory");
-					NotifyPropertyChanged("CurrentCategoryQuestions");
-					NotifyPropertyChanged("CurrentUnnumberedQuestions");
-					NotifyPropertyChanged("CurrentNumberedQuestions");
-				}
-			}
-		}
-		string _currentCategory = string.Empty;
-		#endregion
-
-		// (0.1.0)
-		#region *CurrentCategoryQuestionsプロパティ
-		/// <summary>
-		/// CurrentCategoryに属する問題を取得します．
-		/// </summary>
-		public IEnumerable<SweetQuestion> CurrentCategoryQuestions
-		{
-			get
-			{
-				return this.Questions.Where(q => q.Category == CurrentCategory);
-				//return this.Questions.Where(q => q.Category == CurrentCategory).OrderBy(q => q.No);
-			}
-		}
-		#endregion
-
-		// (0.1.0)
-		#region *CurrentUnnumberedQuestionsプロパティ
-		/// <summary>
-		/// CurrentCategoryに属しており，Noの設定されていない問題を取得します．
-		/// </summary>
-		public IEnumerable<SweetQuestion> CurrentUnnumberedQuestions
-		{
-			get
-			{
-				return this.CurrentCategoryQuestions.Where(q => !q.No.HasValue);
-			}
-		}
-		#endregion
-
-		// (0.1.0)
-		#region *CurrentNumberedQuestionsプロパティ
-		/// <summary>
-		/// CurrentCategoryに属しており，Noの設定された問題を，Noの昇順で取得します．
-		/// </summary>
-		public IEnumerable<SweetQuestion> CurrentNumberedQuestions
-		{
-			get
-			{
-				return this.CurrentCategoryQuestions.Where(q => q.No.HasValue).OrderBy(q => q.No.Value);
-			}
-		}
-		#endregion
-*/
-
 
 	}
 
