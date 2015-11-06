@@ -389,6 +389,7 @@ namespace Aldentea.SweetMutus.Data
 			Questions.Initialize();
 		}
 
+		// (0.1.10)HyperMutusのファイルに対応...したつもり．
 		// (0.1.3)mutus2のファイルに対応？
 		// (*0.4.0.1)Songs.RootDirectoryの設定を追加。
 		#region *[override]ファイルからロード(LoadDocument)
@@ -407,17 +408,19 @@ namespace Aldentea.SweetMutus.Data
 					{
 						if (version >= 3.0M)
 						{
-							var sweet = root.Element(SWEET_ELEMENT_NAME);
-							NowLoading = true;
-							try
+							var result = TryLoadSweetMutusDocument(root, Path.GetDirectoryName(fileName));
+              if (result.HasValue)
 							{
-								this.Questions.LoadElement(sweet.Element(SweetQuestionsCollection.ELEMENT_NAME), Path.GetDirectoryName(fileName));
+								return result.Value;
 							}
-							finally
+							else
 							{
-								NowLoading = false;
+								result = TryLoadGrandMutusDocument(root, fileName);
+								if (result.HasValue)
+								{
+									return result.Value;
+								}
 							}
-							return true;
 						}
 						else if (version >= 2.0M)
 						{
@@ -450,6 +453,80 @@ namespace Aldentea.SweetMutus.Data
 			return false;
 		}
 		#endregion
+
+		bool? TryLoadSweetMutusDocument(XElement root, string fileDirectory)
+		{
+			var sweet = root.Element(SWEET_ELEMENT_NAME);
+			if (sweet != null)
+			{
+				// SweetMutusDocument！
+				NowLoading = true;
+				try
+				{
+					this.Questions.LoadElement(sweet.Element(SweetQuestionsCollection.ELEMENT_NAME), fileDirectory);
+				}
+				finally
+				{
+					NowLoading = false;
+				}
+				return true;
+			}
+			else
+			{
+				return null;
+			}
+		}
+
+		bool? TryLoadGrandMutusDocument(XElement root, string fileName)
+		{
+			var questions_element = root.Element(GrandMutus.Data.QuestionsCollection.ELEMENT_NAME);
+			if (questions_element == null)
+			{
+				// 他のドキュメント形式を試してみる余地がある？(そんなのあるかどうかわからんけど)
+				// ということでnullを返す．
+				return null;
+			}
+			else
+			{
+				if (questions_element.Elements().All(elem => elem.Name == GrandMutus.Data.IntroQuestion.ELEMENT_NAME))
+				{
+					return LoadGrandMutusDocument(root, fileName);
+				}
+				else
+				{
+					// intro以外の問題を含むと厄介なので，rejectする．
+					
+					// ※ユーザに通知したい！
+					return false;
+				}
+			}
+		}
+
+		bool LoadGrandMutusDocument(XElement root, string fileName)
+		{
+			// rootからMutusDocumentというメソッドはないんだっけ？
+			MutusDocument doc = new MutusDocument();
+			
+			doc.LoadGrandMutusDocument(root, fileName);
+
+			NowLoading = true;
+			try {
+				foreach (var q in doc.Questions)
+				{
+					IntroQuestion question = (IntroQuestion)q;
+					var sweet_question = new SweetQuestion(question.Song);
+					sweet_question.PlayPos = question.PlayPos;
+					// intro_question側で未実装．
+					//sweet_question.StopPos = question.StopPos;
+					sweet_question.Category = question.Category;
+					sweet_question.No = question.No;
+
+					this.AddQuestion(sweet_question);
+				}
+			}
+			finally { NowLoading = false; }
+			return true;
+		}
 
 		#region *[override]ファイルに保存(SaveDocument)
 		protected override bool SaveDocument(string destination)
