@@ -97,6 +97,7 @@ namespace Aldentea.SweetMutus
 		}
 		#endregion
 
+		// (0.0.13)音声ボリュームを復元．
 		// (0.0.8.9)
 		#region *ウインドウ初期化時(MainWindow_Initialized)
 		private void MainWindow_Initialized(object sender, EventArgs e)
@@ -113,9 +114,11 @@ namespace Aldentea.SweetMutus
 				this.Width = MySettings.WindowSize.Width;
 				this.Height = MySettings.WindowSize.Height;
 			}
+			this.SongPlayer.Volume = MySettings.SongPlayerVolume;
 		}
 		#endregion
 
+		// (0.0.13)音声ボリュームを保存．
 		// (0.0.8.9)
 		#region *ウインドウクローズ時(MainWindow_Closed)
 		private void MainWindow_Closed(object sender, EventArgs e)
@@ -124,6 +127,8 @@ namespace Aldentea.SweetMutus
 			MySettings.WindowMaximized = this.WindowState == System.Windows.WindowState.Maximized;
 			MySettings.WindowPosition = new Point(this.Left, this.Top);
 			MySettings.WindowSize = new System.Windows.Size(this.Width, this.Height);
+
+			MySettings.SongPlayerVolume = this.SongPlayer.Volume;
 		}
 		#endregion
 
