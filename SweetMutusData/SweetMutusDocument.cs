@@ -349,6 +349,9 @@ namespace Aldentea.SweetMutus.Data
 
 		#endregion
 
+
+		// (0.1.10).mtqファイルのエクスポートに対応．
+		#region *エクスポート時にファイルを保存(SaveExport)
 		/// <summary>
 		/// エクスポート時にファイルを保存します．
 		/// 曲ファイルのコピーは予め済ませておいて下さい．
@@ -357,12 +360,24 @@ namespace Aldentea.SweetMutus.Data
 		/// <param name="songs_root"></param>
 		public void SaveExport(string destination, string songs_root)
 		{
-			using (XmlWriter writer = XmlWriter.Create(destination, this.WriterSettings))
+			switch (Path.GetExtension(destination))
 			{
-				GenerateXml(System.IO.Path.GetDirectoryName(destination), songs_root).WriteTo(writer);
+				case ".mtq":
+					// case ".mtu":
+					using (XmlWriter writer = XmlWriter.Create(destination, this.WriterSettings))
+					{
+						GenerateMtuXml(Path.GetDirectoryName(destination), songs_root).WriteTo(writer);
+					}
+					break;
+				default:
+					using (XmlWriter writer = XmlWriter.Create(destination, this.WriterSettings))
+					{
+						GenerateXml(Path.GetDirectoryName(destination), songs_root).WriteTo(writer);
+					}
+					break;
 			}
-
 		}
+		#endregion
 
 
 		#region DocumentBase実装
@@ -461,7 +476,7 @@ namespace Aldentea.SweetMutus.Data
 		{
 			using (XmlWriter writer = XmlWriter.Create(destination, this.WriterSettings))
 			{
-				GenerateXml(System.IO.Path.GetDirectoryName(destination)).WriteTo(writer);
+				GenerateXml(Path.GetDirectoryName(destination)).WriteTo(writer);
 			}
 			// 基本的にtrueを返せばよろしい．
 			// falseを返すべきなのは，保存する前にキャンセルした時とかかな？
@@ -472,7 +487,7 @@ namespace Aldentea.SweetMutus.Data
 		{
 			using (XmlWriter writer = XmlWriter.Create(destination, this.WriterSettings))
 			{
-				GenerateMtuXml(System.IO.Path.GetDirectoryName(destination)).WriteTo(writer);
+				GenerateMtuXml(Path.GetDirectoryName(destination)).WriteTo(writer);
 			}
 			return true;
 		}

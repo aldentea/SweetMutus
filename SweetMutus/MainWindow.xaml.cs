@@ -460,6 +460,7 @@ namespace Aldentea.SweetMutus
 
 		// カレントカテゴリ関連
 
+		#region *ドキュメント初期化時(MyDocument_Initialized)
 		void MyDocument_Initialized(object sender, EventArgs e)
 		{
 
@@ -471,7 +472,9 @@ namespace Aldentea.SweetMutus
 			this.CurrentSong = null;
 			this.expanderSongPlayer.IsExpanded = false;
 		}
+		#endregion
 
+		#region *ドキュメントオープン時(MyDocument_Opened)
 		void MyDocument_Opened(object sender, EventArgs e)
 		{
 			Categories.Clear();
@@ -499,6 +502,7 @@ namespace Aldentea.SweetMutus
 			this.comboBoxDestinationCategory.SelectedIndex = 0;
 
 		}
+		#endregion
 
 		//private void comboBoxCategories_SelectionChanged(object sender, SelectionChangedEventArgs e)
 		//{
@@ -549,7 +553,7 @@ namespace Aldentea.SweetMutus
 			UpdateFilter(CurrentCategory);
 		}
 
-
+		#region *カテゴリを追加(AddCategory)
 		/// <summary>
 		/// カテゴリを追加します。
 		/// </summary>
@@ -567,6 +571,7 @@ namespace Aldentea.SweetMutus
 				return false;
 			}
 		}
+		#endregion
 
 		#region 問題リスト関連
 
@@ -731,11 +736,12 @@ namespace Aldentea.SweetMutus
 			}
 		}
 
-
+		// (0.0.13)SweetMutus形式に加えて，HyperMutus形式でエクスポートできるように改良．
+		#region *エクスポート(Export)
 		void Export()
 		{
 			// ファイル名選択
-			var dialog = new HyperMutus.ExportDialog { FileFilter = this.SaveFileDialogFilter };
+			var dialog = new HyperMutus.ExportDialog { FileFilter = "SweetMutusファイル(*.smt)|*.smt|HyperMutusファイル(*.mtq)|*.mtq" };
 			if (dialog.ShowDialog() == true)
 			{
 				string fileName = dialog.Destination;
@@ -754,8 +760,9 @@ namespace Aldentea.SweetMutus
 			}
 			
 		}
+		#endregion
 
-
+		#region *ルートディレクトリを設定(SetRootDirectory)
 		private void SetRootDirectory()
 		{
 			var directory = HyperMutus.Helpers.SelectSongsRoot(this.MyDocument.Questions.RootDirectory);
@@ -764,6 +771,7 @@ namespace Aldentea.SweetMutus
 				MyDocument.Questions.RootDirectory = directory;
 			}
 		}
+		#endregion
 
 		#region カテゴリ関連
 
@@ -844,7 +852,7 @@ namespace Aldentea.SweetMutus
 		#endregion
 
 
-		// (0.3.2)プロパティ化。
+		// (*0.3.2)プロパティ化。
 		#region *CurrentSongプロパティ
 		public SweetQuestion CurrentSong
 		{
@@ -863,8 +871,8 @@ namespace Aldentea.SweetMutus
 
 		//DispatcherTimer _songPlayerTimer = null;
 
-		// (0.3.2)
-
+		// (*0.3.2)
+		#region *曲ファイルオープン時(SongPlayer_MediaOpened)
 		void SongPlayer_MediaOpened(object sender, EventArgs e)
 		{
 			if (_songPlayer.Duration.HasValue)
@@ -873,6 +881,7 @@ namespace Aldentea.SweetMutus
 				this.sliderSeekSong.Maximum = _songPlayer.Duration.Value.TotalSeconds;
 			}
 		}
+		#endregion
 
 		#region Playコマンド
 		void Play_Executed(object sender, ExecutedRoutedEventArgs e)
