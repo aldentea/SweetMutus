@@ -10,9 +10,23 @@ using System.IO;
 
 namespace Aldentea.SweetMutus.Data
 {
-
-	public class SweetQuestion : GrandMutus.Data.QuestionBase<SweetQuestionsCollection>/*, IEditableObject*/
+	// (0.1.8)ISongインターフェイスを実装．
+	#region SweetQuestionクラス
+	public class SweetQuestion : GrandMutus.Data.QuestionBase<SweetQuestionsCollection>, GrandMutus.Data.ISong /*, IEditableObject*/
 	{
+		// (0.1.8)ISongを引数にとるコンストラクタを追加．
+		#region *コンストラクタ(SweetQuestion)
+		public SweetQuestion()
+		{ }
+
+		public SweetQuestion(GrandMutus.Data.ISong song)
+		{
+			this.Title = song.Title;
+			this.Artist = song.Artist;
+			this.FileName = song.FileName;
+			this.SabiPos = song.SabiPos;
+		}
+		#endregion
 
 		#region Songのコピペ
 
@@ -528,5 +542,6 @@ namespace Aldentea.SweetMutus.Data
 		#endregion
 
 	}
+	#endregion
 
 }

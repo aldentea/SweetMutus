@@ -14,14 +14,25 @@ using System.IO;
 namespace Aldentea.SweetMutus.Data
 {
 
+	#region SweetMutusDocumentクラス
 	public class SweetMutusDocument : DocumentWithOperationHistory
 	{
-
-		#region MutusDocumentのコピペ
-
-		// (0.3.3)とりあえずIntroQuestionだけに対応している。
+		#region *Questionsプロパティ
+		/// <summary>
+		/// 問題のコレクションを取得します．
+		/// </summary>
 		public SweetQuestionsCollection Questions { get { return _questions; } }
 		readonly SweetQuestionsCollection _questions;
+		#endregion
+
+		// (0.1.9)
+		#region *Songsプロパティ
+		/// <summary>
+		/// Questionsプロパティと同じものを返しますが，ISongの集合として見たいとき(曲のインポートとか)に使います．
+		/// ※プロパティの変更通知はされないかもしれません．
+		/// </summary>
+		public SweetQuestionsCollection Songs { get { return _questions; } }
+		#endregion
 
 		#region *WriterSettingsプロパティ
 		public XmlWriterSettings WriterSettings
@@ -54,6 +65,7 @@ namespace Aldentea.SweetMutus.Data
 		}
 		#endregion
 
+		#region *アイテム変更時(Songs_ItemChanged)
 		// (0.1.4)QuestionNoChangedイベントを発生。
 		// (0.1.2.1)QuestionCategoryChangedイベントを発生。
 		// (0.2.0)Songs以外でも共通に使えるのではなかろうか？
@@ -74,6 +86,7 @@ namespace Aldentea.SweetMutus.Data
 				}
 			}
 		}
+		#endregion
 
 
 		#region 曲関連
@@ -85,6 +98,7 @@ namespace Aldentea.SweetMutus.Data
 		/// </summary>
 		List<string> _addedSongFiles = new List<string>();
 
+		// (0.2.0)曲を追加しない場合にnullを返すように変更。
 		#region *曲を追加(AddQuestions)
 		/// <summary>
 		/// このメソッドが直接呼び出されることは想定していません．
@@ -95,12 +109,27 @@ namespace Aldentea.SweetMutus.Data
 		public SweetQuestion AddQuestion(string fileName)
 		{
 			SweetQuestion question = new SweetQuestion { FileName = fileName };
-			LoadInformation(question);
-			return this.AddQuestion(question);
+			if (LoadInformation(question))
+			{
+				return this.AddQuestion(question);
+			}
+			else
+			{
+				return null;
+			}
 		}
 
+		/// <summary>
+		/// questionがnullの場合は、何もせずにnullを返します。
+		/// </summary>
+		/// <param name="question"></param>
+		/// <returns></returns>
 		private SweetQuestion AddQuestion(SweetQuestion question)
 		{
+			if (question == null)
+			{
+				return null;
+			}
 			try
 			{
 				_questions.Add(question);	// この後の処理でSongDuplicateExceptionが発生する。
@@ -116,7 +145,7 @@ namespace Aldentea.SweetMutus.Data
 			}
 		}
 
-
+		// (0.2.0)追加された問題がない場合は、操作履歴に追加しないように修正。
 		public void AddQuestions(IEnumerable<string> fileNames)
 		{
 			IList<SweetQuestion> added_questions;
@@ -137,8 +166,10 @@ namespace Aldentea.SweetMutus.Data
 				// 通常は呼び出し元に制御を渡して，UIを表示する．
 				added_questions = AddQuestionsAction.Invoke(fileNames);
 			}
-			
-			AddOperationHistory(new SweetQuestionsAddedCache(this, added_questions.ToArray()));
+			if (added_questions.Count > 0)
+			{
+				AddOperationHistory(new SweetQuestionsAddedCache(this, added_questions.ToArray()));
+			}
 		}
 
 		#endregion
@@ -176,18 +207,33 @@ namespace Aldentea.SweetMutus.Data
 		//	AddOperationHistory(new SweetQuestionsRemovedCache(this, e.Item));
 		//}
 
+		// (0.2.0)staticを解除。boolを返すように変更。
+		// (0.1.7)再生開始位置もロードするように変更．
 		// HyperMutusからのパクリ．古いメソッドだけど，とりあえずそのまま使う．
 		// 場所も未定．とりあえずstatic化してここに置いておく．
-		#region *[static]ファイルからメタデータを読み込み(LoadInformation)
+		#region *ファイルからメタデータを読み込み(LoadInformation)
 		/// <summary>
 		/// songのFileNameプロパティで指定されたファイルからメタデータを読み込みます．
 		/// </summary>
-		static void LoadInformation(SweetQuestion question)
+		bool LoadInformation(SweetQuestion question)
 		{
 			SPP.Aldente.IID3Tag tag;
 			try
 			{
 				tag = SPP.Aldente.AldenteMP3TagAccessor.ReadFile(question.FileName);
+			}
+			catch (IOException ex)
+			{
+				// 通知したい。
+				if (Confirm(string.Format(
+					"読み込みに失敗しました。 - {0} \n曲情報を読み込まずに曲ファイルを追加しますか？", ex.Message)))
+				{
+					tag = null;
+				}
+				else
+				{
+					return false;
+				}
 			}
 			catch (ApplicationException)
 			{
@@ -196,6 +242,8 @@ namespace Aldentea.SweetMutus.Data
 			question.Title = tag == null ? string.Empty : tag.Title;
 			question.Artist = tag == null ? string.Empty : tag.Artist;
 			question.SabiPos = tag == null ? TimeSpan.Zero : TimeSpan.FromSeconds(Convert.ToDouble(tag.SabiPos));
+			question.PlayPos = tag == null ? TimeSpan.Zero : TimeSpan.FromSeconds(Convert.ToDouble(tag.StartPos));
+			return true;
 		}
 		#endregion
 
@@ -218,30 +266,11 @@ namespace Aldentea.SweetMutus.Data
 		}
 		#endregion
 
-		// (0.3.4)とりあえず．
-		/*public void AddSweetQuestions(IEnumerable<Song> songs)
-		{
-			var added_questions = new List<SweetQuestion>();
-			foreach (var song in songs)
-			{
-				var question = new SweetQuestion(song.ID);
-				_questions.Add(question);
-				added_questions.Add(question);
-			}
-			// ここで操作履歴処理を行う．(削除の場合と異なりUIから直接，というのは考えられない．)
-			AddOperationHistory(new SweetQuestionsAddedCache(this, added_questions.ToArray()));
-		}
-		*/
-		// (0.4.1)
+		// (*0.4.1)
 		#region *問題を追加(AddQuestions)
-		//private SweetQuestion AddQuestion(SweetQuestion question)
-		//{
-		//	_questions.Add(question);	// ←失敗することは通常想定されないよね？
-		//	return question;
-		//}
-
 		/// <summary>
 		/// 問題削除をアンドゥしたときに使うことを想定しています。
+		/// (0.1.8からは，インポートの時にも使っています．)
 		/// </summary>
 		/// <param name="questions"></param>
 		public void AddQuestions(IEnumerable<SweetQuestion> questions)
@@ -258,20 +287,31 @@ namespace Aldentea.SweetMutus.Data
 		}
 		#endregion
 
-		// (0.4.1)
+		// (0.1.8)
+		#region *曲をインポート(ImportSongs)
+		public void ImportSongs(IEnumerable<GrandMutus.Data.ISong> songs)
+		{
+			this.AddQuestions(songs.Select(song => new SweetQuestion(song)));
+		}
+		#endregion
 
-		// (0.4.5.1)
+
+		// (*0.4.5.1)
+		#region *Questionの番号変更時(Questions_NoChanged)
 		void Questions_QuestionNoChanged(object sender, ValueChangedEventArgs<int?> e)
 		{
 			var question = (SweetQuestion)sender;
 			AddOperationHistory(new QuestionNoChangedCache(question, e.PreviousValue, e.CurrentValue));
 		}
+		#endregion
 
-		// (0.4.4)
+		// (*0.4.4)
+		#region *曲のルートディレクトリ変更時(Questions_RootDirectoryChanged)
 		void Questions_RootDirectoryChanged(object sender, ValueChangedEventArgs<string> e)
 		{
 			this.AddOperationHistory(new RootDirectoryChangedCache(this.Questions, e.PreviousValue, e.CurrentValue));
 		}
+		#endregion
 
 		void Questions_QuestionCategoryChanged(object sender, EventArgs e)
 		{
@@ -342,6 +382,9 @@ namespace Aldentea.SweetMutus.Data
 
 		#endregion
 
+
+		// (0.1.10).mtqファイルのエクスポートに対応．
+		#region *エクスポート時にファイルを保存(SaveExport)
 		/// <summary>
 		/// エクスポート時にファイルを保存します．
 		/// 曲ファイルのコピーは予め済ませておいて下さい．
@@ -350,12 +393,24 @@ namespace Aldentea.SweetMutus.Data
 		/// <param name="songs_root"></param>
 		public void SaveExport(string destination, string songs_root)
 		{
-			using (XmlWriter writer = XmlWriter.Create(destination, this.WriterSettings))
+			switch (Path.GetExtension(destination))
 			{
-				GenerateXml(System.IO.Path.GetDirectoryName(destination), songs_root).WriteTo(writer);
+				case ".mtq":
+					// case ".mtu":
+					using (XmlWriter writer = XmlWriter.Create(destination, this.WriterSettings))
+					{
+						GenerateMtuXml(Path.GetDirectoryName(destination), songs_root).WriteTo(writer);
+					}
+					break;
+				default:
+					using (XmlWriter writer = XmlWriter.Create(destination, this.WriterSettings))
+					{
+						GenerateXml(Path.GetDirectoryName(destination), songs_root).WriteTo(writer);
+					}
+					break;
 			}
-
 		}
+		#endregion
 
 
 		#region DocumentBase実装
@@ -367,8 +422,10 @@ namespace Aldentea.SweetMutus.Data
 			Questions.Initialize();
 		}
 
+		// (0.1.10)HyperMutusのファイルに対応...したつもり．
 		// (0.1.3)mutus2のファイルに対応？
-		// (0.4.0.1)Songs.RootDirectoryの設定を追加。
+		// (*0.4.0.1)Songs.RootDirectoryの設定を追加。
+		#region *[override]ファイルからロード(LoadDocument)
 		protected override bool LoadDocument(string fileName)
 		{
 			using (XmlReader reader = XmlReader.Create(fileName))
@@ -384,17 +441,19 @@ namespace Aldentea.SweetMutus.Data
 					{
 						if (version >= 3.0M)
 						{
-							var sweet = root.Element(SWEET_ELEMENT_NAME);
-							NowLoading = true;
-							try
+							var result = TryLoadSweetMutusDocument(root, Path.GetDirectoryName(fileName));
+              if (result.HasValue)
 							{
-								this.Questions.LoadElement(sweet.Element(SweetQuestionsCollection.ELEMENT_NAME), Path.GetDirectoryName(fileName));
+								return result.Value;
 							}
-							finally
+							else
 							{
-								NowLoading = false;
+								result = TryLoadGrandMutusDocument(root, fileName);
+								if (result.HasValue)
+								{
+									return result.Value;
+								}
 							}
-							return true;
 						}
 						else if (version >= 2.0M)
 						{
@@ -426,7 +485,83 @@ namespace Aldentea.SweetMutus.Data
 			}
 			return false;
 		}
+		#endregion
 
+		bool? TryLoadSweetMutusDocument(XElement root, string fileDirectory)
+		{
+			var sweet = root.Element(SWEET_ELEMENT_NAME);
+			if (sweet != null)
+			{
+				// SweetMutusDocument！
+				NowLoading = true;
+				try
+				{
+					this.Questions.LoadElement(sweet.Element(SweetQuestionsCollection.ELEMENT_NAME), fileDirectory);
+				}
+				finally
+				{
+					NowLoading = false;
+				}
+				return true;
+			}
+			else
+			{
+				return null;
+			}
+		}
+
+		bool? TryLoadGrandMutusDocument(XElement root, string fileName)
+		{
+			var questions_element = root.Element(GrandMutus.Data.QuestionsCollection.ELEMENT_NAME);
+			if (questions_element == null)
+			{
+				// 他のドキュメント形式を試してみる余地がある？(そんなのあるかどうかわからんけど)
+				// ということでnullを返す．
+				return null;
+			}
+			else
+			{
+				if (questions_element.Elements().All(elem => elem.Name == GrandMutus.Data.IntroQuestion.ELEMENT_NAME))
+				{
+					return LoadGrandMutusDocument(root, fileName);
+				}
+				else
+				{
+					// intro以外の問題を含むと厄介なので，rejectする．
+					
+					// ※ユーザに通知したい！
+					return false;
+				}
+			}
+		}
+
+		bool LoadGrandMutusDocument(XElement root, string fileName)
+		{
+			// rootからMutusDocumentというメソッドはないんだっけ？
+			MutusDocument doc = new MutusDocument();
+			
+			doc.LoadGrandMutusDocument(root, fileName);
+
+			NowLoading = true;
+			try {
+				foreach (var q in doc.Questions)
+				{
+					IntroQuestion question = (IntroQuestion)q;
+					var sweet_question = new SweetQuestion(question.Song);
+					sweet_question.PlayPos = question.PlayPos;
+					// intro_question側で未実装．
+					//sweet_question.StopPos = question.StopPos;
+					sweet_question.Category = question.Category;
+					sweet_question.No = question.No;
+
+					this.AddQuestion(sweet_question);
+				}
+			}
+			finally { NowLoading = false; }
+			return true;
+		}
+
+		#region *[override]ファイルに保存(SaveDocument)
 		protected override bool SaveDocument(string destination)
 		{
 			
@@ -451,7 +586,7 @@ namespace Aldentea.SweetMutus.Data
 		{
 			using (XmlWriter writer = XmlWriter.Create(destination, this.WriterSettings))
 			{
-				GenerateXml(System.IO.Path.GetDirectoryName(destination)).WriteTo(writer);
+				GenerateXml(Path.GetDirectoryName(destination)).WriteTo(writer);
 			}
 			// 基本的にtrueを返せばよろしい．
 			// falseを返すべきなのは，保存する前にキャンセルした時とかかな？
@@ -462,7 +597,7 @@ namespace Aldentea.SweetMutus.Data
 		{
 			using (XmlWriter writer = XmlWriter.Create(destination, this.WriterSettings))
 			{
-				GenerateMtuXml(System.IO.Path.GetDirectoryName(destination)).WriteTo(writer);
+				GenerateMtuXml(Path.GetDirectoryName(destination)).WriteTo(writer);
 			}
 			return true;
 		}
@@ -471,137 +606,7 @@ namespace Aldentea.SweetMutus.Data
 
 		#endregion
 
-
-
-
-
-		// これ以下のコードは不要になりそう！
-/*
-		void SweetMutusDocument_Opened(object sender, EventArgs e)
-		{
-			NotifyPropertyChanged("CurrentCategory");
-			NotifyPropertyChanged("CurrentCategoryQuestions");
-			NotifyPropertyChanged("CurrentUnnumberedQuestions");
-			NotifyPropertyChanged("CurrentNumberedQuestions");
-		}
-
-
-		#region カレントカテゴリ関連
-
-		// (0.1.1)
-		void Questions_QuestionNoChangeCompleted(object sender, ValueChangedEventArgs<int?> e)
-		{
-			Question question = (Question)sender;
-			if (question.Category == this.CurrentCategory)
-			{
-				NotifyPropertyChanged("CurrentCategoryQuestions");
-				NotifyPropertyChanged("CurrentNumberedQuestions");
-				if (!e.PreviousValue.HasValue || !e.CurrentValue.HasValue)
-				{
-					NotifyPropertyChanged("CurrentUnnumberedQuestions");
-				}
-			}
-		}
-
-		// (0.1.0)
-		void Questions_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
-		{
-			NotifyPropertyChanged("CurrentCategoryQuestions");
-			NotifyPropertyChanged("CurrentUnnumberedQuestions");
-			NotifyPropertyChanged("CurrentNumberedQuestions");
-		}
-
-		// (0.1.0)
-		void GrandMutusClassicDocument_Opened(object sender, EventArgs e)
-		{
-			CurrentCategory = string.Empty;
-		}
-
-		// (0.1.0)
-		void GrandMutusClassicDocument_Initialized(object sender, EventArgs e)
-		{
-			CurrentCategory = string.Empty;
-		}
-		#endregion
-
-		// (0.1.0)
-		#region *CurrentCategoryプロパティ
-		/// <summary>
-		/// 現在のカテゴリを取得／設定します．
-		/// </summary>
-		public string CurrentCategory
-		{
-			get
-			{
-				return _currentCategory;
-			}
-			set
-			{
-				if (string.IsNullOrEmpty(value))
-				{
-					value = string.Empty;
-				}
-				if (this.CurrentCategory != value)
-				{
-					this._currentCategory = value;
-					// このときは，OperationCacheをどうにかする必要がありそう？
-					// でも，View用のプロパティなんだから，そんなことしなくていいんじゃない？
-					// (実質的な変化を及ぼすものではないということ．)
-					NotifyPropertyChanged("CurrentCategory");
-					NotifyPropertyChanged("CurrentCategoryQuestions");
-					NotifyPropertyChanged("CurrentUnnumberedQuestions");
-					NotifyPropertyChanged("CurrentNumberedQuestions");
-				}
-			}
-		}
-		string _currentCategory = string.Empty;
-		#endregion
-
-		// (0.1.0)
-		#region *CurrentCategoryQuestionsプロパティ
-		/// <summary>
-		/// CurrentCategoryに属する問題を取得します．
-		/// </summary>
-		public IEnumerable<SweetQuestion> CurrentCategoryQuestions
-		{
-			get
-			{
-				return this.Questions.Where(q => q.Category == CurrentCategory);
-				//return this.Questions.Where(q => q.Category == CurrentCategory).OrderBy(q => q.No);
-			}
-		}
-		#endregion
-
-		// (0.1.0)
-		#region *CurrentUnnumberedQuestionsプロパティ
-		/// <summary>
-		/// CurrentCategoryに属しており，Noの設定されていない問題を取得します．
-		/// </summary>
-		public IEnumerable<SweetQuestion> CurrentUnnumberedQuestions
-		{
-			get
-			{
-				return this.CurrentCategoryQuestions.Where(q => !q.No.HasValue);
-			}
-		}
-		#endregion
-
-		// (0.1.0)
-		#region *CurrentNumberedQuestionsプロパティ
-		/// <summary>
-		/// CurrentCategoryに属しており，Noの設定された問題を，Noの昇順で取得します．
-		/// </summary>
-		public IEnumerable<SweetQuestion> CurrentNumberedQuestions
-		{
-			get
-			{
-				return this.CurrentCategoryQuestions.Where(q => q.No.HasValue).OrderBy(q => q.No.Value);
-			}
-		}
-		#endregion
-*/
-
-
 	}
+	#endregion
 
 }
