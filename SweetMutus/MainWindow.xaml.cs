@@ -17,6 +17,7 @@ using Aldentea.Wpf.Application;
 using System.ComponentModel;
 using HyperMutus;
 using System.Collections.ObjectModel;
+using System.Threading;
 
 namespace Aldentea.SweetMutus
 {
@@ -887,6 +888,8 @@ namespace Aldentea.SweetMutus
 		}
 		#endregion
 
+		//AutoResetEvent _mediaOpenedEvent = new AutoResetEvent(false);
+
 		// (0.1.0)再生開始位置から再生するように修正。
 		#region Playコマンド
 		void Play_Executed(object sender, ExecutedRoutedEventArgs e)
@@ -899,9 +902,10 @@ namespace Aldentea.SweetMutus
 				// このまま次の処理に進むと、まだファイルが開いていないうちにCurrentPositionを設定しまうことがある！
 				// ＝ここでの設定が反映されない！
 				// 同期をとればよい？が、そのやり方がよくわからないので適当にDelayを挟む。
-				Task.Delay(1);
-				_songPlayer.CurrentPosition = song.PlayPos;
+				Task.Delay(10);
+
 				this.CurrentSong = song;
+				_songPlayer.CurrentPosition = song.PlayPos;
 				_songPlayer.Play();
 
 				this.expanderSongPlayer.IsExpanded = true;	// ←これはここに書くべきものなのか？
