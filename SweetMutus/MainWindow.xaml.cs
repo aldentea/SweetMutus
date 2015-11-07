@@ -586,6 +586,7 @@ namespace Aldentea.SweetMutus
 			}
 		}
 
+		// (0.1.0)選択しないままOKするとアプリケーションが落ちるバグに対応。
 		void AddQuestionsFromDirectory()
 		{
 			var dialog = new Wpf.Controls.FolderBrowserDialog
@@ -597,10 +598,13 @@ namespace Aldentea.SweetMutus
 			if (dialog.ShowDialog() == true)
 			{
 				var directory = dialog.SelectedPath;
-				AddQuestions(System.IO.Directory.GetFiles(directory, "*.mp3", System.IO.SearchOption.AllDirectories));
-				if (string.IsNullOrEmpty(MyDocument.Questions.RootDirectory))
+				if (!string.IsNullOrEmpty(directory))
 				{
-					MyDocument.Questions.RootDirectory = directory;
+					AddQuestions(System.IO.Directory.GetFiles(directory, "*.mp3", System.IO.SearchOption.AllDirectories));
+					if (string.IsNullOrEmpty(MyDocument.Questions.RootDirectory))
+					{
+						MyDocument.Questions.RootDirectory = directory;
+					}
 				}
 			}
 		}
