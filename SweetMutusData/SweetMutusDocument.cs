@@ -98,6 +98,7 @@ namespace Aldentea.SweetMutus.Data
 		/// </summary>
 		List<string> _addedSongFiles = new List<string>();
 
+		// (0.2.0)曲を追加しない場合にnullを返すように変更。
 		#region *曲を追加(AddQuestions)
 		/// <summary>
 		/// このメソッドが直接呼び出されることは想定していません．
@@ -108,12 +109,27 @@ namespace Aldentea.SweetMutus.Data
 		public SweetQuestion AddQuestion(string fileName)
 		{
 			SweetQuestion question = new SweetQuestion { FileName = fileName };
-			LoadInformation(question);
-			return this.AddQuestion(question);
+			if (LoadInformation(question))
+			{
+				return this.AddQuestion(question);
+			}
+			else
+			{
+				return null;
+			}
 		}
 
+		/// <summary>
+		/// questionがnullの場合は、何もせずにnullを返します。
+		/// </summary>
+		/// <param name="question"></param>
+		/// <returns></returns>
 		private SweetQuestion AddQuestion(SweetQuestion question)
 		{
+			if (question == null)
+			{
+				return null;
+			}
 			try
 			{
 				_questions.Add(question);	// この後の処理でSongDuplicateExceptionが発生する。
@@ -129,7 +145,7 @@ namespace Aldentea.SweetMutus.Data
 			}
 		}
 
-
+		// (0.2.0)追加された問題がない場合は、操作履歴に追加しないように修正。
 		public void AddQuestions(IEnumerable<string> fileNames)
 		{
 			IList<SweetQuestion> added_questions;
@@ -150,8 +166,10 @@ namespace Aldentea.SweetMutus.Data
 				// 通常は呼び出し元に制御を渡して，UIを表示する．
 				added_questions = AddQuestionsAction.Invoke(fileNames);
 			}
-			
-			AddOperationHistory(new SweetQuestionsAddedCache(this, added_questions.ToArray()));
+			if (added_questions.Count > 0)
+			{
+				AddOperationHistory(new SweetQuestionsAddedCache(this, added_questions.ToArray()));
+			}
 		}
 
 		#endregion
@@ -189,19 +207,33 @@ namespace Aldentea.SweetMutus.Data
 		//	AddOperationHistory(new SweetQuestionsRemovedCache(this, e.Item));
 		//}
 
+		// (0.2.0)staticを解除。boolを返すように変更。
 		// (0.1.7)再生開始位置もロードするように変更．
 		// HyperMutusからのパクリ．古いメソッドだけど，とりあえずそのまま使う．
 		// 場所も未定．とりあえずstatic化してここに置いておく．
-		#region *[static]ファイルからメタデータを読み込み(LoadInformation)
+		#region *ファイルからメタデータを読み込み(LoadInformation)
 		/// <summary>
 		/// songのFileNameプロパティで指定されたファイルからメタデータを読み込みます．
 		/// </summary>
-		static void LoadInformation(SweetQuestion question)
+		bool LoadInformation(SweetQuestion question)
 		{
 			SPP.Aldente.IID3Tag tag;
 			try
 			{
 				tag = SPP.Aldente.AldenteMP3TagAccessor.ReadFile(question.FileName);
+			}
+			catch (IOException ex)
+			{
+				// 通知したい。
+				if (Confirm(string.Format(
+					"読み込みに失敗しました。 - {0} \n曲情報を読み込まずに曲ファイルを追加しますか？", ex.Message)))
+				{
+					tag = null;
+				}
+				else
+				{
+					return false;
+				}
 			}
 			catch (ApplicationException)
 			{
@@ -211,6 +243,7 @@ namespace Aldentea.SweetMutus.Data
 			question.Artist = tag == null ? string.Empty : tag.Artist;
 			question.SabiPos = tag == null ? TimeSpan.Zero : TimeSpan.FromSeconds(Convert.ToDouble(tag.SabiPos));
 			question.PlayPos = tag == null ? TimeSpan.Zero : TimeSpan.FromSeconds(Convert.ToDouble(tag.StartPos));
+			return true;
 		}
 		#endregion
 
