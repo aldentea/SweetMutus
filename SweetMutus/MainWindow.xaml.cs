@@ -883,6 +883,7 @@ namespace Aldentea.SweetMutus
 		}
 		#endregion
 
+		// (0.1.0)再生開始位置から再生するように修正。
 		#region Playコマンド
 		void Play_Executed(object sender, ExecutedRoutedEventArgs e)
 		{
@@ -890,9 +891,12 @@ namespace Aldentea.SweetMutus
 			{
 				var song = (SweetQuestion)e.Parameter;
 				_songPlayer.Open(song.FileName);
-				//_songPlayerTimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(0.25) }; // 可変にする？
-				//_songPlayerTimer.Tick += SongPlayerTimer_Tick;
-				//_songPlayerTimer.IsEnabled = true;
+
+				// このまま次の処理に進むと、まだファイルが開いていないうちにCurrentPositionを設定しまうことがある！
+				// ＝ここでの設定が反映されない！
+				// 同期をとればよい？が、そのやり方がよくわからないので適当にDelayを挟む。
+				Task.Delay(1);
+				_songPlayer.CurrentPosition = song.PlayPos;
 				this.CurrentSong = song;
 				_songPlayer.Play();
 
@@ -907,17 +911,26 @@ namespace Aldentea.SweetMutus
 		}
 		#endregion
 
-
+		// (0.1.0)現在の場所が再生開始位置より前であれば、(現在の曲の)再生開始位置にSeekするように修正。
 		// (0.0.8.7)
 		#region NextTrack
 		void NextTrack_Executed(object sender, ExecutedRoutedEventArgs e)
 		{
-			var index = dataGridQuestions.Items.IndexOf(this.CurrentSong);
-			if (index >= 0 && index < dataGridQuestions.Items.Count - 1)
+			if (_songPlayer.CurrentPosition < this.CurrentSong.PlayPos)
 			{
-				var song = (SweetQuestion)dataGridQuestions.Items.GetItemAt(index + 1);
-				System.Windows.Input.MediaCommands.Play.Execute(song, this);
-				dataGridQuestions.SelectedItem = song;
+				// 再生開始位置に移動。
+				_songPlayer.CurrentPosition = this.CurrentSong.PlayPos;
+			}
+			else
+			{
+				// 次の曲を再生(しようとする)。
+				var index = dataGridQuestions.Items.IndexOf(this.CurrentSong);
+				if (index >= 0 && index < dataGridQuestions.Items.Count - 1)
+				{
+					var song = (SweetQuestion)dataGridQuestions.Items.GetItemAt(index + 1);
+					System.Windows.Input.MediaCommands.Play.Execute(song, this);
+					dataGridQuestions.SelectedItem = song;
+				}
 			}
 		}
 
