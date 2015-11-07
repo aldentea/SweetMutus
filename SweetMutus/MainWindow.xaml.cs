@@ -17,6 +17,7 @@ using Aldentea.Wpf.Application;
 using System.ComponentModel;
 using HyperMutus;
 using System.Collections.ObjectModel;
+using System.Threading;
 
 namespace Aldentea.SweetMutus
 {
@@ -91,9 +92,13 @@ namespace Aldentea.SweetMutus
 				new CommandBinding(ApplicationCommands.Redo,
 					Redo_Executed, Redo_CanExecute)
 			);
+
+			// レイアウト関係のコマンドハンドラだけど，なぜかここに記載．
+			//dataGridQuestionsFileNameColumn.Visibility
 		}
 		#endregion
 
+		// (0.0.13)音声ボリュームを復元．
 		// (0.0.8.9)
 		#region *ウインドウ初期化時(MainWindow_Initialized)
 		private void MainWindow_Initialized(object sender, EventArgs e)
@@ -110,9 +115,11 @@ namespace Aldentea.SweetMutus
 				this.Width = MySettings.WindowSize.Width;
 				this.Height = MySettings.WindowSize.Height;
 			}
+			this.SongPlayer.Volume = MySettings.SongPlayerVolume;
 		}
 		#endregion
 
+		// (0.0.13)音声ボリュームを保存．
 		// (0.0.8.9)
 		#region *ウインドウクローズ時(MainWindow_Closed)
 		private void MainWindow_Closed(object sender, EventArgs e)
@@ -121,6 +128,8 @@ namespace Aldentea.SweetMutus
 			MySettings.WindowMaximized = this.WindowState == System.Windows.WindowState.Maximized;
 			MySettings.WindowPosition = new Point(this.Left, this.Top);
 			MySettings.WindowSize = new System.Windows.Size(this.Width, this.Height);
+
+			MySettings.SongPlayerVolume = this.SongPlayer.Volume;
 		}
 		#endregion
 
@@ -426,6 +435,17 @@ namespace Aldentea.SweetMutus
 
 		#endregion
 
+		// (0.0.11)
+		#region Import
+
+		private void Import_Executed(object sender, ExecutedRoutedEventArgs e)
+		{
+			ImportFrom(string.Empty);
+		}
+
+		#endregion
+
+
 		#endregion
 
 		// (0.0.8.9)
@@ -441,6 +461,7 @@ namespace Aldentea.SweetMutus
 
 		// カレントカテゴリ関連
 
+		#region *ドキュメント初期化時(MyDocument_Initialized)
 		void MyDocument_Initialized(object sender, EventArgs e)
 		{
 
@@ -452,7 +473,9 @@ namespace Aldentea.SweetMutus
 			this.CurrentSong = null;
 			this.expanderSongPlayer.IsExpanded = false;
 		}
+		#endregion
 
+		#region *ドキュメントオープン時(MyDocument_Opened)
 		void MyDocument_Opened(object sender, EventArgs e)
 		{
 			Categories.Clear();
@@ -480,6 +503,7 @@ namespace Aldentea.SweetMutus
 			this.comboBoxDestinationCategory.SelectedIndex = 0;
 
 		}
+		#endregion
 
 		//private void comboBoxCategories_SelectionChanged(object sender, SelectionChangedEventArgs e)
 		//{
@@ -530,7 +554,7 @@ namespace Aldentea.SweetMutus
 			UpdateFilter(CurrentCategory);
 		}
 
-
+		#region *カテゴリを追加(AddCategory)
 		/// <summary>
 		/// カテゴリを追加します。
 		/// </summary>
@@ -548,6 +572,7 @@ namespace Aldentea.SweetMutus
 				return false;
 			}
 		}
+		#endregion
 
 		#region 問題リスト関連
 
@@ -562,6 +587,7 @@ namespace Aldentea.SweetMutus
 			}
 		}
 
+		// (0.1.0)選択しないままOKするとアプリケーションが落ちるバグに対応。
 		void AddQuestionsFromDirectory()
 		{
 			var dialog = new Wpf.Controls.FolderBrowserDialog
@@ -573,10 +599,13 @@ namespace Aldentea.SweetMutus
 			if (dialog.ShowDialog() == true)
 			{
 				var directory = dialog.SelectedPath;
-				AddQuestions(System.IO.Directory.GetFiles(directory, "*.mp3", System.IO.SearchOption.AllDirectories));
-				if (string.IsNullOrEmpty(MyDocument.Questions.RootDirectory))
+				if (!string.IsNullOrEmpty(directory))
 				{
-					MyDocument.Questions.RootDirectory = directory;
+					AddQuestions(System.IO.Directory.GetFiles(directory, "*.mp3", System.IO.SearchOption.AllDirectories));
+					if (string.IsNullOrEmpty(MyDocument.Questions.RootDirectory))
+					{
+						MyDocument.Questions.RootDirectory = directory;
+					}
 				}
 			}
 		}
@@ -621,6 +650,86 @@ namespace Aldentea.SweetMutus
 
 		#endregion
 
+		// (0.0.12)smtファイルにも対応．
+		// (0.0.11)
+		#region インポート
+
+		public void ImportFrom(string sourceFileName)
+		{
+			if (string.IsNullOrEmpty(sourceFileName))
+			{
+				sourceFileName = SelectImportSource();
+				if (string.IsNullOrEmpty(sourceFileName))
+				{
+					return;
+				}
+			}
+
+			var dialog = new ImportDialog();
+			dialog.CommandBindings.Add(new CommandBinding(Commands.ImportCommand, DialogImport_Executed, DialogImport_CanExecute));
+			switch (System.IO.Path.GetExtension(sourceFileName))
+			{
+				case ".mtu":
+				case ".mtq":
+					GrandMutus.Data.MutusDocument doc = new GrandMutus.Data.MutusDocument();
+					doc.Open(sourceFileName, true);
+					dialog.DataContext = doc;
+					break;
+				case ".smt":
+					SweetMutusDocument s_doc = new SweetMutusDocument();
+					s_doc.Open(sourceFileName, true);
+					dialog.DataContext = s_doc;
+					break;
+				default:
+					MessageBox.Show("未対応のファイルですorz");
+					return;
+			}
+			dialog.ShowDialog();
+		}
+
+		#region *インポート元のファイルを選択(SelectImportSource)
+		string SelectImportSource()
+		{
+			var file_dialog = new Microsoft.Win32.OpenFileDialog
+			{
+				Filter = "SweetMutusファイル(*.smt)|*.smt|HyperMutusファイル(*.mtu,*.mtq)|*.mtu;*.mtq",
+				ReadOnlyChecked = true,
+				Title = "インポート元ファイルを選択して下さい"
+			};
+			if (file_dialog.ShowDialog() == true)
+			{
+				return file_dialog.FileName;
+			}
+			else
+			{
+				return string.Empty;
+			}
+		}
+		#endregion
+
+		void DialogImport_Executed(object sender, ExecutedRoutedEventArgs e)
+		{
+			if (e.Parameter is System.Collections.IList)
+			{
+				var songs = ((System.Collections.IList)e.Parameter).Cast<GrandMutus.Data.ISong>();
+				MyDocument.ImportSongs(songs);
+			}
+		}
+
+		void DialogImport_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+		{
+			if (e.Parameter is System.Collections.IList)
+			{
+				e.CanExecute = ((System.Collections.IList)e.Parameter).Count > 0;
+			}
+			else
+			{
+				e.CanExecute = false;
+      }
+		}
+		
+		#endregion
+
 
 		void SaveAsMtq()
 		{
@@ -632,11 +741,12 @@ namespace Aldentea.SweetMutus
 			}
 		}
 
-
+		// (0.0.13)SweetMutus形式に加えて，HyperMutus形式でエクスポートできるように改良．
+		#region *エクスポート(Export)
 		void Export()
 		{
 			// ファイル名選択
-			var dialog = new HyperMutus.ExportDialog { FileFilter = this.SaveFileDialogFilter };
+			var dialog = new HyperMutus.ExportDialog { FileFilter = "SweetMutusファイル(*.smt)|*.smt|HyperMutusファイル(*.mtq)|*.mtq" };
 			if (dialog.ShowDialog() == true)
 			{
 				string fileName = dialog.Destination;
@@ -655,8 +765,9 @@ namespace Aldentea.SweetMutus
 			}
 			
 		}
+		#endregion
 
-
+		#region *ルートディレクトリを設定(SetRootDirectory)
 		private void SetRootDirectory()
 		{
 			var directory = HyperMutus.Helpers.SelectSongsRoot(this.MyDocument.Questions.RootDirectory);
@@ -665,6 +776,7 @@ namespace Aldentea.SweetMutus
 				MyDocument.Questions.RootDirectory = directory;
 			}
 		}
+		#endregion
 
 		#region カテゴリ関連
 
@@ -745,7 +857,7 @@ namespace Aldentea.SweetMutus
 		#endregion
 
 
-		// (0.3.2)プロパティ化。
+		// (*0.3.2)プロパティ化。
 		#region *CurrentSongプロパティ
 		public SweetQuestion CurrentSong
 		{
@@ -764,8 +876,8 @@ namespace Aldentea.SweetMutus
 
 		//DispatcherTimer _songPlayerTimer = null;
 
-		// (0.3.2)
-
+		// (*0.3.2)
+		#region *曲ファイルオープン時(SongPlayer_MediaOpened)
 		void SongPlayer_MediaOpened(object sender, EventArgs e)
 		{
 			if (_songPlayer.Duration.HasValue)
@@ -774,7 +886,11 @@ namespace Aldentea.SweetMutus
 				this.sliderSeekSong.Maximum = _songPlayer.Duration.Value.TotalSeconds;
 			}
 		}
+		#endregion
 
+		//AutoResetEvent _mediaOpenedEvent = new AutoResetEvent(false);
+
+		// (0.1.0)再生開始位置から再生するように修正。
 		#region Playコマンド
 		void Play_Executed(object sender, ExecutedRoutedEventArgs e)
 		{
@@ -782,10 +898,14 @@ namespace Aldentea.SweetMutus
 			{
 				var song = (SweetQuestion)e.Parameter;
 				_songPlayer.Open(song.FileName);
-				//_songPlayerTimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(0.25) }; // 可変にする？
-				//_songPlayerTimer.Tick += SongPlayerTimer_Tick;
-				//_songPlayerTimer.IsEnabled = true;
+
+				// このまま次の処理に進むと、まだファイルが開いていないうちにCurrentPositionを設定しまうことがある！
+				// ＝ここでの設定が反映されない！
+				// 同期をとればよい？が、そのやり方がよくわからないので適当にDelayを挟む。
+				Task.Delay(10);
+
 				this.CurrentSong = song;
+				_songPlayer.CurrentPosition = song.PlayPos;
 				_songPlayer.Play();
 
 				this.expanderSongPlayer.IsExpanded = true;	// ←これはここに書くべきものなのか？
@@ -799,17 +919,26 @@ namespace Aldentea.SweetMutus
 		}
 		#endregion
 
-
+		// (0.1.0)現在の場所が再生開始位置より前であれば、(現在の曲の)再生開始位置にSeekするように修正。
 		// (0.0.8.7)
 		#region NextTrack
 		void NextTrack_Executed(object sender, ExecutedRoutedEventArgs e)
 		{
-			var index = dataGridQuestions.Items.IndexOf(this.CurrentSong);
-			if (index >= 0 && index < dataGridQuestions.Items.Count - 1)
+			if (_songPlayer.CurrentPosition < this.CurrentSong.PlayPos)
 			{
-				var song = (SweetQuestion)dataGridQuestions.Items.GetItemAt(index + 1);
-				System.Windows.Input.MediaCommands.Play.Execute(song, this);
-				dataGridQuestions.SelectedItem = song;
+				// 再生開始位置に移動。
+				_songPlayer.CurrentPosition = this.CurrentSong.PlayPos;
+			}
+			else
+			{
+				// 次の曲を再生(しようとする)。
+				var index = dataGridQuestions.Items.IndexOf(this.CurrentSong);
+				if (index >= 0 && index < dataGridQuestions.Items.Count - 1)
+				{
+					var song = (SweetQuestion)dataGridQuestions.Items.GetItemAt(index + 1);
+					System.Windows.Input.MediaCommands.Play.Execute(song, this);
+					dataGridQuestions.SelectedItem = song;
+				}
 			}
 		}
 
@@ -854,6 +983,7 @@ namespace Aldentea.SweetMutus
 
 		// 動作を2つ用意する．
 		// 曲をパラメータとしてとり，現在の曲と違ったら，Playの動作をするようにする？
+		// ↑してみました．
 
 		void SwitchPlayPause_Executed(object sender, ExecutedRoutedEventArgs e)
 		{

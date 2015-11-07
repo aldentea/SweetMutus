@@ -8,7 +8,7 @@
 				xmlns:grand="clr-namespace:GrandMutus.Base;assembly=GrandMutusBase"
 				xmlns:local="clr-namespace:Aldentea.SweetMutus"
 				xmlns:ud="clr-namespace:Aldentea.Wpf.Controls;assembly=UpDownControl"
-				OpenFileDialogFilter="SweetMutusファイル(*.smt)|*.smt|mutus2ファイル(*.mtu)|*.mtu"
+				OpenFileDialogFilter="SweetMutusファイル(*.smt)|*.smt|mutus2ファイル(*.mtu)|*.mtu|HyperMutusファイル(*.mtu,*.mtq)|*.mtu;*.mtq"
 				SaveFileDialogFilter="SweetMutusファイル(*.smt)|*.smt"
         Height="600" Width="800"
 				Initialized="MainWindow_Initialized"
@@ -88,6 +88,10 @@
 		<CommandBinding Command="{x:Static local:Commands.EnterQuestionsCommand}"
 										Executed="EnterQuestions_Executed"
 										CanExecute="IncrementNo_CanExecute" />
+		<CommandBinding
+			Command="{x:Static local:Commands.ImportCommand}"
+			Executed="Import_Executed"
+			CanExecute="Always_CanExecute" />
 	</Window.CommandBindings>
 	<Window.InputBindings>
 		<KeyBinding Key="F5" Command="{x:Static  hypermutus:Commands.SwitchPlayPauseCommand}" />
@@ -140,10 +144,17 @@
 					</MenuItem.CommandParameter>
 				</MenuItem>
 				<MenuItem Header="ホームフォルダ変更(_H)" Command="{x:Static grand:Commands.SetRootDirectoryCommand}" />
-			</MenuItem>
+        <MenuItem Header="インポート(_I)" Command="{x:Static local:Commands.ImportCommand}" />
+      </MenuItem>
 			<MenuItem Header="表示(_V)">
 				<MenuItem Name="menuItemCategoryVisible" Header="カテゴリ" IsCheckable="True" IsChecked="False" />
-				<MenuItem Name="menuItemFileNameColumnVisible" Header="ファイル名列" IsCheckable="True" IsChecked="False" Visibility="Collapsed" />
+				<Separator />
+				<MenuItem x:Name="menuItemIDColumnVisible" Header="ID列" IsCheckable="True"
+									IsChecked="{Binding ElementName=questionsIDColumn, Path=Visibility, Converter={StaticResource fileNameVisibilityConverter}}" />
+				<MenuItem Name="menuItemFileNameColumnVisible" Header="ファイル名列" IsCheckable="True"
+									IsChecked="{Binding ElementName=questionsFileNameColumn, Path=Visibility, Converter={StaticResource fileNameVisibilityConverter}}" />
+				<MenuItem Name="menuItemPlayPosColumnVisible" Header="開始位置列" IsCheckable="True"
+									IsChecked="{Binding ElementName=questionsPlayPosColumn, Path=Visibility, Converter={StaticResource fileNameVisibilityConverter}}" />
 			</MenuItem>
 			<MenuItem Header="曲再生(_P)">
 				<MenuItem Header="再生開始" Command="Play"
@@ -206,7 +217,8 @@
 							>
 				<DataGrid.Columns>
 					<DataGridTextColumn Header="#" Binding="{Binding Path=ID}" IsReadOnly="True"
-														ElementStyle="{StaticResource numericCellStyle}" Visibility="Collapsed" />
+														ElementStyle="{StaticResource numericCellStyle}"
+														x:Name="questionsIDColumn" Visibility="Collapsed" />
 					<DataGridTextColumn Header="No" ElementStyle="{StaticResource numericCellStyle}"
 					>
 						<DataGridTextColumn.Binding>
@@ -222,8 +234,7 @@
 					<!-- このVisibilityのバインディングが機能していない。
 				たぶんXAMLのスコープの話だと思うが、どうすればいいのかはよくわからない。-->
 					<DataGridTextColumn Header="ファイル名" Binding="{Binding Path=RelativeFileName}" IsReadOnly="True" Width="*"
-														Visibility="{Binding ElementName=menuItemFileNameColumnVisible, Path=IsChecked,
-																									Converter={StaticResource fileNameVisibilityConverter}}"
+														Visibility="Collapsed" x:Name="questionsFileNameColumn"
 														>
 						<DataGridTextColumn.ElementStyle>
 							<Style TargetType="TextBlock">
@@ -231,7 +242,7 @@
 							</Style>
 						</DataGridTextColumn.ElementStyle>
 					</DataGridTextColumn>
-					<DataGridTextColumn Header="開始" ElementStyle="{StaticResource numericCellStyle}" MinWidth="60">
+					<DataGridTextColumn Header="開始" x:Name="questionsPlayPosColumn" ElementStyle="{StaticResource numericCellStyle}" MinWidth="60">
 						<DataGridTextColumn.Binding>
 							<Binding Path="PlayPos" Converter="{StaticResource durationConverter}" ConverterParameter="2">
 								<Binding.ValidationRules>

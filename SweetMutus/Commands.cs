@@ -44,6 +44,12 @@ namespace Aldentea.SweetMutus
 		public static RoutedCommand OmitQuestionsCommand = new RoutedCommand();
 		public static RoutedCommand EnterQuestionsCommand = new RoutedCommand();
 
+		// (0.0.11)
+		/// <summary>
+		/// 曲や問題を他のドキュメントからインポートします．
+		/// </summary>
+		public static RoutedCommand ImportCommand = new RoutedCommand();
+		
 	}
 
 }
