@@ -26,17 +26,9 @@ namespace Aldentea.SweetMutus
 	public partial class ChangeFileNameDialog : Window, INotifyPropertyChanged
 	{
 
-		public static readonly DependencyProperty FileNameProperty
-			= DependencyProperty.Register("FileName", typeof(string), typeof(ChangeFileNameDialog),
-						new PropertyMetadata(null, (sender, e) =>
-						{
-							var dialog = (ChangeFileNameDialog)sender;
-							dialog.NotifyPropretyChanged("FilePath");
-							dialog.NotifyPropretyChanged("FileMainName");
-							dialog.NotifyPropretyChanged("FileExtension");
-						})
-				);
+		#region プロパティ
 
+		#region *[dependency]FileNameプロパティ
 		public string FileName
 		{
 			get
@@ -49,6 +41,21 @@ namespace Aldentea.SweetMutus
 			}
 		}
 
+		public static readonly DependencyProperty FileNameProperty
+			= DependencyProperty.Register("FileName", typeof(string), typeof(ChangeFileNameDialog),
+						new PropertyMetadata(null, (sender, e) =>
+						{
+							var dialog = (ChangeFileNameDialog)sender;
+							dialog.NotifyPropretyChanged("FilePath");
+							dialog.NotifyPropretyChanged("FileMainName");
+							dialog.NotifyPropretyChanged("FileExtension");
+						})
+				);
+		#endregion
+
+		// 以下3つはprivateでもいいのか？
+
+		#region *FilePathプロパティ
 		public string FilePath
 		{
 			get
@@ -60,7 +67,9 @@ namespace Aldentea.SweetMutus
 				FileName = IO.Path.Combine(value, string.Join(".", FileMainName, FileExtension));
 			}
 		}
+		#endregion
 
+		#region *FileMainNameプロパティ
 		public string FileMainName
 		{
 			get
@@ -72,7 +81,9 @@ namespace Aldentea.SweetMutus
 				FileName = IO.Path.Combine(FilePath, string.Join(".", value, FileExtension));
 			}
 		}
+		#endregion
 
+		#region *FileExtensionプロパティ
 		public string FileExtension
 		{
 			get
@@ -84,14 +95,53 @@ namespace Aldentea.SweetMutus
 				FileName = IO.Path.Combine(FilePath, string.Join(".", FileMainName, value));
 			}
 		}
+		#endregion
 
+		#endregion
+
+
+		#region *コンストラクタ(ChangeFileNameDialog)
 		public ChangeFileNameDialog()
 		{
 			InitializeComponent();
 		}
+		#endregion
+
+		// 12/09/2011 by aldentea
+		#region *ロード時(Window_Loaded)
+		private void Window_Loaded(object sender, RoutedEventArgs e)
+		{
+			if (this.textBoxName.Focus())
+			{
+				this.textBoxName.SelectionStart = 0;
+				this.textBoxName.SelectionLength = textBoxName.Text.Length;
+			}
+		}
+		#endregion
 
 
-		#region *INotifyPropertyChanged実装
+		#region ボタンイベントハンドラ
+
+		#region *[OK]クリック時(buttonOK_Click)
+		private void buttonOK_Click(object sender, RoutedEventArgs e)
+		{
+			this.DialogResult = true;
+		}
+		#endregion
+
+		#region *[キャンセル]クリック時(buttonCancel_Click)
+		private void buttonCancel_Click(object sender, RoutedEventArgs e)
+		{
+			this.DialogResult = false;
+			//this.Close();
+
+		}
+		#endregion
+
+		#endregion
+
+
+		#region INotifyPropertyChanged実装
 
 		public event PropertyChangedEventHandler PropertyChanged = delegate { };
 
@@ -101,28 +151,6 @@ namespace Aldentea.SweetMutus
 		}
 
 		#endregion
-
-		private void buttonOK_Click(object sender, RoutedEventArgs e)
-		{
-			this.DialogResult = true;
-		}
-
-		private void buttonCancel_Click(object sender, RoutedEventArgs e)
-		{
-			this.DialogResult = false;
-			//this.Close();
-
-		}
-
-		// 12/09/2011 by aldentea
-		private void Window_Loaded(object sender, RoutedEventArgs e)
-		{
-			if (this.textBoxName.Focus())
-			{
-				this.textBoxName.SelectionStart = 0;
-				this.textBoxName.SelectionLength = textBoxName.Text.Length;
-			}
-		}
 
 	}
 }
