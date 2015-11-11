@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 using Aldentea.Wpf.Document;
 using System.Xml;
@@ -94,7 +92,7 @@ namespace Aldentea.SweetMutus.Data
 		// Songオブジェクトはここで(のみ)作るようにする？
 
 		/// <summary>
-		/// (0.3.4)現時点では未使用！
+		/// (*0.3.4)現時点では未使用！
 		/// </summary>
 		List<string> _addedSongFiles = new List<string>();
 
@@ -183,15 +181,17 @@ namespace Aldentea.SweetMutus.Data
 		//	RemoveSongs(fileNames.Select(fileName => _songs.FirstOrDefault(s => s.FileName == fileName)).Where(s => s != null));
 		//}
 
+		// (0.2.1)バグを修正(列挙体にたいする削除操作)。
 		// (0.0.6.3)UIから削除する場合も，このメソッドを経由することにしたので，OperationCacheの追加はここで行う．
 		// (0.3.1)OperationCacheの追加はQuestionsRemovedイベントハンドラで行うことにする
 		// (曲の削除はUIから直接行われることが想定されるため)．
 		// (0.3.0)
 		public void RemoveQuestions(IEnumerable<SweetQuestion> questions)
 		{
-			IList<SweetQuestion> removed_questions = new List<SweetQuestion>();
-			foreach (var question in questions)
+			var removed_questions = new List<SweetQuestion>();
+			foreach (var question in questions.ToArray())
 			{
+				
 				if (_questions.Remove(question))
 				{
 					removed_questions.Add(question);
@@ -313,10 +313,6 @@ namespace Aldentea.SweetMutus.Data
 		}
 		#endregion
 
-		void Questions_QuestionCategoryChanged(object sender, EventArgs e)
-		{
-
-		}
 		/// <summary>
 		/// 問題のカテゴリ変更があったときに発生します。
 		/// </summary>
