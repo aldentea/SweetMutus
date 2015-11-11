@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
@@ -42,14 +40,15 @@ namespace Aldentea.SweetMutus.Data
 
 		#region コレクション変更関連
 
-		// (0.4.1)
+		// (*0.4.1)
 		/// <summary>
 		/// 問題が削除された時に発生します．
 		/// </summary>
 		public event EventHandler<ItemEventArgs<IEnumerable<SweetQuestion>>> QuestionsRemoved = delegate { };
 
 
-		// (0.4.1) Remove時の処理を追加(ほとんどSongsCollectionのコピペ)．
+		// (*0.4.1) Remove時の処理を追加(ほとんどSongsCollectionのコピペ)．
+		#region *コレクション変更時(QuestionsCollection_CollectionChanged)
 		private void QuestionsCollection_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
 		{
 			switch (e.Action)
@@ -102,7 +101,9 @@ namespace Aldentea.SweetMutus.Data
 		}
 		#endregion
 
-		// (0.3.3)SongsCollectionからのコピペ。共通実装にしますか？
+		#endregion
+
+		// (*0.3.3)SongsCollectionからのコピペ。共通実装にしますか？
 		#region ID管理関連
 
 		int GenerateNewID()
@@ -130,8 +131,8 @@ namespace Aldentea.SweetMutus.Data
 
 		#region RootDirectory関連
 
-		// (0.4.4)set時に操作履歴に追加。
-		// (0.4.3)実装を変更し、この変更を各Songに通知するように修正。
+		// (*0.4.4)set時に操作履歴に追加。
+		// (*0.4.3)実装を変更し、この変更を各Songに通知するように修正。
 		#region *RootDirectoryプロパティ
 		/// <summary>
 		/// 曲ファイルを格納するディレクトリのフルパスを取得／設定します．
@@ -188,6 +189,7 @@ namespace Aldentea.SweetMutus.Data
 		string _fileNameCache = string.Empty;
 		string _categoryCache = null;
 
+		#region *Questionのプロパティ変更前(Question_PropertyChanging)
 		void Question_PropertyChanging(object sender, System.ComponentModel.PropertyChangingEventArgs e)
 		{
 			SweetQuestion song = (SweetQuestion)sender;
@@ -214,7 +216,9 @@ namespace Aldentea.SweetMutus.Data
 					break;
 			}
 		}
+		#endregion
 
+		#region *Questionのプロパティ変更後(Question_PropertyChanged)
 		void Question_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
 		{
 			var song = (SweetQuestion)sender;
@@ -270,11 +274,11 @@ namespace Aldentea.SweetMutus.Data
 			// ドキュメントにNotifyしたい！？
 			//e.PropertyName
 		}
+		#endregion
 
-
-		// (0.4.6.0)QuestionNoChangeCompletedイベントの発生を追加．
-		// (0.4.5.2)で、カテゴリを考慮。
-		// (0.4.5.1)まずはカテゴリを考慮しない形で整番処理を記述．
+		// (*0.4.6.0)QuestionNoChangeCompletedイベントの発生を追加．
+		// (*0.4.5.2)で、カテゴリを考慮。
+		// (*0.4.5.1)まずはカテゴリを考慮しない形で整番処理を記述．
 		#region 整番処理関連
 
 		bool _noChangingFlag = false;
@@ -388,6 +392,7 @@ namespace Aldentea.SweetMutus.Data
 		#endregion
 
 
+		#region *初期化(Initialize)
 		/// <summary>
 		/// 初期化します．
 		/// </summary>
@@ -396,9 +401,11 @@ namespace Aldentea.SweetMutus.Data
 			this.Clear();
 			this.RootDirectory = string.Empty;
 		}
+		#endregion
 
 		#endregion
 
+		#region *Categoriesプロパティ
 		/// <summary>
 		/// 現在のドキュメントで使用しているカテゴリを取得します．
 		/// </summary>
@@ -409,7 +416,7 @@ namespace Aldentea.SweetMutus.Data
 				return this.Select(q => q.Category).Distinct();
 			}
 		}
-
+		#endregion
 
 
 		#region XML入出力関連

@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 using Aldentea.Wpf.Document;
 using System.Xml;
@@ -94,7 +92,7 @@ namespace Aldentea.SweetMutus.Data
 		// Songオブジェクトはここで(のみ)作るようにする？
 
 		/// <summary>
-		/// (0.3.4)現時点では未使用！
+		/// (*0.3.4)現時点では未使用！
 		/// </summary>
 		List<string> _addedSongFiles = new List<string>();
 
@@ -315,10 +313,6 @@ namespace Aldentea.SweetMutus.Data
 		}
 		#endregion
 
-		void Questions_QuestionCategoryChanged(object sender, EventArgs e)
-		{
-
-		}
 		/// <summary>
 		/// 問題のカテゴリ変更があったときに発生します。
 		/// </summary>
