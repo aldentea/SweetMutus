@@ -1,28 +1,21 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 
 using Aldentea.Wpf.Application;
 using System.ComponentModel;
 using HyperMutus;
 using System.Collections.ObjectModel;
-using System.Threading;
 
 namespace Aldentea.SweetMutus
 {
 	using Data;
 
+	#region MainWindowクラス
 	/// <summary>
 	/// MainWindow.xaml の相互作用ロジック
 	/// </summary>
@@ -31,10 +24,12 @@ namespace Aldentea.SweetMutus
 
 		#region プロパティ
 
+		#region *MyDocumentプロパティ
 		protected SweetMutusDocument MyDocument
 		{
 			get { return (SweetMutusDocument)App.Current.Document; }
 		}
+		#endregion
 
 		#region *Categoriesプロパティ
 		public ObservableCollection<string> Categories
@@ -505,13 +500,6 @@ namespace Aldentea.SweetMutus
 		}
 		#endregion
 
-		//private void comboBoxCategories_SelectionChanged(object sender, SelectionChangedEventArgs e)
-		//{
-		//	dataGridQuestions.Items.Filter = q => ((SweetQuestion)q).Category == (string)comboBoxCategories.SelectedItem;
-
-		//}
-
-
 		#region *[dependency]CurrentCategoryプロパティ
 
 		/// <summary>
@@ -548,11 +536,12 @@ namespace Aldentea.SweetMutus
 			this.dataGridQuestions.Items.Filter = q => ((SweetQuestion)q).Category == category;
 		}
 
-
+		#region *問題のカテゴリ変更時(MyDocument_QuestionCategoryChanged)
 		void MyDocument_QuestionCategoryChanged(object sender, EventArgs e)
 		{
 			UpdateFilter(CurrentCategory);
 		}
+		#endregion
 
 		#region *カテゴリを追加(AddCategory)
 		/// <summary>
@@ -637,8 +626,11 @@ namespace Aldentea.SweetMutus
 		}
 		#endregion
 
+
+		#region DeleteQuestions
+
 		// (0.0.6.2)GrandMutusからコピペ．
-		// (0.3.4.1)既定の動作をオーバーライドする．
+		// (*0.3.4.1)DataGridの既定の動作をオーバーライドする．
 		private void DeleteQuestions_Executed(object sender, ExecutedRoutedEventArgs e)
 		{
 			var items = ((System.Collections.IList)((DataGrid)sender).SelectedItems).Cast<SweetQuestion>();
@@ -647,6 +639,8 @@ namespace Aldentea.SweetMutus
 				this.MyDocument.RemoveQuestions(items);
 			}
 		}
+
+		#endregion
 
 		#endregion
 
@@ -874,8 +868,6 @@ namespace Aldentea.SweetMutus
 		SweetQuestion _currentSong = null;
 		#endregion
 
-		//DispatcherTimer _songPlayerTimer = null;
-
 		// (*0.3.2)
 		#region *曲ファイルオープン時(SongPlayer_MediaOpened)
 		void SongPlayer_MediaOpened(object sender, EventArgs e)
@@ -941,10 +933,6 @@ namespace Aldentea.SweetMutus
 				}
 			}
 		}
-
-		//void NextTrack_CanExecute(object sender, CanExecuteRoutedEventArgs e)
-		//{
-		//}
 		#endregion
 
 		// (0.0.8.7)
@@ -1005,6 +993,7 @@ namespace Aldentea.SweetMutus
 
 		#endregion
 
+		#region SeekRelative
 		void SeekRelative_Executed(object sender, ExecutedRoutedEventArgs e)
 		{
 			if (_songPlayer.CurrentState != SongPlayer.State.Inactive)
@@ -1016,6 +1005,10 @@ namespace Aldentea.SweetMutus
 				}
 			}
 		}
+
+		#endregion
+
+		#region SeekSabi
 
 		void SeekSabi_Executed(object sender, ExecutedRoutedEventArgs e)
 		{
@@ -1029,6 +1022,8 @@ namespace Aldentea.SweetMutus
 		{
 			e.CanExecute = _songPlayer.CurrentState != SongPlayer.State.Inactive;
 		}
+
+		#endregion
 
 		#region SetSabiPosコマンド
 		void SetSabiPos_Executed(object sender, ExecutedRoutedEventArgs e)
@@ -1098,26 +1093,7 @@ namespace Aldentea.SweetMutus
 		}
 		#endregion
 
-
-		#region お試し
-
-/*		private void MenuItemFilter_Click(object sender, RoutedEventArgs e)
-		{
-			//dataGridQuestions.Items.Filter = (q) => { return ((SweetQuestion)q).Category == "tanuki"; };
-			//dataGridQuestions.Items.SortDescriptions.Add(
-			//	new SortDescription { Direction = ListSortDirection.Ascending, PropertyName = "No" }
-			//);
-			var song = dataGridQuestions.SelectedItem as SweetQuestion;
-			if (song != null)
-			{
-				MediaCommands.Play.Execute(song, this);
-				this.expanderSongPlayer.IsExpanded = true;
-			}
-		}
-*/
-		#endregion
-
-
 	}
+	#endregion
 
 }
