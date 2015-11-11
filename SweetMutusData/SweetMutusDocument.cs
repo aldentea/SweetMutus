@@ -183,15 +183,17 @@ namespace Aldentea.SweetMutus.Data
 		//	RemoveSongs(fileNames.Select(fileName => _songs.FirstOrDefault(s => s.FileName == fileName)).Where(s => s != null));
 		//}
 
+		// (0.2.1)バグを修正(列挙体にたいする削除操作)。
 		// (0.0.6.3)UIから削除する場合も，このメソッドを経由することにしたので，OperationCacheの追加はここで行う．
 		// (0.3.1)OperationCacheの追加はQuestionsRemovedイベントハンドラで行うことにする
 		// (曲の削除はUIから直接行われることが想定されるため)．
 		// (0.3.0)
 		public void RemoveQuestions(IEnumerable<SweetQuestion> questions)
 		{
-			IList<SweetQuestion> removed_questions = new List<SweetQuestion>();
-			foreach (var question in questions)
+			var removed_questions = new List<SweetQuestion>();
+			foreach (var question in questions.ToArray())
 			{
+				
 				if (_questions.Remove(question))
 				{
 					removed_questions.Add(question);
