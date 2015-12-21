@@ -77,18 +77,23 @@ namespace Aldentea.SweetMutus.Data
 					}
 				break;
 
+				// (0.2.1.1)削除時にいったんNoをnullにするように修正．
 				case NotifyCollectionChangedAction.Remove:
 					IList<SweetQuestion> questions = new List<SweetQuestion>();
-					foreach (var question in e.OldItems.Cast<SweetQuestion>())
+					for (int i=0; i< e.OldItems.Count; i++)
 					{
-						// Questionでは、変更通知機能がまだ(ちょっと↑で)実装されていない．
+						var question = (SweetQuestion)e.OldItems[i];
+
+						question.No = null;
 						// 削除にあたって、変更通知機能を抑止。
 						question.PropertyChanging -= Question_PropertyChanging;
 						question.PropertyChanged -= Question_PropertyChanged;
 
 						question.NoChanged -= Question_NoChanged;
+
 						questions.Add(question);
 					}
+
 					// (MutusDocumentを経由せずに)UIから削除される場合もあるので，
 					// ここでOperationCacheの処理を行うことにした．
 					if (questions.Count > 0)
