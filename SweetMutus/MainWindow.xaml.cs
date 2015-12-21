@@ -223,6 +223,7 @@ namespace Aldentea.SweetMutus
 
 		#endregion
 
+		// (0.1.0.1)カテゴリ追加後の後片付けをここに実装．
 		#region AddCategory
 
 		private void AddCategory_Executed(object sender, ExecutedRoutedEventArgs e)
@@ -230,6 +231,13 @@ namespace Aldentea.SweetMutus
 			if (e.Parameter is string)
 			{
 				this.AddCategory((string)e.Parameter);
+			}
+
+			// 後片付け...はここに書くべきなのか？
+			if (e.Source == buttonAddCategory)
+			{
+				textBoxNewCategory.Clear();
+				expanderNewCategory.IsExpanded = false;
 			}
 		}
 
