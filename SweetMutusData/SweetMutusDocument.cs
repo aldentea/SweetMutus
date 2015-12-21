@@ -287,11 +287,12 @@ namespace Aldentea.SweetMutus.Data
 		}
 		#endregion
 
+		// (0.2.2)category引数を追加。
 		// (0.1.8)
 		#region *曲をインポート(ImportSongs)
-		public void ImportSongs(IEnumerable<GrandMutus.Data.ISong> songs)
+		public void ImportSongs(IEnumerable<GrandMutus.Data.ISong> songs, string category = null)
 		{
-			this.AddQuestions(songs.Select(song => new SweetQuestion(song)));
+			this.AddQuestions(songs.Select(song => new SweetQuestion(song) { Category = string.IsNullOrEmpty(category) ? string.Empty : category }));
 		}
 		#endregion
 

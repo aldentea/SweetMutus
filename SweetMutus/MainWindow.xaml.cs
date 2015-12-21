@@ -709,12 +709,13 @@ namespace Aldentea.SweetMutus
 		}
 		#endregion
 
+		// (0.1.1？)CurrentCategoryを反映。
 		void DialogImport_Executed(object sender, ExecutedRoutedEventArgs e)
 		{
 			if (e.Parameter is System.Collections.IList)
 			{
 				var songs = ((System.Collections.IList)e.Parameter).Cast<GrandMutus.Data.ISong>();
-				MyDocument.ImportSongs(songs);
+				MyDocument.ImportSongs(songs, CurrentCategory);
 			}
 		}
 
