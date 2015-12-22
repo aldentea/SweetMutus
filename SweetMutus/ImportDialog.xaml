@@ -5,13 +5,13 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Aldentea.SweetMutus"
         mc:Ignorable="d"
-        Title="ImportDialog" Height="600" Width="300">
+        Title="曲をインポートする" Height="600" Width="300">
   <Window.CommandBindings>
     <CommandBinding
 			Command="Close"
 			Executed="Close_Executed"
 			CanExecute="Always_CanExecute" />
-	</Window.CommandBindings>
+  </Window.CommandBindings>
     <Grid>
     <Grid.RowDefinitions>
       <RowDefinition Height="Auto" />
@@ -20,8 +20,9 @@
     </Grid.RowDefinitions>
 
     <StackPanel Grid.Row="0">
-			<TextBox Name="textBoxFilter" Width="200" Margin="10,5" FontSize="16" Text="未実装"
-							 ToolTip="フィルタ文字列を指定します。"/>
+			<TextBox Name="textBoxFilter" Width="200" Margin="10,5" FontSize="16"
+							 ToolTip="フィルタ文字列を指定します。"
+							 TextChanged="textBoxFilter_TextChanged"/>
 		</StackPanel>
 
     <TabControl Grid.Row="1">
