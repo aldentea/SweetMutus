@@ -223,6 +223,7 @@ namespace Aldentea.SweetMutus
 
 		#endregion
 
+		// (0.1.0.1)カテゴリ追加後の後片付けをここに実装．
 		#region AddCategory
 
 		private void AddCategory_Executed(object sender, ExecutedRoutedEventArgs e)
@@ -230,6 +231,13 @@ namespace Aldentea.SweetMutus
 			if (e.Parameter is string)
 			{
 				this.AddCategory((string)e.Parameter);
+			}
+
+			// 後片付け...はここに書くべきなのか？
+			if (e.Source == buttonAddCategory)
+			{
+				textBoxNewCategory.Clear();
+				expanderNewCategory.IsExpanded = false;
 			}
 		}
 
@@ -599,10 +607,11 @@ namespace Aldentea.SweetMutus
 			}
 		}
 
+		// (0.1.0.3)CurrentCategoryを設定するように改良。
 		#region 問題を追加(AddQuestions)
 		public void AddQuestions(IEnumerable<string> fileNames)
 		{
-			this.MyDocument.AddQuestions(fileNames);
+			this.MyDocument.AddQuestions(fileNames, CurrentCategory);
 		}
 
 		IList<SweetQuestion> AddQuestionsParallel(IEnumerable<string> fileNames)
@@ -614,7 +623,7 @@ namespace Aldentea.SweetMutus
 				// ObservableCollectionに対する操作は，それが作られたスレッドと同じスレッドで行う必要がある．
 
 				var question = this.Dispatcher.Invoke(
-					new Func<string, SweetQuestion>(delegate(string f) { return MyDocument.AddQuestion(f); }), fileName);
+					new Func<string, SweetQuestion>(delegate(string f) { return MyDocument.AddQuestion(f, CurrentCategory); }), fileName);
 				if (question is SweetQuestion)
 				{
 					added_questions.Add((SweetQuestion)question);
@@ -701,12 +710,13 @@ namespace Aldentea.SweetMutus
 		}
 		#endregion
 
+		// (0.1.1？)CurrentCategoryを反映。
 		void DialogImport_Executed(object sender, ExecutedRoutedEventArgs e)
 		{
 			if (e.Parameter is System.Collections.IList)
 			{
 				var songs = ((System.Collections.IList)e.Parameter).Cast<GrandMutus.Data.ISong>();
-				MyDocument.ImportSongs(songs);
+				MyDocument.ImportSongs(songs, CurrentCategory);
 			}
 		}
 
@@ -792,6 +802,7 @@ namespace Aldentea.SweetMutus
 
 		#endregion
 
+		// (0.1.0.3)CurrentCategoryに追加するように改良。
 		// (0.0.6.1)曲ファイルのドロップ処理を実装．
 		#region ドラッグドロップ関連
 
@@ -830,7 +841,7 @@ namespace Aldentea.SweetMutus
 					}
 				}
 			}
-			MyDocument.AddQuestions(songFileNames);
+			MyDocument.AddQuestions(songFileNames, CurrentCategory);
 	
 		}
 

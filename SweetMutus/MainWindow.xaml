@@ -177,10 +177,10 @@
 									ItemsSource="{Binding Path=Categories, RelativeSource={RelativeSource AncestorType={x:Type Window}}}"
 										SelectedItem="{Binding Path=CurrentCategory, RelativeSource={RelativeSource AncestorType={x:Type Window}}}"
 										/>
-					<Expander Header="カテゴリ追加" Collapsed="Expander_Expanded" Expanded="Expander_Expanded">
+					<Expander Header="カテゴリ追加" Collapsed="Expander_Expanded" Expanded="Expander_Expanded" Name="expanderNewCategory">
 						<StackPanel Orientation="Horizontal">
 							<TextBox MinWidth="100" Margin="3,5" x:Name="textBoxNewCategory" ToolTip="追加するカテゴリの名前を入れて下さい。" />
-							<Button Content="追加" MinWidth="60" Margin="3"
+							<Button Content="追加" Name="buttonAddCategory" MinWidth="60" Margin="3"
 										Command="{x:Static local:Commands.AddCategoryCommand}"
 										CommandParameter="{Binding Text, ElementName=textBoxNewCategory}" />
 						</StackPanel>

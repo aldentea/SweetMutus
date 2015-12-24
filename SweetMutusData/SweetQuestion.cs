@@ -24,22 +24,25 @@ namespace Aldentea.SweetMutus.Data
 
 		#region Songのコピペ
 
+		// (0.2.2.2)get時にnullを返さない(string.Emptyを返す)ように修正。
 		#region *Titleプロパティ
 		/// <summary>
 		/// 曲のタイトルを取得／設定します．
+		/// 取得時にはnullは返らないようになっています。
 		/// </summary>
 		public string Title
 		{
 			get
 			{
-				return _title;
+				return _title ?? string.Empty;
 			}
 			set
 			{
-				if (Title != value)
+				string new_value = string.IsNullOrEmpty(value) ? string.Empty : value;
+				if (Title != new_value)
 				{
 					NotifyPropertyChanging("Title");
-					this._title = value;
+					this._title = new_value;
 					NotifyPropertyChanged("Title");
 				}
 			}
@@ -72,22 +75,25 @@ namespace Aldentea.SweetMutus.Data
 		string _fileName = string.Empty;
 		#endregion
 
+		// (0.2.2.2)get時にnullを返さない(string.Emptyを返す)ように修正。
 		#region *Artistプロパティ
 		/// <summary>
 		/// 曲のアーティストを取得／設定します．
+		/// 取得時にはnullは返らないようになっています。
 		/// </summary>
 		public string Artist
 		{
 			get
 			{
-				return _artist;
+				return _artist ?? string.Empty;
 			}
 			set
 			{
-				if (Artist != value)
+				string new_value = string.IsNullOrEmpty(value) ? string.Empty : value;
+				if (Artist != new_value)
 				{
 					NotifyPropertyChanging("Artist");
-					this._artist = value;
+					this._artist = new_value;
 					NotifyPropertyChanged("Artist");
 				}
 			}
