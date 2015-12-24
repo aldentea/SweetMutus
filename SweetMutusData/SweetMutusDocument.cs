@@ -96,6 +96,7 @@ namespace Aldentea.SweetMutus.Data
 		/// </summary>
 		List<string> _addedSongFiles = new List<string>();
 
+		// (0.2.2.1)カテゴリを設定できるように改良。
 		// (0.2.0)曲を追加しない場合にnullを返すように変更。
 		#region *曲を追加(AddQuestions)
 		/// <summary>
@@ -104,9 +105,9 @@ namespace Aldentea.SweetMutus.Data
 		/// </summary>
 		/// <param name="fileName"></param>
 		/// <returns></returns>
-		public SweetQuestion AddQuestion(string fileName)
+		public SweetQuestion AddQuestion(string fileName, string category = null)
 		{
-			SweetQuestion question = new SweetQuestion { FileName = fileName };
+			SweetQuestion question = new SweetQuestion { FileName = fileName, Category = string.IsNullOrEmpty(category) ? string.Empty : category };
 			if (LoadInformation(question))
 			{
 				return this.AddQuestion(question);
@@ -143,8 +144,9 @@ namespace Aldentea.SweetMutus.Data
 			}
 		}
 
+		// (0.2.2.1)カテゴリを設定できるように改良。
 		// (0.2.0)追加された問題がない場合は、操作履歴に追加しないように修正。
-		public void AddQuestions(IEnumerable<string> fileNames)
+		public void AddQuestions(IEnumerable<string> fileNames, string category = null)
 		{
 			IList<SweetQuestion> added_questions;
 
@@ -154,7 +156,7 @@ namespace Aldentea.SweetMutus.Data
 				added_questions = new List<SweetQuestion>();
 				foreach (var fileName in fileNames)
 				{
-					var question = AddQuestion(fileName);
+					var question = AddQuestion(fileName, category);
 					if (question != null)
 					{ added_questions.Add(question); }
 				}
@@ -287,11 +289,12 @@ namespace Aldentea.SweetMutus.Data
 		}
 		#endregion
 
+		// (0.2.2)category引数を追加。
 		// (0.1.8)
 		#region *曲をインポート(ImportSongs)
-		public void ImportSongs(IEnumerable<GrandMutus.Data.ISong> songs)
+		public void ImportSongs(IEnumerable<GrandMutus.Data.ISong> songs, string category = null)
 		{
-			this.AddQuestions(songs.Select(song => new SweetQuestion(song)));
+			this.AddQuestions(songs.Select(song => new SweetQuestion(song) { Category = string.IsNullOrEmpty(category) ? string.Empty : category }));
 		}
 		#endregion
 
@@ -536,7 +539,7 @@ namespace Aldentea.SweetMutus.Data
 			// rootからMutusDocumentというメソッドはないんだっけ？
 			MutusDocument doc = new MutusDocument();
 			
-			doc.LoadGrandMutusDocument(root, fileName);
+			doc.LoadGrandMutusDocument(root, fileName);	// 0.6.4.2以降！
 
 			NowLoading = true;
 			try {

@@ -1,8 +1,11 @@
 ﻿using System.Windows;
 using System.Windows.Input;
 
+
+
 namespace Aldentea.SweetMutus
 {
+	using Data;
 
 	#region ImportDialogクラス
 	/// <summary>
@@ -33,8 +36,27 @@ namespace Aldentea.SweetMutus
 
 		#endregion
 
+		// コマンドを使おうと思ったけど，TextBoxのTextが変更になったときに使えるコマンドのトリガがなかったので，
+		// イベントで頑張ることにする．
+
+		// (0.1.0.2)
+		static bool HitFilter(GrandMutus.Data.ISong song, string filter)
+		{
+			// とりあえず大文字小文字を判別する．
+			return song.Title.Contains(filter) || song.Artist.Contains(filter);
+		}
+
 		#endregion
 
+		// (0.1.0.2)
+		private void textBoxFilter_TextChanged(object sender, System.Windows.Controls.TextChangedEventArgs e)
+		{
+			// 対症療法っぽいけど，仕方がない．
+			//if (dataGridSongs != null)
+			//{
+				dataGridSongs.Items.Filter = (song) => HitFilter((GrandMutus.Data.ISong)song, textBoxFilter.Text);
+			//}
+		}
 	}
 	#endregion
 
