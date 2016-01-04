@@ -76,19 +76,41 @@ namespace Aldentea.SweetMutus.Data
 			if (operationCache != null)
 			{
 				this.AddOperationHistory(operationCache);
-				if (operationCache is QuestionCategoryChangedCache)
-				{
-					this.QuestionCategoryChanged(this, EventArgs.Empty);
-				}
 				// ★ここに書くと，Undoのときにイベントが発生しないのでは...
-				if (operationCache is QuestionNoChangedCache)
-				{
-					this.QuestionNoChanged(this, EventArgs.Empty);
-				}
+				// →実際，発生しないので，その場合はSweetMutusDocument_UndoCompletedから同じ処理を呼び出す．
+				NotifyOperation(operationCache);
 			}
 		}
 		#endregion
 
+		// (0.2.3)
+		protected void NotifyOperation(IOperationCache operationCache)
+		{
+			if (operationCache is QuestionCategoryChangedCache)
+			{
+				this.QuestionCategoryChanged(this, EventArgs.Empty);
+			}
+			if (operationCache is QuestionNoChangedCache)
+			{
+				this.QuestionNoChanged(this, EventArgs.Empty);
+			}
+		}
+
+		/// <summary>
+		/// 問題のカテゴリ変更があったときに発生します。
+		/// </summary>
+		public event EventHandler QuestionCategoryChanged = delegate { };
+
+		/// <summary>
+		/// 問題のNo変更があったときに発生します。
+		/// </summary>
+		public event EventHandler QuestionNoChanged = delegate { };
+
+		// (0.2.3)
+		private void SweetMutusDocument_UndoCompleted(object sender, UndoCompletedEventArgs e)
+		{
+			NotifyOperation(e.OperationCache);
+		}
 
 		#region 曲関連
 
@@ -318,29 +340,6 @@ namespace Aldentea.SweetMutus.Data
 			this.AddOperationHistory(new RootDirectoryChangedCache(this.Questions, e.PreviousValue, e.CurrentValue));
 		}
 		#endregion
-
-		/// <summary>
-		/// 問題のカテゴリ変更があったときに発生します。
-		/// </summary>
-		public event EventHandler QuestionCategoryChanged = delegate { };
-
-		/// <summary>
-		/// 問題のNo変更があったときに発生します。
-		/// </summary>
-		public event EventHandler QuestionNoChanged = delegate { };
-
-		// (0.2.3)
-		private void SweetMutusDocument_UndoCompleted(object sender, UndoCompletedEventArgs e)
-		{
-			if (e.OperationCache is QuestionNoChangedCache)
-			{
-				this.QuestionNoChanged(this, EventArgs.Empty);
-			}
-			else if (e.OperationCache is QuestionCategoryChangedCache)
-			{
-				this.QuestionCategoryChanged(this, EventArgs.Empty);
-			}
-		}
 
 		#endregion
 
