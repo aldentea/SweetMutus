@@ -40,7 +40,8 @@ namespace Aldentea.SweetMutus.Data
 		XmlWriterSettings _xmlWriterSettings;
 		#endregion
 
-		// (0.3.3)Questions関連処理を追加。
+		// (0.2.3)UndoCompletedイベントを拾うように改良．
+		// (*0.3.3)Questions関連処理を追加。
 		#region *コンストラクタ(SweetMutusDocument)
 		public SweetMutusDocument()
 		{
@@ -49,7 +50,9 @@ namespace Aldentea.SweetMutus.Data
 			//_questions.QuestionsRemoved += Questions_QuestionsRemoved;
 			_questions.ItemChanged += Songs_ItemChanged;
 			_questions.RootDirectoryChanged += Questions_RootDirectoryChanged;
-			_questions.QuestionNoChanged += Questions_QuestionNoChanged;
+			//_questions.QuestionNoChanged += Questions_QuestionNoChanged;
+			_questions.QuestionNoChangeCompleted += Questions_QuestionNoChanged;
+			this.UndoCompleted += SweetMutusDocument_UndoCompleted;
 
 			// カレントカテゴリ関連
 			//this.Opened += SweetMutusDocument_Opened;
@@ -325,6 +328,19 @@ namespace Aldentea.SweetMutus.Data
 		/// 問題のNo変更があったときに発生します。
 		/// </summary>
 		public event EventHandler QuestionNoChanged = delegate { };
+
+		// (0.2.3)
+		private void SweetMutusDocument_UndoCompleted(object sender, UndoCompletedEventArgs e)
+		{
+			if (e.OperationCache is QuestionNoChangedCache)
+			{
+				this.QuestionNoChanged(this, EventArgs.Empty);
+			}
+			else if (e.OperationCache is QuestionCategoryChangedCache)
+			{
+				this.QuestionCategoryChanged(this, EventArgs.Empty);
+			}
+		}
 
 		#endregion
 
