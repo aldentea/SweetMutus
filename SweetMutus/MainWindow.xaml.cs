@@ -8,12 +8,15 @@ using System.Windows.Input;
 
 using Aldentea.Wpf.Application;
 using System.ComponentModel;
-using HyperMutus;
+//using HyperMutus;
 using System.Collections.ObjectModel;
+
+using GrandMutus.Base;
 
 namespace Aldentea.SweetMutus
 {
 	using Data;
+	using static GrandMutus.Base.Helpers;
 
 	#region MainWindowクラス
 	/// <summary>
@@ -110,7 +113,7 @@ namespace Aldentea.SweetMutus
 				this.Width = MySettings.WindowSize.Width;
 				this.Height = MySettings.WindowSize.Height;
 			}
-			this.SongPlayer.Volume = MySettings.SongPlayerVolume;
+			this.MySongPlayer.Volume = MySettings.SongPlayerVolume;
 		}
 		#endregion
 
@@ -124,7 +127,7 @@ namespace Aldentea.SweetMutus
 			MySettings.WindowPosition = new Point(this.Left, this.Top);
 			MySettings.WindowSize = new System.Windows.Size(this.Width, this.Height);
 
-			MySettings.SongPlayerVolume = this.SongPlayer.Volume;
+			MySettings.SongPlayerVolume = this.MySongPlayer.Volume;
 		}
 		#endregion
 
@@ -279,9 +282,9 @@ namespace Aldentea.SweetMutus
 			if (e.Parameter is SweetQuestion)
 			{
 				SweetQuestion question = (SweetQuestion)e.Parameter;
-				if (this.SongPlayer.MediaSource == new Uri(question.FileName))
+				if (this.MySongPlayer.MediaSource == new Uri(question.FileName))
 				{
-					this.SongPlayer.Close();
+					this.MySongPlayer.Close();
 					// 無意味にSleepする。
 					Task.Delay(140);
 				}
@@ -472,7 +475,7 @@ namespace Aldentea.SweetMutus
 			AddCategory(string.Empty);
 			this.CurrentCategory = string.Empty;
 
-			this.SongPlayer.Close();
+			this.MySongPlayer.Close();
 			this.CurrentSong = null;
 			this.expanderSongPlayer.IsExpanded = false;
 		}
@@ -573,10 +576,11 @@ namespace Aldentea.SweetMutus
 
 		#region 問題リスト関連
 
+		// (0.1.3)GrandMutusのHelperを使用するように変更．
 		void AddQuestions()
 		{
 			// ファイルダイアログを表示．
-			var fileNames = HyperMutus.Helpers.SelectSongFiles();	// これのためにMutusBaseを参照している！(いや，もう1か所あった．)
+			var fileNames = SelectSongFiles();
 			if (fileNames != null)
 			{
 				AddQuestions(fileNames);
@@ -607,6 +611,7 @@ namespace Aldentea.SweetMutus
 			}
 		}
 
+		// (0.1.3.1)GrandMutusのWorkBackground～を使用するように変更．
 		// (0.1.0.3)CurrentCategoryを設定するように改良。
 		#region 問題を追加(AddQuestions)
 		public void AddQuestions(IEnumerable<string> fileNames)
@@ -630,7 +635,7 @@ namespace Aldentea.SweetMutus
 				}
 					
 			};
-			HyperMutus.Helpers.WorkBackgroundParallel<string>(fileNames, action);
+			WorkBackgroundParallel<string>(fileNames, action);
 			return added_questions;
 		}
 		#endregion
@@ -761,8 +766,8 @@ namespace Aldentea.SweetMutus
 				var destinationDirectory = System.IO.Path.GetDirectoryName(fileName);
 				string songsDestination = songDirectory == null ? destinationDirectory : System.IO.Path.Combine(destinationDirectory, songDirectory);
 
-				//document.SongsRoot = songsDestination;
-				Helpers.ExportFiles(MyDocument.Questions.Select(q => q.FileName), songsDestination);
+				//Helpers.ExportFiles(MyDocument.Questions.Select(q => q.FileName), songsDestination);
+				ExportAllSongs(MyDocument.Questions, songsDestination);
 
 				// ドキュメント保存
 				MyDocument.SaveExport(fileName, songDirectory);
@@ -771,10 +776,11 @@ namespace Aldentea.SweetMutus
 		}
 		#endregion
 
+		// (0.1.3)GrandMutusのHelperを使用するように変更．
 		#region *ルートディレクトリを設定(SetRootDirectory)
 		private void SetRootDirectory()
 		{
-			var directory = HyperMutus.Helpers.SelectSongsRoot(this.MyDocument.Questions.RootDirectory);
+			var directory = SelectSongsRoot(this.MyDocument.Questions.RootDirectory);
 			if (directory != null)
 			{
 				MyDocument.Questions.RootDirectory = directory;
@@ -850,15 +856,17 @@ namespace Aldentea.SweetMutus
 
 		#region 曲再生関連
 
-		#region *SongPlayerプロパティ
-		public HyperMutus.SongPlayer SongPlayer
+		// (0.1.3)SongPlayerクラスとの混同を避けるため，MySongPlayerプロパティに名称を変更．
+		// (0.1.3)GrandMutusのSongPlayerを使用するように変更．
+		#region *MySongPlayerプロパティ
+		public GrandMutus.Base.SongPlayer MySongPlayer
 		{
 			get
 			{
 				return _songPlayer;
 			}
 		}
-		HyperMutus.SongPlayer _songPlayer = new HyperMutus.SongPlayer();
+		SongPlayer _songPlayer = new SongPlayer();
 		#endregion
 
 

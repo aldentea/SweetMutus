@@ -8,7 +8,8 @@ namespace Aldentea.SweetMutus
 {
 	public static class Helpers
 	{
-
+		// (0.3.0)GrandMutusのものを使用する．
+		/*
 		#region *[static]ファイルをエクスポート(ExportFiles)
 		/// <summary>
 		/// ファイルを指定した場所にコピーします．
@@ -25,6 +26,6 @@ namespace Aldentea.SweetMutus
 			);
 		}
 		#endregion
-
+		*/
 	}
 }
