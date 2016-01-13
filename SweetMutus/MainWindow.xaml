@@ -160,6 +160,10 @@
 				<MenuItem Header="再生開始" Command="Play"
 									CommandParameter="{Binding ElementName=dataGridQuestions, Path=SelectedItem}" />
 			</MenuItem>
+			<MenuItem Header="モード(_M)">
+				<MenuItem Header="編集モード" IsCheckable="True" />
+				<MenuItem Header="出題モード" IsCheckable="True" />
+			</MenuItem>
 		</Menu>
 
 		<StackPanel Orientation="Horizontal" Grid.Row="1"

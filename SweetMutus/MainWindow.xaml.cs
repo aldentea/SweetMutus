@@ -50,6 +50,47 @@ namespace Aldentea.SweetMutus
 			return MessageBox.Show(message, "確認", MessageBoxButton.YesNo) == MessageBoxResult.Yes;
 		}
 
+		// (0.1.3)
+		#region モード関連
+
+		#region *CurrentModeプロパティ
+		/// <summary>
+		/// 現在のモードを取得／設定します．
+		/// </summary>
+		public Mode CurrentMode
+		{
+			get
+			{
+				return _currentMode;
+			}
+			set
+			{
+				if (_currentMode != value)
+				{
+					this._currentMode = value;
+					UpdateUI();
+					NotifyPropertyChanged("CurrentMode");
+				}
+			}
+		}
+		Mode _currentMode = Mode.Edit;
+		#endregion
+
+		void UpdateUI()
+		{
+			dataGridQuestions.IsReadOnly = CurrentMode == Mode.Play;
+		}
+
+		public enum Mode
+		{
+			Edit,
+			Play
+		}
+
+		#endregion
+
+
+
 		#region *コンストラクタ(MainWindow)
 		public MainWindow()
 		{
