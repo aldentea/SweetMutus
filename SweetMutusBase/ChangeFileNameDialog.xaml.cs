@@ -15,7 +15,7 @@ using System.Windows.Shapes;
 using System.ComponentModel;
 using IO = System.IO;
 
-namespace Aldentea.SweetMutus
+namespace Aldentea.SweetMutus.Base
 {
 
 	// HyperMutusよりコピペ。

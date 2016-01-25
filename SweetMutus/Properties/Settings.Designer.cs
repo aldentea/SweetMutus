@@ -117,5 +117,17 @@ namespace Aldentea.SweetMutus.Properties {
                 this["SongPlayerVolume"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("Default")]
+        public global::Aldentea.SweetMutus.Base.QuestionColumnsVisibility DataGridColumnsVisibility {
+            get {
+                return ((global::Aldentea.SweetMutus.Base.QuestionColumnsVisibility)(this["DataGridColumnsVisibility"]));
+            }
+            set {
+                this["DataGridColumnsVisibility"] = value;
+            }
+        }
     }
 }

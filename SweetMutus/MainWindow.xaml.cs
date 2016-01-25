@@ -14,6 +14,7 @@ using System.Collections.ObjectModel;
 namespace Aldentea.SweetMutus
 {
 	using Data;
+	using Base;
 
 	#region MainWindowクラス
 	/// <summary>
@@ -93,6 +94,7 @@ namespace Aldentea.SweetMutus
 		}
 		#endregion
 
+		// (0.1.3.1)[表示]系メニューの設定を追加．
 		// (0.0.13)音声ボリュームを復元．
 		// (0.0.8.9)
 		#region *ウインドウ初期化時(MainWindow_Initialized)
@@ -111,9 +113,22 @@ namespace Aldentea.SweetMutus
 				this.Height = MySettings.WindowSize.Height;
 			}
 			this.SongPlayer.Volume = MySettings.SongPlayerVolume;
+
+			// [表示]系メニューの設定．
+			questionsIDColumn.Visibility
+				= MySettings.DataGridColumnsVisibility.HasFlag(QuestionColumnsVisibility.IdColumn) ? Visibility.Visible : Visibility.Collapsed;
+			questionsFileNameColumn.Visibility
+				= MySettings.DataGridColumnsVisibility.HasFlag(QuestionColumnsVisibility.FileNameColumn) ? Visibility.Visible : Visibility.Collapsed;
+			questionsPlayPosColumn.Visibility
+				= MySettings.DataGridColumnsVisibility.HasFlag(QuestionColumnsVisibility.PlayPosColumn) ? Visibility.Visible : Visibility.Collapsed;
+			questionsSabiPosColumn.Visibility
+				= MySettings.DataGridColumnsVisibility.HasFlag(QuestionColumnsVisibility.SabiPosColumn) ? Visibility.Visible : Visibility.Collapsed;
+			questionsStopPosColumn.Visibility
+				= MySettings.DataGridColumnsVisibility.HasFlag(QuestionColumnsVisibility.StopPosColumn) ? Visibility.Visible : Visibility.Collapsed;
 		}
 		#endregion
 
+		// (0.1.3.1)[表示]系メニューの保存を追加．
 		// (0.0.13)音声ボリュームを保存．
 		// (0.0.8.9)
 		#region *ウインドウクローズ時(MainWindow_Closed)
@@ -125,6 +140,15 @@ namespace Aldentea.SweetMutus
 			MySettings.WindowSize = new System.Windows.Size(this.Width, this.Height);
 
 			MySettings.SongPlayerVolume = this.SongPlayer.Volume;
+
+			// (0.1.3.1)[表示]系メニューを保存．
+			var flags = QuestionColumnsVisibility.None;
+			flags |= menuItemIDColumnVisible.IsChecked ? QuestionColumnsVisibility.IdColumn : 0;
+			flags |= menuItemFileNameColumnVisible.IsChecked ? QuestionColumnsVisibility.FileNameColumn : 0;
+			flags |= menuItemPlayPosColumnVisible.IsChecked ? QuestionColumnsVisibility.PlayPosColumn : 0;
+			flags |= menuItemSabiPosColumnVisible.IsChecked ? QuestionColumnsVisibility.SabiPosColumn : 0;
+			flags |= menuItemStopPosColumnVisible.IsChecked ? QuestionColumnsVisibility.StopPosColumn : 0;
+			MySettings.DataGridColumnsVisibility = flags;
 		}
 		#endregion
 
@@ -1057,6 +1081,21 @@ namespace Aldentea.SweetMutus
 		}
 		#endregion
 
+		// (0.1.3.1)
+		#region SetStopPosコマンド
+		void SetStopPos_Executed(object sender, ExecutedRoutedEventArgs e)
+		{
+			if (_songPlayer.CurrentState != SongPlayer.State.Inactive)
+			{
+				_currentSong.StopPos = _songPlayer.CurrentPosition;
+			}
+		}
+		#endregion
+
+		#region UpDownControlコマンドハンドラ
+
+		// このあたりはなんとかならないのかしら？
+
 		private void UpDownControl_UpClick(object sender, RoutedEventArgs e)
 		{
 			if (CurrentSong != null)
@@ -1090,6 +1129,27 @@ namespace Aldentea.SweetMutus
 			}
 		}
 
+		// (0.1.3.1)
+		private void UpDownControlStopPos_UpClick(object sender, RoutedEventArgs e)
+		{
+			if (CurrentSong != null)
+			{
+				CurrentSong.StopPos += TimeSpan.FromSeconds(0.1);
+			}
+		}
+
+		// (0.1.3.1)
+		private void UpDownControlStopPos_DownClick(object sender, RoutedEventArgs e)
+		{
+			if (CurrentSong != null)
+			{
+				var new_position = CurrentSong.StopPos.Add(TimeSpan.FromSeconds(-0.1));
+				CurrentSong.StopPos = new_position > TimeSpan.Zero ? new_position : TimeSpan.Zero;
+			}
+		}
+
+		#endregion
+
 		#endregion
 
 		//	#endregion
@@ -1103,7 +1163,6 @@ namespace Aldentea.SweetMutus
 			this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
 		}
 		#endregion
-
 	}
 	#endregion
 

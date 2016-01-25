@@ -1,11 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 
-namespace Aldentea.SweetMutus
+namespace Aldentea.SweetMutus.Base
 {
+
+	// (0.1.3.1)SweetMutusBaseに移動．
 	public static class Helpers
 	{
 
