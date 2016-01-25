@@ -26,5 +26,8 @@
     <Setting Name="SongPlayerVolume" Type="System.Double" Scope="User">
       <Value Profile="(Default)">0.5</Value>
     </Setting>
+    <Setting Name="DataGridColumnsVisibility" Type="Aldentea.SweetMutus.Base.QuestionColumnsVisibility" Scope="User">
+      <Value Profile="(Default)">Default</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

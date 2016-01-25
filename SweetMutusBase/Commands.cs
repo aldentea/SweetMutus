@@ -1,12 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Input; // for RoutedCommand.
+﻿using System.Windows.Input; // for RoutedCommand.
 
-namespace Aldentea.SweetMutus
+namespace Aldentea.SweetMutus.Base
 {
+	// (0.1.3.1)SweetMutusBaseに移動．
+
 	public static class Commands
 	{
 		public static RoutedCommand SaveAsMtqCommand = new RoutedCommand();
@@ -22,6 +19,9 @@ namespace Aldentea.SweetMutus
 		public static RoutedCommand ExportCommand = new RoutedCommand();
 
 		public static RoutedCommand SetPlayPosCommand = new RoutedCommand();
+
+		// (0.1.3.1)
+		public static RoutedCommand SetStopPosCommand = new RoutedCommand();
 
 		/// <summary>
 		/// 新たなカテゴリを追加します。
