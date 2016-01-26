@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 using System.Windows.Data;
 
 namespace Aldentea.SweetMutus.Base
@@ -109,5 +110,23 @@ namespace Aldentea.SweetMutus.Base
 		}
 	}
 	#endregion
+
+
+	// (0.1.3.1)
+	#region EqualsConverterクラス
+	public class EqualsConverter : IValueConverter
+	{
+		public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+		{
+			return value.Equals(parameter);
+		}
+
+		public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+		{
+			throw new NotImplementedException();
+		}
+	}
+	#endregion
+
 
 }

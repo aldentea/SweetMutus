@@ -49,7 +49,10 @@ namespace Aldentea.SweetMutus.Base
 		/// 曲や問題を他のドキュメントからインポートします．
 		/// </summary>
 		public static RoutedCommand ImportCommand = new RoutedCommand();
-		
+
+		// (0.1.3.1)
+		public static RoutedCommand SetWindowModeCommand = new RoutedCommand();
+
 	}
 
 }

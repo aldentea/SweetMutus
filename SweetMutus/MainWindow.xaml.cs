@@ -58,7 +58,7 @@ namespace Aldentea.SweetMutus
 		/// <summary>
 		/// 現在のモードを取得／設定します．
 		/// </summary>
-		public Mode CurrentMode
+		public WindowMode CurrentMode
 		{
 			get
 			{
@@ -70,23 +70,57 @@ namespace Aldentea.SweetMutus
 				{
 					this._currentMode = value;
 					UpdateUI();
+					SetKeyBindings();
 					NotifyPropertyChanged("CurrentMode");
 				}
 			}
 		}
-		Mode _currentMode = Mode.Edit;
+		WindowMode _currentMode = WindowMode.Edit;
 		#endregion
 
 		void UpdateUI()
 		{
-			dataGridQuestions.IsReadOnly = CurrentMode == Mode.Play;
+			// ※たぶんデータバインディングで実現可能．
+			dataGridQuestions.IsReadOnly = CurrentMode == WindowMode.Play;
 		}
 
-		public enum Mode
+		static KeyBinding SetSabiKeyBinding = new KeyBinding(GrandMutus.Base.Commands.SetSabiPosCommand, new KeyGesture(Key.F9));
+		static KeyBinding SetPlayKeyBinding = new KeyBinding(Commands.SetPlayPosCommand, new KeyGesture(Key.F10));
+		static KeyBinding SetStopKeyBinding = new KeyBinding(Commands.SetStopPosCommand, new KeyGesture(Key.F11));
+
+		// ※そのうちKeyBindingを動的に設定できるようにしたい．↓が参考になるかも．
+		//var test = SetStopKeyBinding.Key.ToString();	// "F11"
+		//var modifiers = SetStopKeyBinding.Modifiers.ToString();	// "Alt, Control"
+
+
+		void SetKeyBindings()
 		{
-			Edit,
-			Play
+			switch (CurrentMode)
+			{
+				case WindowMode.Edit:
+					this.InputBindings.Add(SetSabiKeyBinding);
+					this.InputBindings.Add(SetPlayKeyBinding);
+					this.InputBindings.Add(SetStopKeyBinding);
+					break;
+				case WindowMode.Play:
+					this.InputBindings.Remove(SetSabiKeyBinding);
+					this.InputBindings.Remove(SetPlayKeyBinding);
+					this.InputBindings.Remove(SetStopKeyBinding);
+					break;
+			}
 		}
+
+		// (0.1.3.1)
+		#region SetWindowMode
+		private void SetWindowMode_Executed(object sender, ExecutedRoutedEventArgs e)
+		{
+			if (e.Parameter is WindowMode)
+			{
+				this.CurrentMode = (WindowMode)e.Parameter;
+			}
+		}
+		#endregion
+
 
 		#endregion
 
@@ -129,9 +163,7 @@ namespace Aldentea.SweetMutus
 				new CommandBinding(ApplicationCommands.Redo,
 					Redo_Executed, Redo_CanExecute)
 			);
-
-			// レイアウト関係のコマンドハンドラだけど，なぜかここに記載．
-			//dataGridQuestionsFileNameColumn.Visibility
+			this.CurrentMode = WindowMode.Edit;
 		}
 		#endregion
 

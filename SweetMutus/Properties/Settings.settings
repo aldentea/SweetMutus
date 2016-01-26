@@ -29,5 +29,8 @@
     <Setting Name="DataGridColumnsVisibility" Type="Aldentea.SweetMutus.Base.QuestionColumnsVisibility" Scope="User">
       <Value Profile="(Default)">Default</Value>
     </Setting>
+    <Setting Name="KeyGestures" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
   </Settings>
 </SettingsFile>

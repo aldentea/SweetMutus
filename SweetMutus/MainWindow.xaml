@@ -18,6 +18,7 @@
 		<util:CaptionConverter x:Key="captionConverter" ApplicationName="SweetMutus" />
 		<util:TimeSpanDoubleConverter x:Key="timeSpanDoubleConverter" />
 		<base:DurationConverter x:Key="durationConverter" />
+		<base:EqualsConverter x:Key="equalsConverter" />
 		<grand:NullableIntConverter x:Key="noConverter" />
 		<grand:VisibilityConverter x:Key="categoryVisibilityConverter" />
 		<grand:VisibilityConverter x:Key="fileNameVisibilityConverter" />
@@ -96,6 +97,9 @@
 			Command="{x:Static base:Commands.ImportCommand}"
 			Executed="Import_Executed"
 			CanExecute="Always_CanExecute" />
+		<CommandBinding Command="{x:Static base:Commands.SetWindowModeCommand}"
+										Executed="SetWindowMode_Executed"
+										CanExecute="Always_CanExecute" />
 	</Window.CommandBindings>
 	<Window.InputBindings>
 		<KeyBinding Key="F5" Command="{x:Static  hypermutus:Commands.SwitchPlayPauseCommand}" />
@@ -123,7 +127,8 @@
 			<RowDefinition Height="Auto" />
 		</Grid.RowDefinitions>
 
-		<Menu Name="MainMenu" Grid.Row="0" HorizontalAlignment="Stretch" Padding="3">
+		<Menu Name="MainMenu" Grid.Row="0" HorizontalAlignment="Stretch" Padding="3"
+					>
 			<MenuItem Header="ファイル(_F)">
 				<MenuItem Header="新規作成(_N)" Command="New" />
 				<MenuItem Header="開く(_O)" Command="Open" />
@@ -168,18 +173,30 @@
 				<MenuItem Header="再生開始" Command="Play"
 									CommandParameter="{Binding ElementName=dataGridQuestions, Path=SelectedItem}" />
 			</MenuItem>
-			<MenuItem Header="モード(_M)">
-				<MenuItem Header="編集モード" IsCheckable="True" />
-				<MenuItem Header="出題モード" IsCheckable="True" />
+			<MenuItem Header="モード(_M)" Name="menuItemMode" DataContext="{Binding RelativeSource={RelativeSource AncestorType=Window}}">
+				<MenuItem Header="編集モード" Name="menuItemEditMode"
+									Command="{x:Static base:Commands.SetWindowModeCommand}" CommandParameter="{x:Static base:WindowMode.Edit}">
+					<MenuItem.IsChecked>
+						<Binding Path="CurrentMode" Converter="{StaticResource equalsConverter}"
+									 ConverterParameter="{x:Static base:WindowMode.Edit}">
+						</Binding>
+					</MenuItem.IsChecked>
+				</MenuItem>
+				<MenuItem Header="出題モード" Name="menuItemPlayMode"
+									Command="{x:Static base:Commands.SetWindowModeCommand}" CommandParameter="{x:Static base:WindowMode.Play}">
+					<MenuItem.IsChecked>
+						<Binding Path="CurrentMode" Converter="{StaticResource equalsConverter}"
+									 ConverterParameter="{x:Static base:WindowMode.Play}">
+						</Binding>
+					</MenuItem.IsChecked>
+				</MenuItem>
 			</MenuItem>
 		</Menu>
 
 		<StackPanel Orientation="Horizontal" Grid.Row="1"
 								Visibility="{Binding ElementName=menuItemCategoryVisible, Path=IsChecked, Converter={StaticResource categoryVisibilityConverter}}"
 		>
-			<GroupBox Header="表示カテゴリ" Margin="6,6"
-				Width="213"
-							>
+			<GroupBox Header="表示カテゴリ" Margin="6,6" Width="213">
 				<GroupBox.CommandBindings>
 					<CommandBinding Command="{x:Static base:Commands.AddCategoryCommand}"
 												Executed="AddCategory_Executed" CanExecute="AddCategory_CanExecute" />

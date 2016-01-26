@@ -129,5 +129,17 @@ namespace Aldentea.SweetMutus.Properties {
                 this["DataGridColumnsVisibility"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string KeyGestures {
+            get {
+                return ((string)(this["KeyGestures"]));
+            }
+            set {
+                this["KeyGestures"] = value;
+            }
+        }
     }
 }
