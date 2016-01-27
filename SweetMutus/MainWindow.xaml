@@ -325,91 +325,121 @@
 					<RowDefinition Height="Auto" />
 					<RowDefinition Height="Auto" />
 				</Grid.RowDefinitions>
-				<Button Content="再生" Grid.Row="0" Height="40" Width="75"
-								HorizontalAlignment="Left" VerticalAlignment="Center" Margin="10,5"
+				<DockPanel Grid.Row="0">
+					<DockPanel.Resources>
+						<Style TargetType="Button">
+							<Setter Property="Padding" Value="5" />
+							<Setter Property="MinWidth" Value="75" />
+							<Setter Property="MinHeight" Value="40" />
+							<Setter Property="VerticalAlignment" Value="Center" />
+							<Setter Property="Margin" Value="10,5" />
+						</Style>
+					</DockPanel.Resources>
+					<Button Content="再生" DockPanel.Dock="Left"
 								Command="{x:Static hypermutus:Commands.SwitchPlayPauseCommand}" />
-				<Button Content="サビ" Grid.Row="0" Height="40" Width="75"
-								HorizontalAlignment="Left" VerticalAlignment="Center" Margin="99,5,0,5"
+					<Button Content="サビ" DockPanel.Dock="Left"
 								Command="{x:Static hypermutus:Commands.SeekSabiCommand}" />
-				<TabControl Grid.Row="0" Margin="200,0,0,0" Width="270" Height="60" HorizontalAlignment="Left"
+					<TabControl DockPanel.Dock="Left" Margin="10,0,0,0" Height="80" HorizontalAlignment="Left"
 										TabStripPlacement="Left">
-					<TabItem Header="サビ">
-						<Grid>
-							<Button Content="サビ設定" Grid.Row="0" Height="34" Width="80"
-								HorizontalAlignment="Left" Margin="5,0,0,0"
-								Command="{x:Static grand:Commands.SetSabiPosCommand}" />
-							<TextBox HorizontalAlignment="Left" Grid.Row="0" Height="34" Margin="100,0,0,0"
-									TextWrapping="Wrap"	Width="80" HorizontalContentAlignment="Right" VerticalContentAlignment="Center">
-								<TextBox.Text>
-									<Binding Path="SabiPos" Converter="{StaticResource durationConverter}" ConverterParameter="2">
-										<Binding.ValidationRules>
-											<base:DurationValidationRule />
-										</Binding.ValidationRules>
-									</Binding>
-								</TextBox.Text>
-							</TextBox>
-							<ud:UpDownControl Grid.Row="0" Height="34" Width="32" Margin="180,0,0,0" HorizontalAlignment="Left"
-									UpClick="UpDownControl_UpClick" DownClick="UpDownControl_DownClick" />
-						</Grid>
-					</TabItem>
-					<TabItem Header="開始">
-						<Grid>
-							<Button Content="開始位置設定" Grid.Row="0" Height="34" Width="80"
-								HorizontalAlignment="Left" VerticalAlignment="Center" Margin="5,5,0,5"
+						<TabControl.Resources>
+							<Style TargetType="StackPanel">
+								<Setter Property="Orientation" Value="Horizontal" />
+								<Setter Property="FlowDirection" Value="LeftToRight" />
+							</Style>
+							<Style TargetType="Button">
+								<Setter Property="Height" Value="34" />
+								<Setter Property="Width" Value="100" />
+								<Setter Property="HorizontalAlignment" Value="Left" />
+								<Setter Property="Margin" Value="5,0,0,0" />
+							</Style>
+							<Style TargetType="TextBox">
+								<Setter Property="Height" Value="34" />
+								<Setter Property="Width" Value="80" />
+								<Setter Property="HorizontalAlignment" Value="Left" />
+								<Setter Property="Margin" Value="10,0,0,0" />
+								<Setter Property="VerticalContentAlignment" Value="Center" />
+								<Setter Property="HorizontalContentAlignment" Value="Right" />
+								<Setter Property="TextWrapping" Value="Wrap" />
+							</Style>
+							<Style TargetType="ud:UpDownControl">
+								<Setter Property="Height" Value="34" />
+								<Setter Property="Width" Value="32" />
+								<Setter Property="HorizontalAlignment" Value="Left" />
+								<Setter Property="Margin" Value="0,0,0,0" />
+							</Style>
+						</TabControl.Resources>
+						<TabItem Header="サビ">
+							<StackPanel>
+								<Button Content="サビ設定"
+											Command="{x:Static grand:Commands.SetSabiPosCommand}" />
+								<TextBox>
+									<TextBox.Text>
+										<Binding Path="SabiPos" Converter="{StaticResource durationConverter}" ConverterParameter="2">
+											<Binding.ValidationRules>
+												<base:DurationValidationRule />
+											</Binding.ValidationRules>
+										</Binding>
+									</TextBox.Text>
+								</TextBox>
+								<ud:UpDownControl UpClick="UpDownControl_UpClick" DownClick="UpDownControl_DownClick" />
+							</StackPanel>
+						</TabItem>
+						<TabItem Header="開始">
+							<StackPanel>
+								<Button Content="開始位置設定" VerticalAlignment="Center"
 								Command="{x:Static base:Commands.SetPlayPosCommand}" />
-							<TextBox HorizontalAlignment="Left" Grid.Row="0" Width="80" Height="34" Margin="100,5,0,5"
-									TextWrapping="Wrap" VerticalAlignment="Center" HorizontalContentAlignment="Right" VerticalContentAlignment="Center">
-								<TextBox.Text>
-									<Binding Path="PlayPos" Converter="{StaticResource durationConverter}" ConverterParameter="2">
-										<Binding.ValidationRules>
-											<base:DurationValidationRule />
-										</Binding.ValidationRules>
-									</Binding>
-								</TextBox.Text>
+								<TextBox>
+									<TextBox.Text>
+										<Binding Path="PlayPos" Converter="{StaticResource durationConverter}" ConverterParameter="2">
+											<Binding.ValidationRules>
+												<base:DurationValidationRule />
+											</Binding.ValidationRules>
+										</Binding>
+									</TextBox.Text>
 
-							</TextBox>
-							<ud:UpDownControl Grid.Row="0" Height="34" Width="32" Margin="180,5,0,5" HorizontalAlignment="Left" VerticalAlignment="Center"
-									UpClick="UpDownControlPlayPos_UpClick" DownClick="UpDownControlPlayPos_DownClick" />
-						</Grid>
-					</TabItem>
-					<TabItem Header="停止">
-						<Grid>
-							<Button Content="停止位置設定" Grid.Row="0" Height="34" Width="80"
-								HorizontalAlignment="Left" VerticalAlignment="Center" Margin="5,5,0,5"
+								</TextBox>
+								<ud:UpDownControl UpClick="UpDownControlPlayPos_UpClick" DownClick="UpDownControlPlayPos_DownClick" />
+							</StackPanel>
+						</TabItem>
+						<TabItem Header="停止">
+							<StackPanel>
+								<Button Content="停止位置設定" VerticalAlignment="Center"
 								Command="{x:Static base:Commands.SetStopPosCommand}" />
-							<TextBox HorizontalAlignment="Left" Grid.Row="0" Width="80" Height="34" Margin="100,5,0,5"
-									TextWrapping="Wrap" VerticalAlignment="Center" HorizontalContentAlignment="Right" VerticalContentAlignment="Center">
-								<TextBox.Text>
-									<Binding Path="StopPos" Converter="{StaticResource durationConverter}" ConverterParameter="2">
-										<Binding.ValidationRules>
-											<base:DurationValidationRule />
-										</Binding.ValidationRules>
-									</Binding>
-								</TextBox.Text>
+								<TextBox>
+									<TextBox.Text>
+										<Binding Path="StopPos" Converter="{StaticResource durationConverter}" ConverterParameter="2">
+											<Binding.ValidationRules>
+												<base:DurationValidationRule />
+											</Binding.ValidationRules>
+										</Binding>
+									</TextBox.Text>
 
-							</TextBox>
-							<ud:UpDownControl Grid.Row="0" Height="34" Width="32" Margin="180,5,0,5" HorizontalAlignment="Left" VerticalAlignment="Center"
+								</TextBox>
+								<ud:UpDownControl
 									UpClick="UpDownControlStopPos_UpClick" DownClick="UpDownControlStopPos_DownClick" />
-						</Grid>
-					</TabItem>
-				</TabControl>
-				<Slider Grid.Row="0" Margin="490,21,20,21" VerticalAlignment="Center" ToolTip="音量"
-								Value="{Binding RelativeSource={RelativeSource AncestorType=local:MainWindow}, Path=SongPlayer.Volume}"
+							</StackPanel>
+						</TabItem>
+					</TabControl>
+					<Slider Margin="10,0" VerticalAlignment="Center" ToolTip="音量"
+								Value="{Binding RelativeSource={RelativeSource AncestorType=local:MainWindow}, Path=MySongPlayer.Volume}"
 								Maximum="1" Minimum="0" SmallChange="0.01" LargeChange="0.1" AutoToolTipPrecision="2" IsSelectionRangeEnabled="True" AutoToolTipPlacement="BottomRight" />
+				</DockPanel>
+				<DockPanel Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2">
+					<Label Name="labelDuration" DockPanel.Dock="Right" HorizontalContentAlignment="Right" MinWidth="60"
+								HorizontalAlignment="Right" ContentStringFormat="m\:ss" Content="{x:Static sys:TimeSpan.Zero}"
+								Margin="0,8,20,8" VerticalAlignment="Center"/>
+					<Label Name="labelCurrentPosition" DockPanel.Dock="Right" MinWidth="60"
+								Content="{Binding RelativeSource={RelativeSource AncestorType=Window},
+													Path=MySongPlayer.CurrentPosition, Mode=OneWay}" ContentStringFormat="m\:ss"
+								HorizontalAlignment="Right" HorizontalContentAlignment="Right"
+								Margin="0,16,40,15" VerticalAlignment="Center"/>
 
-				<Slider Grid.Row="1" Height="36" Margin="31,4,200,1" VerticalAlignment="Center"
+					<Slider Margin="30,4,30,4" VerticalAlignment="Center"
 								TickFrequency="60" Maximum="100" Minimum="0" Name="sliderSeekSong" TickPlacement="BottomRight"
 								LargeChange="30" SmallChange="5"
 								Value="{Binding RelativeSource={RelativeSource AncestorType=Window},
-												Path=SongPlayer.CurrentPosition, Mode=TwoWay, Converter={StaticResource timeSpanDoubleConverter}}"/>
-				<Label Name="labelCurrentPosition"  Grid.Row="1"
-								Content="{Binding RelativeSource={RelativeSource AncestorType=Window},
-													Path=SongPlayer.CurrentPosition, Mode=OneWay}" ContentStringFormat="m\:ss"
-								HorizontalAlignment="Right" HorizontalContentAlignment="Right"
-								Margin="0,16,99,15" VerticalAlignment="Center"/>
-				<Label Name="labelDuration" HorizontalContentAlignment="Right"
-								HorizontalAlignment="Right" ContentStringFormat="m\:ss" Content="{x:Static sys:TimeSpan.Zero}"
-								Margin="0,8,31,8" Grid.Row="1" VerticalAlignment="Center"/>
+												Path=MySongPlayer.CurrentPosition, Mode=TwoWay, Converter={StaticResource timeSpanDoubleConverter}}"/>
+				</DockPanel>
 			</Grid>
 		</Expander>
 
