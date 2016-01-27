@@ -51,11 +51,7 @@ namespace Aldentea.SweetMutus
 		// (0.1.0.2)
 		private void textBoxFilter_TextChanged(object sender, System.Windows.Controls.TextChangedEventArgs e)
 		{
-			// 対症療法っぽいけど，仕方がない．
-			//if (dataGridSongs != null)
-			//{
-				dataGridSongs.Items.Filter = (song) => HitFilter((GrandMutus.Data.ISong)song, textBoxFilter.Text);
-			//}
+			dataGridSongs.Items.Filter = (song) => HitFilter((GrandMutus.Data.ISong)song, textBoxFilter.Text);
 		}
 	}
 	#endregion

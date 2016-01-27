@@ -24,6 +24,8 @@ namespace Aldentea.SweetMutus.Data
 
 		#region Songのコピペ
 
+		#region ISong実装
+
 		// (0.2.2.2)get時にnullを返さない(string.Emptyを返す)ように修正。
 		#region *Titleプロパティ
 		/// <summary>
@@ -123,6 +125,8 @@ namespace Aldentea.SweetMutus.Data
 			}
 		}
 		TimeSpan _sabiPos = TimeSpan.Zero;
+		#endregion
+
 		#endregion
 
 		// (*0.3.0)Parentがnullの場合の対策をしておく(OnAddTo(null)が呼ばれるときにまずいことになったので)．
