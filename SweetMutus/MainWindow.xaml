@@ -111,6 +111,11 @@
 		<CommandBinding Command="{x:Static base:Commands.SetWindowModeCommand}"
 										Executed="SetWindowMode_Executed"
 										CanExecute="Always_CanExecute" />
+		<!-- 以下，出題関連 -->
+<!--		<CommandBinding Command="{x:Static grand:Commands.StartQuestionCommand}"
+										Executed="StartQuestion_Executed"
+										CanExecute="StartQuestion_CanExecute" />
+-->
 	</Window.CommandBindings>
 	<Window.InputBindings>
 		<KeyBinding Key="F5" Command="{x:Static  hypermutus:Commands.SwitchPlayPauseCommand}" />

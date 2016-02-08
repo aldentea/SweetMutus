@@ -43,7 +43,7 @@ namespace Aldentea.SweetMutus
 				return _categories;
 			}
 		}
-		ObservableCollection<string> _categories = new ObservableCollection<string>(new string[] {string.Empty});
+		ObservableCollection<string> _categories = new ObservableCollection<string>(new string[] { string.Empty });
 		#endregion
 
 		#endregion
@@ -401,7 +401,7 @@ namespace Aldentea.SweetMutus
 		{
 			e.CanExecute = (e.Parameter is SweetQuestion);
 		}
-	
+
 		#endregion
 
 		#region ChangeFileName
@@ -448,7 +448,7 @@ namespace Aldentea.SweetMutus
 				// 何かいい方法はないかなぁ？
 				// (questionsに直接foreachすると，要素を変更してしまうので...)
 				var ids = questions.Where(q => q.No.HasValue).OrderByDescending(q => q.No).Select(q => q.ID).ToArray();
-				foreach(var id in ids)
+				foreach (var id in ids)
 				{
 					var question = MyDocument.FindQuestion(id);
 					question.No += 1;
@@ -689,7 +689,7 @@ namespace Aldentea.SweetMutus
 			if (fileNames != null)
 			{
 				AddQuestions(fileNames);
-			//SayInfo("曲追加完了！");
+				//SayInfo("曲追加完了！");
 			}
 		}
 
@@ -733,12 +733,12 @@ namespace Aldentea.SweetMutus
 				// ObservableCollectionに対する操作は，それが作られたスレッドと同じスレッドで行う必要がある．
 
 				var question = this.Dispatcher.Invoke(
-					new Func<string, SweetQuestion>(delegate(string f) { return MyDocument.AddQuestion(f, CurrentCategory); }), fileName);
+					new Func<string, SweetQuestion>(delegate (string f) { return MyDocument.AddQuestion(f, CurrentCategory); }), fileName);
 				if (question is SweetQuestion)
 				{
 					added_questions.Add((SweetQuestion)question);
 				}
-					
+
 			};
 			WorkBackgroundParallel<string>(fileNames, action);
 			return added_questions;
@@ -839,9 +839,9 @@ namespace Aldentea.SweetMutus
 			else
 			{
 				e.CanExecute = false;
-      }
+			}
 		}
-		
+
 		#endregion
 
 
@@ -865,7 +865,7 @@ namespace Aldentea.SweetMutus
 			{
 				string fileName = dialog.Destination;
 				//var document = IntroMutusDocument.Clone<IntroMutusDocument>();
-				
+
 				// 曲ファイルコピー
 				var songDirectory = dialog.SongDirectory;
 				var destinationDirectory = System.IO.Path.GetDirectoryName(fileName);
@@ -877,7 +877,7 @@ namespace Aldentea.SweetMutus
 				// ドキュメント保存
 				MyDocument.SaveExport(fileName, songDirectory);
 			}
-			
+
 		}
 		#endregion
 
@@ -923,7 +923,7 @@ namespace Aldentea.SweetMutus
 			{
 				var files = ((DataObject)e.Data).GetFileDropList();
 
-				for (int i=0; i<files.Count; i++)
+				for (int i = 0; i < files.Count; i++)
 				{
 					if (files[i].EndsWith(".mp3"))
 					{
@@ -953,7 +953,7 @@ namespace Aldentea.SweetMutus
 				}
 			}
 			MyDocument.AddQuestions(songFileNames, CurrentCategory);
-	
+
 		}
 
 		#endregion
@@ -1024,7 +1024,7 @@ namespace Aldentea.SweetMutus
 				_songPlayer.CurrentPosition = song.PlayPos;
 				_songPlayer.Play();
 
-				this.expanderSongPlayer.IsExpanded = true;	// ←これはここに書くべきものなのか？
+				this.expanderSongPlayer.IsExpanded = true;  // ←これはここに書くべきものなのか？
 			}
 		}
 
@@ -1125,7 +1125,7 @@ namespace Aldentea.SweetMutus
 				double sec;
 				if (Double.TryParse(e.Parameter.ToString(), out sec))
 				{
-				_songPlayer.CurrentPosition = _songPlayer.CurrentPosition.Add(TimeSpan.FromSeconds(sec));
+					_songPlayer.CurrentPosition = _songPlayer.CurrentPosition.Add(TimeSpan.FromSeconds(sec));
 				}
 			}
 		}
@@ -1245,6 +1245,28 @@ namespace Aldentea.SweetMutus
 
 		#region 出題関連
 
+		#region *CurrentPhaseプロパティ
+		/// <summary>
+		/// 現在の出題フェイズを取得します(setterはとりあえずprivateです)．
+		/// </summary>
+		public PlayingPhase CurrentPhase
+		{
+			get
+			{
+				return _currentPhase;
+			}
+			private set
+			{
+				if (_currentPhase != value)
+				{
+					_currentPhase = value;
+					NotifyPropertyChanged("CurrentPhase");
+				}
+			}
+		}
+		PlayingPhase _currentPhase = PlayingPhase.Talking;
+		#endregion
+
 		#region *CurrentQuestionプロパティ
 		/// <summary>
 		/// 出題中の問題を取得します(setterはとりあえずprivateです)．
@@ -1273,15 +1295,40 @@ namespace Aldentea.SweetMutus
 		{
 			// どうにかして問題を決定．
 			//MyDocument.FindQuestion();
+
+			// とりあえず安易に...
+			var nextQuestion = dataGridQuestions.SelectedItem as SweetQuestion;
+			if (nextQuestion != null)
+			{
+				this.CurrentQuestion = nextQuestion;
+				MySongPlayer.Open(nextQuestion.FileName);
+				this.CurrentPhase = PlayingPhase.Ready;
+			}
+		}
+
+		void NextQuestion_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+		{
+			e.CanExecute = this.CurrentPhase == PlayingPhase.Talking;
+		}
+
+		void StartQuestion_Executed(object sender, ExecutedRoutedEventArgs e)
+		{
+			MySongPlayer.Play();
+			CurrentPhase = PlayingPhase.Playing;
+		}
+
+		void StartQuestion_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+		{
+			e.CanExecute = this.CurrentPhase == PlayingPhase.Ready; // CurrentQuestion must not be null.
 		}
 
 		#endregion
 
-			#endregion
+		#endregion
 
 
 
-			#region INotifyPropertyChanged実装
+		#region INotifyPropertyChanged実装
 
 		public event PropertyChangedEventHandler PropertyChanged = delegate { };
 
