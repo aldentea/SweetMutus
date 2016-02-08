@@ -26,6 +26,17 @@
 			<Setter Property="HorizontalAlignment" Value="Right" />
 			<Setter Property="Padding" Value="4,0" />
 		</Style>
+		<!-- 音量設定用スライダのスタイル -->
+		<Style TargetType="Slider" x:Key="volumeSliderStyle">
+			<Setter Property="VerticalAlignment" Value="Center" />
+			<Setter Property="Maximum" Value="1" />
+			<Setter Property="Minimum" Value="0" />
+			<Setter Property="AutoToolTipPlacement" Value="BottomRight" />
+			<Setter Property="AutoToolTipPrecision" Value="2" />
+			<Setter Property="SmallChange" Value="0.01" />
+			<Setter Property="LargeChange" Value="0.1" />
+			<Setter Property="ToolTip" Value="音量" />
+		</Style>
 	</Window.Resources>
 	<Window.Title>
 		<MultiBinding Converter="{StaticResource captionConverter}">
@@ -123,6 +134,7 @@
 			<RowDefinition Height="Auto" />
 			<RowDefinition Height="Auto" />
 			<RowDefinition Height="*" />
+			<RowDefinition Height="Auto" />
 			<RowDefinition Height="Auto" />
 			<RowDefinition Height="Auto" />
 		</Grid.RowDefinitions>
@@ -441,9 +453,9 @@
 							</StackPanel>
 						</TabItem>
 					</TabControl>
-					<Slider Margin="10,0" VerticalAlignment="Center" ToolTip="音量"
-								Value="{Binding RelativeSource={RelativeSource AncestorType=local:MainWindow}, Path=MySongPlayer.Volume}"
-								Maximum="1" Minimum="0" SmallChange="0.01" LargeChange="0.1" AutoToolTipPrecision="2" IsSelectionRangeEnabled="True" AutoToolTipPlacement="BottomRight" />
+					<Slider Style="{StaticResource volumeSliderStyle}" Margin="10,0"
+									Value="{Binding RelativeSource={RelativeSource AncestorType=local:MainWindow}, Path=MySongPlayer.Volume}"
+									/>
 				</DockPanel>
 				<DockPanel Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2">
 					<Label Name="labelDuration" DockPanel.Dock="Right" HorizontalContentAlignment="Right" MinWidth="60"
@@ -463,7 +475,21 @@
 				</DockPanel>
 			</Grid>
 		</Expander>
-
-		<StatusBar Height="32" Grid.Row="4" />
+		<Expander Header="出題" Name="expanderQuestionPlayer" Margin="0" Grid.Row="4">
+			<Grid>
+				<Grid.RowDefinitions>
+					<RowDefinition Height="Auto" />
+					<RowDefinition Height="Auto" />
+				</Grid.RowDefinitions>
+				<DockPanel Grid.Row="0">
+					<Button Content="再生" DockPanel.Dock="Left" Margin="10,5" Width="100"
+								Command="{x:Static hypermutus:Commands.SwitchPlayPauseCommand}" />
+					<Slider Style="{StaticResource volumeSliderStyle}" Margin="10,0"
+									Value="{Binding RelativeSource={RelativeSource AncestorType=local:MainWindow}, Path=MySongPlayer.Volume}"
+									/>
+				</DockPanel>
+			</Grid>
+		</Expander>
+		<StatusBar Height="32" Grid.Row="5" />
 	</Grid>
 </appbase:BasicWindow>

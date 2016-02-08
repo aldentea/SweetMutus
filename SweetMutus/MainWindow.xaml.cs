@@ -81,10 +81,18 @@ namespace Aldentea.SweetMutus
 		WindowMode _currentMode = WindowMode.Edit;
 		#endregion
 
+		// データバインディングで実装する前の，仮実装の置き場？
 		void UpdateUI()
 		{
+
 			// ※たぶんデータバインディングで実現可能．
 			dataGridQuestions.IsReadOnly = CurrentMode == WindowMode.Play;
+
+			MySongPlayer.Close();
+			// ※とりあえずここに書く．
+			expanderSongPlayer.Visibility = CurrentMode == WindowMode.Edit ? Visibility.Visible : Visibility.Collapsed;
+			expanderQuestionPlayer.Visibility = CurrentMode == WindowMode.Play ? Visibility.Visible : Visibility.Collapsed;
+
 		}
 
 		static KeyBinding SetSabiKeyBinding = new KeyBinding(GrandMutus.Base.Commands.SetSabiPosCommand, new KeyGesture(Key.F9));
