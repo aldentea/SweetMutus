@@ -482,6 +482,11 @@
 					<RowDefinition Height="Auto" />
 				</Grid.RowDefinitions>
 				<DockPanel Grid.Row="0">
+					<Button Content="NEXT" DockPanel.Dock="Left" Margin="10,5" Width="100"
+								Command="{x:Static hypermutus:Commands.SwitchPlayPauseCommand}" />
+					<Label Content="???" />
+				</DockPanel>
+				<DockPanel Grid.Row="1">
 					<Button Content="再生" DockPanel.Dock="Left" Margin="10,5" Width="100"
 								Command="{x:Static hypermutus:Commands.SwitchPlayPauseCommand}" />
 					<Slider Style="{StaticResource volumeSliderStyle}" Margin="10,0"

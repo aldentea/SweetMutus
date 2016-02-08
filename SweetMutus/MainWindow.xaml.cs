@@ -1243,7 +1243,45 @@ namespace Aldentea.SweetMutus
 
 		//	#endregion
 
-		#region INotifyPropertyChanged実装
+		#region 出題関連
+
+		#region *CurrentQuestionプロパティ
+		/// <summary>
+		/// 出題中の問題を取得します(setterはとりあえずprivateです)．
+		/// </summary>
+		public SweetQuestion CurrentQuestion
+		{
+			get
+			{
+				return _currentQuestion;
+			}
+			private set
+			{
+				if (_currentQuestion != value)
+				{
+					_currentQuestion = value;
+					NotifyPropertyChanged("CurrentQuestion");
+				}
+			}
+		}
+		SweetQuestion _currentQuestion;
+		#endregion
+
+		#region コマンドハンドラ
+
+		void NextQuestion_Executed(object sender, ExecutedRoutedEventArgs e)
+		{
+			// どうにかして問題を決定．
+			//MyDocument.FindQuestion();
+		}
+
+		#endregion
+
+			#endregion
+
+
+
+			#region INotifyPropertyChanged実装
 
 		public event PropertyChangedEventHandler PropertyChanged = delegate { };
 
