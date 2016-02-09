@@ -21,6 +21,10 @@ namespace Aldentea.SweetMutus.Base
 		/// </summary>
 		Thinking,
 		/// <summary>
+		/// 判定後(得点処理前)．
+		/// </summary>
+		Judged,
+		/// <summary>
 		/// 出題後．
 		/// </summary>
 		Talking

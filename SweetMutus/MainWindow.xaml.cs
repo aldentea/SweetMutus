@@ -1291,6 +1291,7 @@ namespace Aldentea.SweetMutus
 
 		#region コマンドハンドラ
 
+		#region NextQuestion
 		void NextQuestion_Executed(object sender, ExecutedRoutedEventArgs e)
 		{
 			// どうにかして問題を決定．
@@ -1310,9 +1311,13 @@ namespace Aldentea.SweetMutus
 		{
 			e.CanExecute = this.CurrentPhase == PlayingPhase.Talking;
 		}
+		#endregion
 
+		#region Start
 		void StartQuestion_Executed(object sender, ExecutedRoutedEventArgs e)
 		{
+			// ※停止位置設定を行う．
+
 			MySongPlayer.Play();
 			CurrentPhase = PlayingPhase.Playing;
 		}
@@ -1321,6 +1326,37 @@ namespace Aldentea.SweetMutus
 		{
 			e.CanExecute = this.CurrentPhase == PlayingPhase.Ready; // CurrentQuestion must not be null.
 		}
+		#endregion
+
+		#region Stop
+		void StopQuestion_Executed(object sender, ExecutedRoutedEventArgs e)
+		{
+			// ※停止位置設定を行う．
+
+			MySongPlayer.Pause();
+			CurrentPhase = PlayingPhase.Thinking;
+		}
+
+		void StopQuestion_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+		{
+			e.CanExecute = this.CurrentPhase == PlayingPhase.Playing; // CurrentQuestion must not be null.
+		}
+		#endregion
+
+		#region Judge
+		void Judge_Executed(object sender, ExecutedRoutedEventArgs e)
+		{
+			// ※停止位置設定を行う．
+
+			MySongPlayer.Play();
+			CurrentPhase = PlayingPhase.Talking;
+		}
+
+		void Judge_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+		{
+			e.CanExecute = this.CurrentPhase == PlayingPhase.Thinking; // CurrentQuestion must not be null.
+		}
+		#endregion
 
 		#endregion
 

@@ -112,10 +112,19 @@
 										Executed="SetWindowMode_Executed"
 										CanExecute="Always_CanExecute" />
 		<!-- 以下，出題関連 -->
-<!--		<CommandBinding Command="{x:Static grand:Commands.StartQuestionCommand}"
+		<CommandBinding Command="{x:Static hypermutus:QuizCommands.Start}"
 										Executed="StartQuestion_Executed"
 										CanExecute="StartQuestion_CanExecute" />
--->
+		<CommandBinding Command="{x:Static base:Commands.NextQuestionCommand}"
+										Executed="NextQuestion_Executed"
+										CanExecute="NextQuestion_CanExecute" />
+		<CommandBinding Command="{x:Static hypermutus:QuizCommands.Stop}"
+										Executed="StopQuestion_Executed"
+										CanExecute="StopQuestion_CanExecute" />
+		<CommandBinding Command="{x:Static base:Commands.JudgeCommand}"
+										Executed="Judge_Executed"
+										CanExecute="Judge_CanExecute" />
+
 	</Window.CommandBindings>
 	<Window.InputBindings>
 		<KeyBinding Key="F5" Command="{x:Static  hypermutus:Commands.SwitchPlayPauseCommand}" />
@@ -488,12 +497,16 @@
 				</Grid.RowDefinitions>
 				<DockPanel Grid.Row="0">
 					<Button Content="NEXT" DockPanel.Dock="Left" Margin="10,5" Width="100"
-								Command="{x:Static hypermutus:Commands.SwitchPlayPauseCommand}" />
+								Command="{x:Static base:Commands.NextQuestionCommand}" />
 					<Label Content="???" />
 				</DockPanel>
 				<DockPanel Grid.Row="1">
 					<Button Content="再生" DockPanel.Dock="Left" Margin="10,5" Width="100"
-								Command="{x:Static hypermutus:Commands.SwitchPlayPauseCommand}" />
+								Command="{x:Static hypermutus:QuizCommands.Start}" />
+					<Button Content="停止" DockPanel.Dock="Left" Margin="10,5" Width="100"
+								Command="{x:Static hypermutus:QuizCommands.Stop}" />
+					<Button Content="○" DockPanel.Dock="Left" Margin="10,5" Width="70"
+								Command="{x:Static base:Commands.JudgeCommand}" />
 					<Slider Style="{StaticResource volumeSliderStyle}" Margin="10,0"
 									Value="{Binding RelativeSource={RelativeSource AncestorType=local:MainWindow}, Path=MySongPlayer.Volume}"
 									/>

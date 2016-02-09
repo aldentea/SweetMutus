@@ -53,6 +53,11 @@ namespace Aldentea.SweetMutus.Base
 		// (0.1.3.1)
 		public static RoutedCommand SetWindowModeCommand = new RoutedCommand();
 
+		// ※とりあえずここに置いておくが，QuizCommandsに入れた方がいいかな？
+		public static RoutedCommand NextQuestionCommand = new RoutedCommand();
+		public static RoutedCommand JudgeCommand = new RoutedCommand();	// 判定内容はパラメータで与える．
+
+
 	}
 
 }
