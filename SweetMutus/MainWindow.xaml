@@ -498,7 +498,8 @@
 				<DockPanel Grid.Row="0">
 					<Button Content="NEXT" DockPanel.Dock="Left" Margin="10,5" Width="100"
 								Command="{x:Static base:Commands.NextQuestionCommand}" />
-					<Label Content="???" />
+					<Label Content="{Binding RelativeSource={RelativeSource AncestorType=Window}, Path=CurrentQuestion.Answer}"
+								 Name="labelCurrentQuestion" />
 				</DockPanel>
 				<DockPanel Grid.Row="1">
 					<Button Content="再生" DockPanel.Dock="Left" Margin="10,5" Width="100"

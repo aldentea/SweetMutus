@@ -280,6 +280,18 @@ namespace Aldentea.SweetMutus.Data
 		#endregion
 
 
+		// 正解とか出題曲表示用の文字列ってどう実装します？
+		// ToString()を使えば簡単なんだけど，それはデバッグ用に限った方がいいという考えもあるみたいなので，
+		// なにかそれ用のプロパティを用意する方向で考えてみましょう．
+		public override string Answer
+		{
+			get
+			{
+				return $"{Title} / {Artist}";	// C# 6.0 の記法を使ってみる．
+			}
+		}
+
+
 		#region XML入出力関連
 
 		// どこに置くかは未定．
