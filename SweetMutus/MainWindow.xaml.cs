@@ -29,9 +29,9 @@ namespace Aldentea.SweetMutus
 		#region プロパティ
 
 		#region *MyDocumentプロパティ
-		protected SweetMutusDocument MyDocument
+		protected SweetMutusGameDocument MyDocument
 		{
-			get { return (SweetMutusDocument)App.Current.Document; }
+			get { return (SweetMutusGameDocument)App.Current.Document; }
 		}
 		#endregion
 
@@ -74,6 +74,10 @@ namespace Aldentea.SweetMutus
 					this._currentMode = value;
 					UpdateUI();
 					SetKeyBindings();
+					if (_currentMode == WindowMode.Play)
+					{
+						MyDocument.AddFirstOrder();
+					}
 					NotifyPropertyChanged("CurrentMode");
 				}
 			}
@@ -583,6 +587,8 @@ namespace Aldentea.SweetMutus
 			this.MySongPlayer.Close();
 			this.CurrentSong = null;
 			this.expanderSongPlayer.IsExpanded = false;
+
+			this.CurrentMode = WindowMode.Edit;
 		}
 		#endregion
 
@@ -1304,6 +1310,8 @@ namespace Aldentea.SweetMutus
 				this.CurrentQuestion = nextQuestion;
 				MySongPlayer.Open(nextQuestion.FileName);
 				this.CurrentPhase = PlayingPhase.Ready;
+				MyDocument.AddOrder(nextQuestion);
+
 			}
 		}
 
@@ -1346,6 +1354,10 @@ namespace Aldentea.SweetMutus
 		#region Judge
 		void Judge_Executed(object sender, ExecutedRoutedEventArgs e)
 		{
+			// 得点とかの処理．
+			MyDocument.AddLog("○", 1);
+
+			// 以下，フォロー再生．
 			// ※停止位置設定を行う．
 
 			MySongPlayer.Play();

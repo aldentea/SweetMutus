@@ -489,7 +489,7 @@
 				</DockPanel>
 			</Grid>
 		</Expander>
-		<Expander Header="出題" Name="expanderQuestionPlayer" Margin="0" Grid.Row="4">
+		<Expander Header="出題" Name="expanderQuestionPlayer" Margin="0" Grid.Row="4" Visibility="Collapsed">
 			<Grid>
 				<Grid.RowDefinitions>
 					<RowDefinition Height="Auto" />
