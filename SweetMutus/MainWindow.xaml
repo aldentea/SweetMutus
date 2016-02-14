@@ -19,6 +19,7 @@
 		<util:TimeSpanDoubleConverter x:Key="timeSpanDoubleConverter" />
 		<base:DurationConverter x:Key="durationConverter" />
 		<base:EqualsConverter x:Key="equalsConverter" />
+		<base:FreePlayConverter x:Key="freePlayConverter" />
 		<grand:NullableIntConverter x:Key="noConverter" />
 		<grand:VisibilityConverter x:Key="categoryVisibilityConverter" />
 		<grand:VisibilityConverter x:Key="fileNameVisibilityConverter" />
@@ -260,7 +261,7 @@
 		<Grid Grid.Row="2">
 			<Grid.ColumnDefinitions>
 				<ColumnDefinition Width="*" />
-				<ColumnDefinition Width="Auto" />
+				<ColumnDefinition Width="Auto" Name="numberingColumn" />
 			</Grid.ColumnDefinitions>
 			<DataGrid Grid.Column="0" Margin="10" VerticalAlignment="Stretch"
 							ItemsSource="{Binding Questions}" AutoGenerateColumns="False"
@@ -489,12 +490,23 @@
 				</DockPanel>
 			</Grid>
 		</Expander>
-		<Expander Header="出題" Name="expanderQuestionPlayer" Margin="0" Grid.Row="4" Visibility="Collapsed">
+		<Expander Header="出題" Name="expanderQuestionPlayer" Margin="0" Grid.Row="4"
+							DataContext="{Binding RelativeSource={RelativeSource AncestorType=Window}, Path=MyQuestionPlayer}">
+			<Expander.CommandBindings>
+				<CommandBinding	Command="{x:Static hypermutus:Commands.SeekSabiCommand}"
+										Executed="Play_SeekSabi_Executed"
+										CanExecute="Play_SongPlayer_CanExecute" />
+				<CommandBinding
+										Command="{x:Static hypermutus:Commands.SwitchPlayPauseCommand}"
+										Executed="Play_SwitchPlayPause_Executed"
+										CanExecute="Play_SwitchPlayPause_CanExecute" />
+			</Expander.CommandBindings>
 			<Grid>
 				<Grid.RowDefinitions>
 					<RowDefinition Height="Auto" />
 					<RowDefinition Height="Auto" />
-				</Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
 				<DockPanel Grid.Row="0">
 					<Button Content="NEXT" DockPanel.Dock="Left" Margin="10,5" Width="100"
 								Command="{x:Static base:Commands.NextQuestionCommand}" />
@@ -502,16 +514,42 @@
 								 Name="labelCurrentQuestion" />
 				</DockPanel>
 				<DockPanel Grid.Row="1">
-					<Button Content="再生" DockPanel.Dock="Left" Margin="10,5" Width="100"
+					<Button Content="開始" DockPanel.Dock="Left" Margin="10,5" Width="100"
 								Command="{x:Static hypermutus:QuizCommands.Start}" />
 					<Button Content="停止" DockPanel.Dock="Left" Margin="10,5" Width="100"
 								Command="{x:Static hypermutus:QuizCommands.Stop}" />
 					<Button Content="○" DockPanel.Dock="Left" Margin="10,5" Width="70"
-								Command="{x:Static base:Commands.JudgeCommand}" />
+								Command="{x:Static base:Commands.JudgeCommand}" CommandParameter="○" />
+					<Button Content="×" DockPanel.Dock="Left" Margin="10,5" Width="70"
+								Command="{x:Static base:Commands.JudgeCommand}" CommandParameter="×" />
 					<Slider Style="{StaticResource volumeSliderStyle}" Margin="10,0"
-									Value="{Binding RelativeSource={RelativeSource AncestorType=local:MainWindow}, Path=MySongPlayer.Volume}"
+									Value="{Binding Path=Volume}"
 									/>
 				</DockPanel>
+				<DockPanel Grid.Row="2">
+					<Button Content="再生" DockPanel.Dock="Left" Margin="10,5" Width="100"
+									Command="{x:Static hypermutus:Commands.SwitchPlayPauseCommand}"
+									IsEnabled="{Binding RelativeSource={RelativeSource AncestorType=Window}, Path=CurrentPhase,
+																			Converter={StaticResource freePlayConverter}}"/>
+					<Button Content="サビ" DockPanel.Dock="Left" Margin="10,5" Width="100"
+									Command="{x:Static hypermutus:Commands.SeekSabiCommand}"
+									/>
+					<Label Name="labelDuration_Play" DockPanel.Dock="Right" HorizontalContentAlignment="Right" MinWidth="60"
+								HorizontalAlignment="Right" ContentStringFormat="m\:ss" Content="{Binding Path=Duration}"
+								Margin="0,8,20,8" VerticalAlignment="Center"/>
+					<Label Name="labelCurrentPosition_Play" DockPanel.Dock="Right" MinWidth="60"
+								Content="{Binding Path=CurrentPosition, Mode=OneWay}" ContentStringFormat="m\:ss"
+								HorizontalAlignment="Right" HorizontalContentAlignment="Right"
+								Margin="0,16,40,15" VerticalAlignment="Center"/>
+
+					<Slider Margin="30,4,30,4" VerticalAlignment="Center"
+								TickFrequency="60" Maximum="100" Minimum="0" Name="sliderSeekSong_Play" TickPlacement="BottomRight"
+								LargeChange="30" SmallChange="5"
+								Value="{Binding Path=CurrentPosition, Mode=TwoWay, Converter={StaticResource timeSpanDoubleConverter}}"
+								IsEnabled="{Binding RelativeSource={RelativeSource AncestorType=Window}, Path=CurrentPhase,
+																		Converter={StaticResource freePlayConverter}}"/>
+				</DockPanel>
+
 			</Grid>
 		</Expander>
 		<StatusBar Height="32" Grid.Row="5" />
