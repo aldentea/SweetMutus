@@ -191,6 +191,7 @@ namespace Aldentea.SweetMutus.Data
 		string _artistCache = string.Empty;
 		TimeSpan _playPosCache = TimeSpan.Zero;
 		TimeSpan _sabiPosCache = TimeSpan.Zero;
+		TimeSpan _stopPosCache = TimeSpan.Zero;
 		string _fileNameCache = string.Empty;
 		string _categoryCache = null;
 
@@ -211,6 +212,9 @@ namespace Aldentea.SweetMutus.Data
 					break;
 				case "SabiPos":
 					this._sabiPosCache = song.SabiPos;
+					break;
+				case "StopPos":
+					this._stopPosCache = song.StopPos;
 					break;
 				case "FileName":
 					this._fileNameCache = song.FileName;
@@ -257,6 +261,13 @@ namespace Aldentea.SweetMutus.Data
 						Item = new QuestionSabiPosChangedCache(song, _sabiPosCache, song.SabiPos)
 					});
 					_sabiPosCache = TimeSpan.Zero;
+					break;
+				case "StopPos":
+					this.ItemChanged(this, new ItemEventArgs<IOperationCache>
+					{
+						Item = new QuestionStopPosChangedCache(song, _stopPosCache, song.StopPos)
+					});
+					_stopPosCache = TimeSpan.Zero;
 					break;
 				case "FileName":
 					this.ItemChanged(this, new ItemEventArgs<IOperationCache>
