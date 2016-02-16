@@ -12,6 +12,8 @@ using System.ComponentModel;
 using System.Collections.ObjectModel;
 
 using GrandMutus.Base;
+using System.Windows.Media;
+using System.Windows.Media.Animation;
 
 namespace Aldentea.SweetMutus
 {
@@ -94,6 +96,15 @@ namespace Aldentea.SweetMutus
 
 			MySongPlayer.Close();
 			// ※とりあえずここに書く．
+
+			if (CurrentMode == WindowMode.Edit)
+			{
+				numberingColumn.Width = GridLength.Auto;
+			}
+			else
+			{
+				numberingColumn.Width = new GridLength(0);
+			}
 			expanderSongPlayer.Visibility = CurrentMode == WindowMode.Edit ? Visibility.Visible : Visibility.Collapsed;
 			expanderQuestionPlayer.Visibility = CurrentMode == WindowMode.Play ? Visibility.Visible : Visibility.Collapsed;
 
@@ -179,6 +190,8 @@ namespace Aldentea.SweetMutus
 					Redo_Executed, Redo_CanExecute)
 			);
 			this.CurrentMode = WindowMode.Edit;
+
+			InitializeQuestionPlayer();
 		}
 		#endregion
 
@@ -1006,6 +1019,9 @@ namespace Aldentea.SweetMutus
 			{
 				this.labelDuration.Content = _songPlayer.Duration.Value;
 				this.sliderSeekSong.Maximum = _songPlayer.Duration.Value.TotalSeconds;
+				// 出題用
+				this.labelDuration_Play.Content = _songPlayer.Duration.Value;
+				this.sliderSeekSong_Play.Maximum = _songPlayer.Duration.Value.TotalSeconds;
 			}
 		}
 		#endregion
@@ -1273,6 +1289,22 @@ namespace Aldentea.SweetMutus
 		PlayingPhase _currentPhase = PlayingPhase.Talking;
 		#endregion
 
+		public SweetQuestionPlayer MyQuestionPlayer
+		{
+			get
+			{
+				return _questionPlayer;
+			}
+		}
+		SweetQuestionPlayer _questionPlayer = new SweetQuestionPlayer();
+
+		void InitializeQuestionPlayer()
+		{
+			_questionPlayer.MediaOpened += questionPlayer_MediaOpened;
+			_questionPlayer.QuestionStopped += questionPlayer_QuestionStopped;
+		}
+
+
 		#region *CurrentQuestionプロパティ
 		/// <summary>
 		/// 出題中の問題を取得します(setterはとりあえずprivateです)．
@@ -1297,6 +1329,12 @@ namespace Aldentea.SweetMutus
 
 		#region コマンドハンドラ
 
+		//MediaClock _clock;
+		//MediaClock _followClock;
+		//MediaTimeline _questionTimeLine;
+		//MediaPlayer _questionMediaPlayer = new MediaPlayer();
+		//ClockController _questionClockController;
+
 		#region NextQuestion
 		void NextQuestion_Executed(object sender, ExecutedRoutedEventArgs e)
 		{
@@ -1308,9 +1346,19 @@ namespace Aldentea.SweetMutus
 			if (nextQuestion != null)
 			{
 				this.CurrentQuestion = nextQuestion;
-				MySongPlayer.Open(nextQuestion.FileName);
+
+				MyQuestionPlayer.Open(nextQuestion);
+				//MySongPlayer.Open(nextQuestion.FileName);
+				//_questionTimeLine = new MediaTimeline(new Uri(nextQuestion.FileName));
+
 				this.CurrentPhase = PlayingPhase.Ready;
 				MyDocument.AddOrder(nextQuestion);
+
+				//MySongPlayer.CurrentPosition = nextQuestion.PlayPos;
+				//_questionClockController = _questionStoryboard.CreateClock().Controller;
+				//_questionClockController.Seek(nextQuestion.PlayPos, TimeSeekOrigin.BeginTime);	// doesn't work?
+				//_questionClockController.Clock.Timeline.BeginTime = nextQuestion.PlayPos;		// Invalid
+				//_questionStoryboard.BeginTime=nextQuestion.PlayPos;	// Doesn't work.
 
 			}
 		}
@@ -1319,14 +1367,19 @@ namespace Aldentea.SweetMutus
 		{
 			e.CanExecute = this.CurrentPhase == PlayingPhase.Talking;
 		}
+
+
+		private void questionPlayer_MediaOpened(object sender, EventArgs e)
+		{
+			sliderSeekSong_Play.Maximum = MyQuestionPlayer.Duration.TotalSeconds;
+		}
+
 		#endregion
 
 		#region Start
 		void StartQuestion_Executed(object sender, ExecutedRoutedEventArgs e)
 		{
-			// ※停止位置設定を行う．
-
-			MySongPlayer.Play();
+			MyQuestionPlayer.Start();
 			CurrentPhase = PlayingPhase.Playing;
 		}
 
@@ -1337,30 +1390,48 @@ namespace Aldentea.SweetMutus
 		#endregion
 
 		#region Stop
-		void StopQuestion_Executed(object sender, ExecutedRoutedEventArgs e)
-		{
-			// ※停止位置設定を行う．
-
-			MySongPlayer.Pause();
-			CurrentPhase = PlayingPhase.Thinking;
-		}
-
 		void StopQuestion_CanExecute(object sender, CanExecuteRoutedEventArgs e)
 		{
 			e.CanExecute = this.CurrentPhase == PlayingPhase.Playing; // CurrentQuestion must not be null.
 		}
+
+		void StopQuestion_Executed(object sender, ExecutedRoutedEventArgs e)
+		{
+			//MySongPlayer.Pause();
+			MyQuestionPlayer.Stop();
+		}
+
+
+		private void questionPlayer_QuestionStopped(object sender, EventArgs e)
+		{
+			CurrentPhase = PlayingPhase.Thinking;
+		}
+
 		#endregion
 
 		#region Judge
 		void Judge_Executed(object sender, ExecutedRoutedEventArgs e)
 		{
+
 			// 得点とかの処理．
-			MyDocument.AddLog("○", 1);
+			var code = (string)e.Parameter;
+			if (code == "×")
+			{
+				MyDocument.AddLog("×", -1);
+			}
+			else
+			{
+				MyDocument.AddLog("○", 1);
+			}
 
 			// 以下，フォロー再生．
 			// ※停止位置設定を行う．
 
-			MySongPlayer.Play();
+			//MySongPlayer.Play();
+			//_clock.Controller.Resume();
+			//_questionMediaPlayer.Clock = _followClock;
+			MyQuestionPlayer.Follow();
+
 			CurrentPhase = PlayingPhase.Talking;
 		}
 
@@ -1368,6 +1439,42 @@ namespace Aldentea.SweetMutus
 		{
 			e.CanExecute = this.CurrentPhase == PlayingPhase.Thinking; // CurrentQuestion must not be null.
 		}
+		#endregion
+
+		#region SeekSabi
+
+		void Play_SeekSabi_Executed(object sender, ExecutedRoutedEventArgs e)
+		{
+			MyQuestionPlayer.CurrentPosition = CurrentQuestion.SabiPos;
+		}
+
+		void Play_SongPlayer_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+		{
+			e.CanExecute = CurrentPhase == PlayingPhase.Judged || CurrentPhase == PlayingPhase.Talking;
+			e.Handled = true;
+		}
+
+		#endregion
+
+
+		#region SwitchPlayPauseコマンド
+
+		void Play_SwitchPlayPause_Executed(object sender, ExecutedRoutedEventArgs e)
+		{
+			if (CurrentMode == WindowMode.Play
+								&& (CurrentPhase == PlayingPhase.Judged || CurrentPhase == PlayingPhase.Talking))
+			{
+				MyQuestionPlayer.SwitchPlayPause();
+			}
+		}
+
+		void Play_SwitchPlayPause_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+		{
+			e.CanExecute = CurrentMode == WindowMode.Play
+					&& (CurrentPhase == PlayingPhase.Judged || CurrentPhase == PlayingPhase.Talking);
+			e.Handled = true;
+		}
+
 		#endregion
 
 		#endregion

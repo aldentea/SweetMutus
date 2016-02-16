@@ -128,5 +128,33 @@ namespace Aldentea.SweetMutus.Base
 	}
 	#endregion
 
+	// (0.2.0)うーん...
+	public class FreePlayConverter : IValueConverter
+	{
+		public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+		{
+			if (value is PlayingPhase)
+			{
+				switch ((PlayingPhase)value)
+				{
+					case PlayingPhase.Judged:
+					case PlayingPhase.Talking:
+						return true;
+					default:
+						return false;
+				}
+			}
+			else
+			{
+				throw new ArgumentException("FreePlayConverterは、PlayingPhase型に対してのみ使えます。");
+			}
+		}
+
+		public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+		{
+			throw new NotImplementedException();
+		}
+
+	}
 
 }

@@ -67,8 +67,10 @@ namespace Aldentea.SweetMutus.Data
 			var sweet = base.GenerateSweetMutusElement(destination_directory, exported_songs_root);
 
 			// ログを追加．
-			sweet.Add(Logs.GenerateElement());
-
+			if (!Logs.IsEmpty)
+			{
+				sweet.Add(Logs.GenerateElement());
+			}
 			return sweet;
 		}
 
@@ -76,7 +78,11 @@ namespace Aldentea.SweetMutus.Data
 		protected override void LoadElements(XElement sweet, string fileDirectory)
 		{
 			base.LoadElements(sweet, fileDirectory);
-			Logs.LoadElement(sweet.Element(LogsCollection.ELEMENT_NAME));
+			var logsElement = sweet.Element(LogsCollection.ELEMENT_NAME);
+			if (logsElement != null)
+			{
+				Logs.LoadElement(logsElement);
+			}
 		}
 
 		#endregion
