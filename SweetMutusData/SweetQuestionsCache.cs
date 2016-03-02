@@ -9,25 +9,40 @@ using Aldentea.Wpf.Document;
 
 namespace Aldentea.SweetMutus.Data
 {
+
+	// これはDocument単位で考えた方がいい？
+	// SweetMutusDocument以外にも適用させたいが、ちょうどいい親クラスが実装されていないので、
+	// とりあえずこのようにしておく。
+
+	// (0.3.1.1)
+	public abstract class SweetMutusDocumentCache : IOperationCache
+	{
+		public SweetMutusDocument Document { get; protected set; }
+
+		protected SweetMutusDocumentCache(SweetMutusDocument document)
+		{
+			this.Document = document;
+		}
+
+		public abstract bool CanCancelWith(IOperationCache other);
+		public abstract void Reverse();
+
+	}
+
 	// ほとんどQuestionsCacheのコピペ．
 
 	#region [abstract]SweetQuestionsCacheクラス
-	public abstract class SweetQuestionsCache : IOperationCache
+	public abstract class SweetQuestionsCache : SweetMutusDocumentCache
 	{
-
-		public SweetMutusDocument Document { get; protected set; }
 		
 		public ISet<SweetQuestion> Questions
 		{ get; protected set; }
 
 		protected SweetQuestionsCache(SweetMutusDocument document, IEnumerable<SweetQuestion> questions)
+			: base(document)
 		{
-			this.Document = document;
 			this.Questions = new HashSet<SweetQuestion>(questions);
 		}
-
-		public abstract void Reverse();
-		public abstract bool CanCancelWith(IOperationCache other);
 
 		/// <summary>
 		/// Questionsプロパティの中身が同一であればtrueを返します．
@@ -442,6 +457,12 @@ namespace Aldentea.SweetMutus.Data
 		//}
 
 	}
+	#endregion
+
+
+	#region 出題進行関連
+
+
 	#endregion
 
 }

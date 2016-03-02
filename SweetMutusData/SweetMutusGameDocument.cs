@@ -10,14 +10,15 @@ namespace Aldentea.SweetMutus.Data
 {
 	// とりあえずSweetMutusDocumentとは分けて実装してみる．
 
+	// (0.3.1.2)IMutusGameDocumentを追加。
 	// (0.3.0)
 	#region SweetMutusGameDocumentクラス
-	public class SweetMutusGameDocument : SweetMutusDocument
+	public class SweetMutusGameDocument : SweetMutusDocument, IMutusGameDocument
 	{
 
 		// (0.3.0)
 		#region *Logsプロパティ
-		LogsCollection Logs
+		public LogsCollection Logs
 		{
 			get
 			{
@@ -29,6 +30,9 @@ namespace Aldentea.SweetMutus.Data
 		#endregion
 
 
+		public event EventHandler<OrderEventArgs> OrderAdded = delegate { };
+		public event EventHandler<OrderEventArgs> OrderRemoved = delegate { };
+
 		// (0.3.0)
 		protected override void InitializeDocument()
 		{
@@ -36,18 +40,36 @@ namespace Aldentea.SweetMutus.Data
 			Logs.Initialize();
 		}
 
+
 		#region ログ関連
 
 		// (0.3.0)
-		public void AddOrder(QuestionBase question)
+		public void AddOrder(int? questionID)
 		{
-			Logs.AddOrder(question.ID);
+			if (questionID.HasValue)
+			{
+				Logs.AddOrder(questionID.Value);
+				AddOperationHistory(new AddOrderCache(this, questionID));
+			}
+			else
+			{
+				Logs.AddFirstOrder();
+			}
+			this.OrderAdded(this, new OrderEventArgs(questionID));
 		}
 
 		// (0.3.0)
-		public bool AddFirstOrder()
+		//public bool AddFirstOrder()
+		//{
+		//	return Logs.AddFirstOrder();
+		//}
+
+		// (0.3.0)
+		public void RemoveOrder()
 		{
-			return Logs.AddFirstOrder();
+			int? questionID = Logs.RemoveOrder();
+			AddOperationHistory(new RemoveOrderCache(this, questionID));
+			this.OrderRemoved(this, new OrderEventArgs(null));
 		}
 
 		// (0.3.0)
@@ -67,7 +89,7 @@ namespace Aldentea.SweetMutus.Data
 			var sweet = base.GenerateSweetMutusElement(destination_directory, exported_songs_root);
 
 			// ログを追加．
-			if (!Logs.IsEmpty)
+			if (Logs.Count > 0)
 			{
 				sweet.Add(Logs.GenerateElement());
 			}

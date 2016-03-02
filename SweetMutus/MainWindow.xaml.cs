@@ -78,7 +78,7 @@ namespace Aldentea.SweetMutus
 					SetKeyBindings();
 					if (_currentMode == WindowMode.Play)
 					{
-						MyDocument.AddFirstOrder();
+						MyDocument.AddOrder(null);
 					}
 					NotifyPropertyChanged("CurrentMode");
 				}
@@ -151,7 +151,7 @@ namespace Aldentea.SweetMutus
 		#endregion
 
 
-
+		// (0.2.0.2)MyDocumentのOrder関連のイベントハンドラを追加。
 		#region *コンストラクタ(MainWindow)
 		public MainWindow()
 		{
@@ -164,6 +164,9 @@ namespace Aldentea.SweetMutus
 			MyDocument.Opened += MyDocument_Opened;
 			MyDocument.QuestionCategoryChanged += MyDocument_QuestionCategoryChanged;
 			MyDocument.QuestionNoChanged += MyDocument_QuestionCategoryChanged;
+
+			MyDocument.OrderAdded += MyDocument_OrderAdded;
+			MyDocument.OrderRemoved += MyDocument_OrderRemoved;
 
 			//複数曲追加
 			//this.MyDocument.AddSongsAction = this.AddSongsParallel;
@@ -1345,21 +1348,7 @@ namespace Aldentea.SweetMutus
 			var nextQuestion = dataGridQuestions.SelectedItem as SweetQuestion;
 			if (nextQuestion != null)
 			{
-				this.CurrentQuestion = nextQuestion;
-
-				MyQuestionPlayer.Open(nextQuestion);
-				//MySongPlayer.Open(nextQuestion.FileName);
-				//_questionTimeLine = new MediaTimeline(new Uri(nextQuestion.FileName));
-
-				this.CurrentPhase = PlayingPhase.Ready;
-				MyDocument.AddOrder(nextQuestion);
-
-				//MySongPlayer.CurrentPosition = nextQuestion.PlayPos;
-				//_questionClockController = _questionStoryboard.CreateClock().Controller;
-				//_questionClockController.Seek(nextQuestion.PlayPos, TimeSeekOrigin.BeginTime);	// doesn't work?
-				//_questionClockController.Clock.Timeline.BeginTime = nextQuestion.PlayPos;		// Invalid
-				//_questionStoryboard.BeginTime=nextQuestion.PlayPos;	// Doesn't work.
-
+				MyDocument.AddOrder(nextQuestion.ID);
 			}
 		}
 
@@ -1479,6 +1468,35 @@ namespace Aldentea.SweetMutus
 
 		#endregion
 
+		#region イベントハンドラ
+
+		// (0.2.0.2)
+		#region *Order追加時
+		private void MyDocument_OrderAdded(object sender, GrandMutus.Data.OrderEventArgs e)
+		{
+			var q_id = e.QuestionID;
+			if (q_id.HasValue)
+			{
+				var nextQuestion = MyDocument.Questions.Get(q_id.Value);
+				this.CurrentQuestion = nextQuestion;
+				MyQuestionPlayer.Open(nextQuestion);
+				this.CurrentPhase = PlayingPhase.Ready;
+			}
+		}
+		#endregion
+
+		// (0.2.0.2)
+		#region *Order削除時
+		private void MyDocument_OrderRemoved(object sender, GrandMutus.Data.OrderEventArgs e)
+		{
+			this.CurrentPhase = PlayingPhase.Talking;
+			MyQuestionPlayer.Close();
+			this.CurrentQuestion = null;
+		}
+		#endregion
+
+		#endregion
+
 		#endregion
 
 
@@ -1494,5 +1512,6 @@ namespace Aldentea.SweetMutus
 		#endregion
 	}
 	#endregion
+
 
 }

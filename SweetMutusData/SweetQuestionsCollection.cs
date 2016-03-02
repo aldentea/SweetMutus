@@ -436,6 +436,17 @@ namespace Aldentea.SweetMutus.Data
 		}
 		#endregion
 
+		// (0.3.1.1)
+		/// <summary>
+		/// 指定したIDがついた問題を返します。
+		/// 該当する問題がない場合は、InvalidOperationExceptionをスローします。
+		/// </summary>
+		/// <param name="id"></param>
+		/// <returns></returns>
+		public SweetQuestion Get(int id)
+		{
+			return this.Items.Single(q => q.ID == id);
+		}
 
 		#region XML入出力関連
 

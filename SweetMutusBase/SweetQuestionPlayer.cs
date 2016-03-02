@@ -234,12 +234,16 @@ namespace Aldentea.SweetMutus
 				}
 			}
 
+			// (0.1.3.2)_timer.IsEnabledのチェックを追加。
 			public void Close()
 			{
 				_questionMediaPlayer.Stop();
 				_questionClock = null;
 				_followClock = null;
-				_timer.Stop();
+				if (_timer != null && _timer.IsEnabled)
+				{
+					_timer.Stop();
+				}
 			}
 
 
