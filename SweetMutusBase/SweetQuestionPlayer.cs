@@ -67,6 +67,7 @@ namespace Aldentea.SweetMutus
 				}
 			}
 
+			#region *Durationプロパティ
 			/// <summary>
 			/// 現在の曲の長さを取得します。
 			/// </summary>
@@ -77,7 +78,9 @@ namespace Aldentea.SweetMutus
 					return _currentSongDuration;
 				}
 			}
+			#endregion
 
+			#region *CurrentPhaseプロパティ
 			protected Phase CurrentPhase
 			{
 				get
@@ -92,7 +95,9 @@ namespace Aldentea.SweetMutus
 					}
 				}
 			}
+			#endregion
 
+			#region *Volumeプロパティ
 			/// <summary>
 			/// 音量を取得／設定します。
 			/// </summary>
@@ -108,6 +113,7 @@ namespace Aldentea.SweetMutus
 					NotifyPropertyChanged("Volume");
 				}
 			}
+			#endregion
 
 			#region *コンストラクタ(SwetQuestionPlayer)
 			public SweetQuestionPlayer()
@@ -150,6 +156,7 @@ namespace Aldentea.SweetMutus
 			}
 			#endregion
 
+			#region *曲ファイルを開く(Open)
 			/// <summary>
 			/// questionで指定された曲ファイルをオープンします。
 			/// オープンが完了すると、MediaOpenedイベントが発生します。
@@ -157,12 +164,15 @@ namespace Aldentea.SweetMutus
 			/// <param name="question"></param>
 			public void Open(SweetQuestion question)
 			{
+				Close();
+
 				_questionTimeLine = new MediaTimeline(new Uri(question.FileName));
 				//_questionTimeLine.Completed += question_Completed;
 				CurrentQuestion = question;
 			}
+			#endregion
 
-
+			#region *出題開始(Start)
 			public void Start()
 			{
 				// 停止位置設定を行う．
@@ -184,12 +194,14 @@ namespace Aldentea.SweetMutus
 				_timer.Start();
 
 			}
+			#endregion
 
 			private void question_Completed(object sender, EventArgs e)
 			{
 				Stop();
 			}
 
+			#region *出題停止(Stop)
 			public void Stop()
 			{
 				_questionClock.Controller.Pause();
@@ -207,6 +219,7 @@ namespace Aldentea.SweetMutus
 				_followClock.Controller.Pause();
 
 			}
+			#endregion
 
 			/// <summary>
 			/// 出題が停止したときに発生します。出題停止位置に達した場合にも発生します。
@@ -234,16 +247,23 @@ namespace Aldentea.SweetMutus
 				}
 			}
 
+
 			// (0.1.3.2)_timer.IsEnabledのチェックを追加。
 			public void Close()
 			{
-				_questionMediaPlayer.Stop();
+				// アンドゥの時にしか呼ばれない！
+
+				_questionMediaPlayer.Clock = null;
+				//_questionMediaPlayer.Stop();
 				_questionClock = null;
 				_followClock = null;
 				if (_timer != null && _timer.IsEnabled)
 				{
 					_timer.Stop();
 				}
+				NotifyPropertyChanged("CurrentPosition");
+				_currentSongDuration = TimeSpan.Zero;
+				NotifyPropertyChanged("Duration");
 			}
 
 
