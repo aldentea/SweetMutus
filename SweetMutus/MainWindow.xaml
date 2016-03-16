@@ -490,7 +490,7 @@
 				</DockPanel>
 			</Grid>
 		</Expander>
-		<Expander Header="出題" Name="expanderQuestionPlayer" Margin="0" Grid.Row="4"
+		<Expander Header="出題" Name="expanderQuestionPlayer" Visibility="Collapsed" Margin="0" Grid.Row="4"
 							DataContext="{Binding RelativeSource={RelativeSource AncestorType=Window}, Path=MyQuestionPlayer}">
 			<Expander.CommandBindings>
 				<CommandBinding	Command="{x:Static hypermutus:Commands.SeekSabiCommand}"

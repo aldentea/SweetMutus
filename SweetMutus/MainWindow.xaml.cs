@@ -192,9 +192,9 @@ namespace Aldentea.SweetMutus
 				new CommandBinding(ApplicationCommands.Redo,
 					Redo_Executed, Redo_CanExecute)
 			);
-			this.CurrentMode = WindowMode.Edit;
 
 			InitializeQuestionPlayer();
+			this.CurrentMode = WindowMode.Edit;
 		}
 		#endregion
 
