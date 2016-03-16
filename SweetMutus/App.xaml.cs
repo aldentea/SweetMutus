@@ -8,6 +8,9 @@ using System.Windows;
 
 namespace Aldentea.SweetMutus
 {
+	// (0.2.0)ドキュメントをSweetMutusGameDocumentに変更．
+
+
 	// 1. Appの継承元を変更する(XAMLも忘れずに！)．
 
 
@@ -23,7 +26,7 @@ namespace Aldentea.SweetMutus
 		protected App()
 			: base()
 		{
-			this.Document = new SweetMutusDocument();
+			this.Document = new SweetMutusGameDocument();
 			this.Exit += new ExitEventHandler(App_Exit);
 		}
 

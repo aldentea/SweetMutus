@@ -9,25 +9,40 @@ using Aldentea.Wpf.Document;
 
 namespace Aldentea.SweetMutus.Data
 {
+
+	// これはDocument単位で考えた方がいい？
+	// SweetMutusDocument以外にも適用させたいが、ちょうどいい親クラスが実装されていないので、
+	// とりあえずこのようにしておく。
+
+	// (0.3.1.1)
+	public abstract class SweetMutusDocumentCache : IOperationCache
+	{
+		public SweetMutusDocument Document { get; protected set; }
+
+		protected SweetMutusDocumentCache(SweetMutusDocument document)
+		{
+			this.Document = document;
+		}
+
+		public abstract bool CanCancelWith(IOperationCache other);
+		public abstract void Reverse();
+
+	}
+
 	// ほとんどQuestionsCacheのコピペ．
 
 	#region [abstract]SweetQuestionsCacheクラス
-	public abstract class SweetQuestionsCache : IOperationCache
+	public abstract class SweetQuestionsCache : SweetMutusDocumentCache
 	{
-
-		public SweetMutusDocument Document { get; protected set; }
 		
 		public ISet<SweetQuestion> Questions
 		{ get; protected set; }
 
 		protected SweetQuestionsCache(SweetMutusDocument document, IEnumerable<SweetQuestion> questions)
+			: base(document)
 		{
-			this.Document = document;
 			this.Questions = new HashSet<SweetQuestion>(questions);
 		}
-
-		public abstract void Reverse();
-		public abstract bool CanCancelWith(IOperationCache other);
 
 		/// <summary>
 		/// Questionsプロパティの中身が同一であればtrueを返します．
@@ -219,16 +234,14 @@ namespace Aldentea.SweetMutus.Data
 	}
 	#endregion
 
+	// (0.3.1)実装をQuestionPositionChangedCacheクラスに切り出し．
 	// (0.1.6)ほとんどSabiPosのコピペ．
 	#region QuestionPlayPosChangedCacheクラス
-	public class QuestionPlayPosChangedCache : GrandMutus.Data.PropertyChangedCache<TimeSpan>
+	public class QuestionPlayPosChangedCache : QuestionPositionChangedCache
 	{
-		SweetQuestion _question;
-
 		public QuestionPlayPosChangedCache(SweetQuestion question, TimeSpan from, TimeSpan to)
-			: base(from, to)
+			: base(question, from, to)
 		{
-			this._question = question;
 		}
 
 		public override void Reverse()
@@ -236,42 +249,58 @@ namespace Aldentea.SweetMutus.Data
 			_question.PlayPos = _previousValue;
 		}
 
-		public override bool CanCancelWith(IOperationCache other)
-		{
-			var other_cache = other as QuestionPlayPosChangedCache;
-			if (other_cache == null)
-			{ return false; }
-			else
-			{
-				return other_cache._question == this._question &&
-					other_cache._previousValue == this._currentValue &&
-					other_cache._currentValue == this._previousValue;
-			}
-		}
-
 	}
 	#endregion
 
+	// (0.3.1)実装をQuestionPositionChangedCacheクラスに切り出し．
 	// (*0.4.2)
 	#region QuestionSabiPosChangedCacheクラス
-	public class QuestionSabiPosChangedCache : GrandMutus.Data.PropertyChangedCache<TimeSpan>
+	public class QuestionSabiPosChangedCache : QuestionPositionChangedCache
 	{
-		SweetQuestion _question;
-
 		public QuestionSabiPosChangedCache(SweetQuestion question, TimeSpan from, TimeSpan to)
-			: base(from, to)
+			: base(question, from, to)
 		{
-			this._question = question;
 		}
 
 		public override void Reverse()
 		{
 			_question.SabiPos = _previousValue;
 		}
+	}
+	#endregion
+
+	// (0.3.1)
+	#region QuestionStopPosChangedCacheクラス
+	public class QuestionStopPosChangedCache : QuestionPositionChangedCache
+	{
+		public QuestionStopPosChangedCache(SweetQuestion question, TimeSpan from, TimeSpan to)
+			: base(question, from, to)
+		{
+		}
+
+		public override void Reverse()
+		{
+			_question.StopPos = _previousValue;
+		}
+
+	}
+	#endregion
+
+	// (0.3.1)
+	#region QuestionPositionChangedCacheクラス
+	public abstract class QuestionPositionChangedCache : GrandMutus.Data.PropertyChangedCache<TimeSpan>
+	{
+		protected SweetQuestion _question;
+
+		public QuestionPositionChangedCache(SweetQuestion question, TimeSpan from, TimeSpan to)
+			: base(from, to)
+		{
+			this._question = question;
+		}
 
 		public override bool CanCancelWith(IOperationCache other)
 		{
-			var other_cache = other as QuestionSabiPosChangedCache;
+			var other_cache = other as QuestionPositionChangedCache;
 			if (other_cache == null)
 			{ return false; }
 			else
@@ -428,6 +457,12 @@ namespace Aldentea.SweetMutus.Data
 		//}
 
 	}
+	#endregion
+
+
+	#region 出題進行関連
+
+
 	#endregion
 
 }

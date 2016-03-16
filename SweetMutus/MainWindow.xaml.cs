@@ -8,12 +8,18 @@ using System.Windows.Input;
 
 using Aldentea.Wpf.Application;
 using System.ComponentModel;
-using HyperMutus;
+//using HyperMutus;
 using System.Collections.ObjectModel;
+
+using GrandMutus.Base;
+using System.Windows.Media;
+using System.Windows.Media.Animation;
 
 namespace Aldentea.SweetMutus
 {
 	using Data;
+	using static GrandMutus.Base.Helpers;
+	using Base;
 
 	#region MainWindowクラス
 	/// <summary>
@@ -25,9 +31,9 @@ namespace Aldentea.SweetMutus
 		#region プロパティ
 
 		#region *MyDocumentプロパティ
-		protected SweetMutusDocument MyDocument
+		protected SweetMutusGameDocument MyDocument
 		{
-			get { return (SweetMutusDocument)App.Current.Document; }
+			get { return (SweetMutusGameDocument)App.Current.Document; }
 		}
 		#endregion
 
@@ -39,7 +45,7 @@ namespace Aldentea.SweetMutus
 				return _categories;
 			}
 		}
-		ObservableCollection<string> _categories = new ObservableCollection<string>(new string[] {string.Empty});
+		ObservableCollection<string> _categories = new ObservableCollection<string>(new string[] { string.Empty });
 		#endregion
 
 		#endregion
@@ -50,6 +56,102 @@ namespace Aldentea.SweetMutus
 			return MessageBox.Show(message, "確認", MessageBoxButton.YesNo) == MessageBoxResult.Yes;
 		}
 
+		// (0.1.3)
+		#region モード関連
+
+		#region *CurrentModeプロパティ
+		/// <summary>
+		/// 現在のモードを取得／設定します．
+		/// </summary>
+		public WindowMode CurrentMode
+		{
+			get
+			{
+				return _currentMode;
+			}
+			set
+			{
+				if (_currentMode != value)
+				{
+					this._currentMode = value;
+					UpdateUI();
+					SetKeyBindings();
+					if (_currentMode == WindowMode.Play)
+					{
+						MyDocument.AddOrder(null);
+					}
+					NotifyPropertyChanged("CurrentMode");
+				}
+			}
+		}
+		WindowMode _currentMode = WindowMode.Edit;
+		#endregion
+
+		// データバインディングで実装する前の，仮実装の置き場？
+		void UpdateUI()
+		{
+
+			// ※たぶんデータバインディングで実現可能．
+			dataGridQuestions.IsReadOnly = CurrentMode == WindowMode.Play;
+
+			MySongPlayer.Close();
+			// ※とりあえずここに書く．
+
+			if (CurrentMode == WindowMode.Edit)
+			{
+				numberingColumn.Width = GridLength.Auto;
+			}
+			else
+			{
+				numberingColumn.Width = new GridLength(0);
+			}
+			expanderSongPlayer.Visibility = CurrentMode == WindowMode.Edit ? Visibility.Visible : Visibility.Collapsed;
+			expanderQuestionPlayer.Visibility = CurrentMode == WindowMode.Play ? Visibility.Visible : Visibility.Collapsed;
+
+		}
+
+		static KeyBinding SetSabiKeyBinding = new KeyBinding(GrandMutus.Base.Commands.SetSabiPosCommand, new KeyGesture(Key.F9));
+		static KeyBinding SetPlayKeyBinding = new KeyBinding(Commands.SetPlayPosCommand, new KeyGesture(Key.F10));
+		static KeyBinding SetStopKeyBinding = new KeyBinding(Commands.SetStopPosCommand, new KeyGesture(Key.F11));
+
+		// ※そのうちKeyBindingを動的に設定できるようにしたい．↓が参考になるかも．
+		//var test = SetStopKeyBinding.Key.ToString();	// "F11"
+		//var modifiers = SetStopKeyBinding.Modifiers.ToString();	// "Alt, Control"
+
+
+		void SetKeyBindings()
+		{
+			switch (CurrentMode)
+			{
+				case WindowMode.Edit:
+					this.InputBindings.Add(SetSabiKeyBinding);
+					this.InputBindings.Add(SetPlayKeyBinding);
+					this.InputBindings.Add(SetStopKeyBinding);
+					break;
+				case WindowMode.Play:
+					this.InputBindings.Remove(SetSabiKeyBinding);
+					this.InputBindings.Remove(SetPlayKeyBinding);
+					this.InputBindings.Remove(SetStopKeyBinding);
+					break;
+			}
+		}
+
+		// (0.1.3.1)
+		#region SetWindowMode
+		private void SetWindowMode_Executed(object sender, ExecutedRoutedEventArgs e)
+		{
+			if (e.Parameter is WindowMode)
+			{
+				this.CurrentMode = (WindowMode)e.Parameter;
+			}
+		}
+		#endregion
+
+
+		#endregion
+
+
+		// (0.2.0.2)MyDocumentのOrder関連のイベントハンドラを追加。
 		#region *コンストラクタ(MainWindow)
 		public MainWindow()
 		{
@@ -62,6 +164,9 @@ namespace Aldentea.SweetMutus
 			MyDocument.Opened += MyDocument_Opened;
 			MyDocument.QuestionCategoryChanged += MyDocument_QuestionCategoryChanged;
 			MyDocument.QuestionNoChanged += MyDocument_QuestionCategoryChanged;
+
+			MyDocument.OrderAdded += MyDocument_OrderAdded;
+			MyDocument.OrderRemoved += MyDocument_OrderRemoved;
 
 			//複数曲追加
 			//this.MyDocument.AddSongsAction = this.AddSongsParallel;
@@ -87,12 +192,13 @@ namespace Aldentea.SweetMutus
 				new CommandBinding(ApplicationCommands.Redo,
 					Redo_Executed, Redo_CanExecute)
 			);
+			this.CurrentMode = WindowMode.Edit;
 
-			// レイアウト関係のコマンドハンドラだけど，なぜかここに記載．
-			//dataGridQuestionsFileNameColumn.Visibility
+			InitializeQuestionPlayer();
 		}
 		#endregion
 
+		// (0.1.3.1)[表示]系メニューの設定を追加．
 		// (0.0.13)音声ボリュームを復元．
 		// (0.0.8.9)
 		#region *ウインドウ初期化時(MainWindow_Initialized)
@@ -110,10 +216,23 @@ namespace Aldentea.SweetMutus
 				this.Width = MySettings.WindowSize.Width;
 				this.Height = MySettings.WindowSize.Height;
 			}
-			this.SongPlayer.Volume = MySettings.SongPlayerVolume;
+			this.MySongPlayer.Volume = MySettings.SongPlayerVolume;
+
+			// [表示]系メニューの設定．
+			questionsIDColumn.Visibility
+				= MySettings.DataGridColumnsVisibility.HasFlag(QuestionColumnsVisibility.IdColumn) ? Visibility.Visible : Visibility.Collapsed;
+			questionsFileNameColumn.Visibility
+				= MySettings.DataGridColumnsVisibility.HasFlag(QuestionColumnsVisibility.FileNameColumn) ? Visibility.Visible : Visibility.Collapsed;
+			questionsPlayPosColumn.Visibility
+				= MySettings.DataGridColumnsVisibility.HasFlag(QuestionColumnsVisibility.PlayPosColumn) ? Visibility.Visible : Visibility.Collapsed;
+			questionsSabiPosColumn.Visibility
+				= MySettings.DataGridColumnsVisibility.HasFlag(QuestionColumnsVisibility.SabiPosColumn) ? Visibility.Visible : Visibility.Collapsed;
+			questionsStopPosColumn.Visibility
+				= MySettings.DataGridColumnsVisibility.HasFlag(QuestionColumnsVisibility.StopPosColumn) ? Visibility.Visible : Visibility.Collapsed;
 		}
 		#endregion
 
+		// (0.1.3.1)[表示]系メニューの保存を追加．
 		// (0.0.13)音声ボリュームを保存．
 		// (0.0.8.9)
 		#region *ウインドウクローズ時(MainWindow_Closed)
@@ -124,7 +243,16 @@ namespace Aldentea.SweetMutus
 			MySettings.WindowPosition = new Point(this.Left, this.Top);
 			MySettings.WindowSize = new System.Windows.Size(this.Width, this.Height);
 
-			MySettings.SongPlayerVolume = this.SongPlayer.Volume;
+			MySettings.SongPlayerVolume = this.MySongPlayer.Volume;
+
+			// (0.1.3.1)[表示]系メニューを保存．
+			var flags = QuestionColumnsVisibility.None;
+			flags |= menuItemIDColumnVisible.IsChecked ? QuestionColumnsVisibility.IdColumn : 0;
+			flags |= menuItemFileNameColumnVisible.IsChecked ? QuestionColumnsVisibility.FileNameColumn : 0;
+			flags |= menuItemPlayPosColumnVisible.IsChecked ? QuestionColumnsVisibility.PlayPosColumn : 0;
+			flags |= menuItemSabiPosColumnVisible.IsChecked ? QuestionColumnsVisibility.SabiPosColumn : 0;
+			flags |= menuItemStopPosColumnVisible.IsChecked ? QuestionColumnsVisibility.StopPosColumn : 0;
+			MySettings.DataGridColumnsVisibility = flags;
 		}
 		#endregion
 
@@ -279,9 +407,9 @@ namespace Aldentea.SweetMutus
 			if (e.Parameter is SweetQuestion)
 			{
 				SweetQuestion question = (SweetQuestion)e.Parameter;
-				if (this.SongPlayer.MediaSource == new Uri(question.FileName))
+				if (this.MySongPlayer.MediaSource == new Uri(question.FileName))
 				{
-					this.SongPlayer.Close();
+					this.MySongPlayer.Close();
 					// 無意味にSleepする。
 					Task.Delay(140);
 				}
@@ -293,7 +421,7 @@ namespace Aldentea.SweetMutus
 		{
 			e.CanExecute = (e.Parameter is SweetQuestion);
 		}
-	
+
 		#endregion
 
 		#region ChangeFileName
@@ -340,7 +468,7 @@ namespace Aldentea.SweetMutus
 				// 何かいい方法はないかなぁ？
 				// (questionsに直接foreachすると，要素を変更してしまうので...)
 				var ids = questions.Where(q => q.No.HasValue).OrderByDescending(q => q.No).Select(q => q.ID).ToArray();
-				foreach(var id in ids)
+				foreach (var id in ids)
 				{
 					var question = MyDocument.FindQuestion(id);
 					question.No += 1;
@@ -472,9 +600,11 @@ namespace Aldentea.SweetMutus
 			AddCategory(string.Empty);
 			this.CurrentCategory = string.Empty;
 
-			this.SongPlayer.Close();
+			this.MySongPlayer.Close();
 			this.CurrentSong = null;
 			this.expanderSongPlayer.IsExpanded = false;
+
+			this.CurrentMode = WindowMode.Edit;
 		}
 		#endregion
 
@@ -573,14 +703,15 @@ namespace Aldentea.SweetMutus
 
 		#region 問題リスト関連
 
+		// (0.1.3)GrandMutusのHelperを使用するように変更．
 		void AddQuestions()
 		{
 			// ファイルダイアログを表示．
-			var fileNames = HyperMutus.Helpers.SelectSongFiles();	// これのためにMutusBaseを参照している！(いや，もう1か所あった．)
+			var fileNames = SelectSongFiles();
 			if (fileNames != null)
 			{
 				AddQuestions(fileNames);
-			//SayInfo("曲追加完了！");
+				//SayInfo("曲追加完了！");
 			}
 		}
 
@@ -607,6 +738,7 @@ namespace Aldentea.SweetMutus
 			}
 		}
 
+		// (0.1.3.1)GrandMutusのWorkBackground～を使用するように変更．
 		// (0.1.0.3)CurrentCategoryを設定するように改良。
 		#region 問題を追加(AddQuestions)
 		public void AddQuestions(IEnumerable<string> fileNames)
@@ -623,14 +755,14 @@ namespace Aldentea.SweetMutus
 				// ObservableCollectionに対する操作は，それが作られたスレッドと同じスレッドで行う必要がある．
 
 				var question = this.Dispatcher.Invoke(
-					new Func<string, SweetQuestion>(delegate(string f) { return MyDocument.AddQuestion(f, CurrentCategory); }), fileName);
+					new Func<string, SweetQuestion>(delegate (string f) { return MyDocument.AddQuestion(f, CurrentCategory); }), fileName);
 				if (question is SweetQuestion)
 				{
 					added_questions.Add((SweetQuestion)question);
 				}
-					
+
 			};
-			HyperMutus.Helpers.WorkBackgroundParallel<string>(fileNames, action);
+			WorkBackgroundParallel<string>(fileNames, action);
 			return added_questions;
 		}
 		#endregion
@@ -729,9 +861,9 @@ namespace Aldentea.SweetMutus
 			else
 			{
 				e.CanExecute = false;
-      }
+			}
 		}
-		
+
 		#endregion
 
 
@@ -755,26 +887,27 @@ namespace Aldentea.SweetMutus
 			{
 				string fileName = dialog.Destination;
 				//var document = IntroMutusDocument.Clone<IntroMutusDocument>();
-				
+
 				// 曲ファイルコピー
 				var songDirectory = dialog.SongDirectory;
 				var destinationDirectory = System.IO.Path.GetDirectoryName(fileName);
 				string songsDestination = songDirectory == null ? destinationDirectory : System.IO.Path.Combine(destinationDirectory, songDirectory);
 
-				//document.SongsRoot = songsDestination;
-				Helpers.ExportFiles(MyDocument.Questions.Select(q => q.FileName), songsDestination);
+				//Helpers.ExportFiles(MyDocument.Questions.Select(q => q.FileName), songsDestination);
+				ExportAllSongs(MyDocument.Questions, songsDestination);
 
 				// ドキュメント保存
 				MyDocument.SaveExport(fileName, songDirectory);
 			}
-			
+
 		}
 		#endregion
 
+		// (0.1.3)GrandMutusのHelperを使用するように変更．
 		#region *ルートディレクトリを設定(SetRootDirectory)
 		private void SetRootDirectory()
 		{
-			var directory = HyperMutus.Helpers.SelectSongsRoot(this.MyDocument.Questions.RootDirectory);
+			var directory = SelectSongsRoot(this.MyDocument.Questions.RootDirectory);
 			if (directory != null)
 			{
 				MyDocument.Questions.RootDirectory = directory;
@@ -812,7 +945,7 @@ namespace Aldentea.SweetMutus
 			{
 				var files = ((DataObject)e.Data).GetFileDropList();
 
-				for (int i=0; i<files.Count; i++)
+				for (int i = 0; i < files.Count; i++)
 				{
 					if (files[i].EndsWith(".mp3"))
 					{
@@ -842,7 +975,7 @@ namespace Aldentea.SweetMutus
 				}
 			}
 			MyDocument.AddQuestions(songFileNames, CurrentCategory);
-	
+
 		}
 
 		#endregion
@@ -850,15 +983,17 @@ namespace Aldentea.SweetMutus
 
 		#region 曲再生関連
 
-		#region *SongPlayerプロパティ
-		public HyperMutus.SongPlayer SongPlayer
+		// (0.1.3)SongPlayerクラスとの混同を避けるため，MySongPlayerプロパティに名称を変更．
+		// (0.1.3)GrandMutusのSongPlayerを使用するように変更．
+		#region *MySongPlayerプロパティ
+		public GrandMutus.Base.SongPlayer MySongPlayer
 		{
 			get
 			{
 				return _songPlayer;
 			}
 		}
-		HyperMutus.SongPlayer _songPlayer = new HyperMutus.SongPlayer();
+		SongPlayer _songPlayer = new SongPlayer();
 		#endregion
 
 
@@ -887,6 +1022,9 @@ namespace Aldentea.SweetMutus
 			{
 				this.labelDuration.Content = _songPlayer.Duration.Value;
 				this.sliderSeekSong.Maximum = _songPlayer.Duration.Value.TotalSeconds;
+				// 出題用
+				this.labelDuration_Play.Content = _songPlayer.Duration.Value;
+				this.sliderSeekSong_Play.Maximum = _songPlayer.Duration.Value.TotalSeconds;
 			}
 		}
 		#endregion
@@ -911,7 +1049,7 @@ namespace Aldentea.SweetMutus
 				_songPlayer.CurrentPosition = song.PlayPos;
 				_songPlayer.Play();
 
-				this.expanderSongPlayer.IsExpanded = true;	// ←これはここに書くべきものなのか？
+				this.expanderSongPlayer.IsExpanded = true;  // ←これはここに書くべきものなのか？
 			}
 		}
 
@@ -1012,7 +1150,7 @@ namespace Aldentea.SweetMutus
 				double sec;
 				if (Double.TryParse(e.Parameter.ToString(), out sec))
 				{
-				_songPlayer.CurrentPosition = _songPlayer.CurrentPosition.Add(TimeSpan.FromSeconds(sec));
+					_songPlayer.CurrentPosition = _songPlayer.CurrentPosition.Add(TimeSpan.FromSeconds(sec));
 				}
 			}
 		}
@@ -1057,6 +1195,21 @@ namespace Aldentea.SweetMutus
 		}
 		#endregion
 
+		// (0.1.3.1)
+		#region SetStopPosコマンド
+		void SetStopPos_Executed(object sender, ExecutedRoutedEventArgs e)
+		{
+			if (_songPlayer.CurrentState != SongPlayer.State.Inactive)
+			{
+				_currentSong.StopPos = _songPlayer.CurrentPosition;
+			}
+		}
+		#endregion
+
+		#region UpDownControlコマンドハンドラ
+
+		// このあたりはなんとかならないのかしら？
+
 		private void UpDownControl_UpClick(object sender, RoutedEventArgs e)
 		{
 			if (CurrentSong != null)
@@ -1090,9 +1243,263 @@ namespace Aldentea.SweetMutus
 			}
 		}
 
+		// (0.1.3.1)
+		private void UpDownControlStopPos_UpClick(object sender, RoutedEventArgs e)
+		{
+			if (CurrentSong != null)
+			{
+				CurrentSong.StopPos += TimeSpan.FromSeconds(0.1);
+			}
+		}
+
+		// (0.1.3.1)
+		private void UpDownControlStopPos_DownClick(object sender, RoutedEventArgs e)
+		{
+			if (CurrentSong != null)
+			{
+				var new_position = CurrentSong.StopPos.Add(TimeSpan.FromSeconds(-0.1));
+				CurrentSong.StopPos = new_position > TimeSpan.Zero ? new_position : TimeSpan.Zero;
+			}
+		}
+
+		#endregion
+
 		#endregion
 
 		//	#endregion
+
+		#region 出題関連
+
+		#region *CurrentPhaseプロパティ
+		/// <summary>
+		/// 現在の出題フェイズを取得します(setterはとりあえずprivateです)．
+		/// </summary>
+		public PlayingPhase CurrentPhase
+		{
+			get
+			{
+				return _currentPhase;
+			}
+			private set
+			{
+				if (_currentPhase != value)
+				{
+					_currentPhase = value;
+					NotifyPropertyChanged("CurrentPhase");
+				}
+			}
+		}
+		PlayingPhase _currentPhase = PlayingPhase.Talking;
+		#endregion
+
+		public SweetQuestionPlayer MyQuestionPlayer
+		{
+			get
+			{
+				return _questionPlayer;
+			}
+		}
+		SweetQuestionPlayer _questionPlayer = new SweetQuestionPlayer();
+
+		void InitializeQuestionPlayer()
+		{
+			_questionPlayer.MediaOpened += questionPlayer_MediaOpened;
+			_questionPlayer.QuestionStopped += questionPlayer_QuestionStopped;
+		}
+
+
+		#region *CurrentQuestionプロパティ
+		/// <summary>
+		/// 出題中の問題を取得します(setterはとりあえずprivateです)．
+		/// </summary>
+		public SweetQuestion CurrentQuestion
+		{
+			get
+			{
+				return _currentQuestion;
+			}
+			private set
+			{
+				if (_currentQuestion != value)
+				{
+					_currentQuestion = value;
+					NotifyPropertyChanged("CurrentQuestion");
+				}
+			}
+		}
+		SweetQuestion _currentQuestion;
+		#endregion
+
+		#region コマンドハンドラ
+
+		//MediaClock _clock;
+		//MediaClock _followClock;
+		//MediaTimeline _questionTimeLine;
+		//MediaPlayer _questionMediaPlayer = new MediaPlayer();
+		//ClockController _questionClockController;
+
+		#region NextQuestion
+		void NextQuestion_Executed(object sender, ExecutedRoutedEventArgs e)
+		{
+			// どうにかして問題を決定．
+			//MyDocument.FindQuestion();
+
+			// とりあえず安易に...
+			var nextQuestion = dataGridQuestions.SelectedItem as SweetQuestion;
+			if (nextQuestion != null)
+			{
+				MyDocument.AddOrder(nextQuestion.ID);
+			}
+		}
+
+		void NextQuestion_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+		{
+			e.CanExecute = this.CurrentPhase == PlayingPhase.Talking;
+		}
+
+
+		private void questionPlayer_MediaOpened(object sender, EventArgs e)
+		{
+			sliderSeekSong_Play.Maximum = MyQuestionPlayer.Duration.TotalSeconds;
+		}
+
+		#endregion
+
+		#region Start
+		void StartQuestion_Executed(object sender, ExecutedRoutedEventArgs e)
+		{
+			MyQuestionPlayer.Start();
+			CurrentPhase = PlayingPhase.Playing;
+		}
+
+		void StartQuestion_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+		{
+			e.CanExecute = this.CurrentPhase == PlayingPhase.Ready; // CurrentQuestion must not be null.
+		}
+		#endregion
+
+		#region Stop
+		void StopQuestion_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+		{
+			e.CanExecute = this.CurrentPhase == PlayingPhase.Playing; // CurrentQuestion must not be null.
+		}
+
+		void StopQuestion_Executed(object sender, ExecutedRoutedEventArgs e)
+		{
+			//MySongPlayer.Pause();
+			MyQuestionPlayer.Stop();
+		}
+
+
+		private void questionPlayer_QuestionStopped(object sender, EventArgs e)
+		{
+			CurrentPhase = PlayingPhase.Thinking;
+		}
+
+		#endregion
+
+		#region Judge
+		void Judge_Executed(object sender, ExecutedRoutedEventArgs e)
+		{
+
+			// 得点とかの処理．
+			var code = (string)e.Parameter;
+			if (code == "×")
+			{
+				MyDocument.AddLog("×", -1);
+			}
+			else
+			{
+				MyDocument.AddLog("○", 1);
+			}
+
+			// 以下，フォロー再生．
+			// ※停止位置設定を行う．
+
+			//MySongPlayer.Play();
+			//_clock.Controller.Resume();
+			//_questionMediaPlayer.Clock = _followClock;
+			MyQuestionPlayer.Follow();
+
+			CurrentPhase = PlayingPhase.Talking;
+		}
+
+		void Judge_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+		{
+			e.CanExecute = this.CurrentPhase == PlayingPhase.Thinking; // CurrentQuestion must not be null.
+		}
+		#endregion
+
+		#region SeekSabi
+
+		void Play_SeekSabi_Executed(object sender, ExecutedRoutedEventArgs e)
+		{
+			MyQuestionPlayer.CurrentPosition = CurrentQuestion.SabiPos;
+		}
+
+		void Play_SongPlayer_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+		{
+			e.CanExecute = CurrentPhase == PlayingPhase.Judged || CurrentPhase == PlayingPhase.Talking;
+			e.Handled = true;
+		}
+
+		#endregion
+
+
+		#region SwitchPlayPauseコマンド
+
+		void Play_SwitchPlayPause_Executed(object sender, ExecutedRoutedEventArgs e)
+		{
+			if (CurrentMode == WindowMode.Play
+								&& (CurrentPhase == PlayingPhase.Judged || CurrentPhase == PlayingPhase.Talking))
+			{
+				MyQuestionPlayer.SwitchPlayPause();
+			}
+		}
+
+		void Play_SwitchPlayPause_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+		{
+			e.CanExecute = CurrentMode == WindowMode.Play
+					&& (CurrentPhase == PlayingPhase.Judged || CurrentPhase == PlayingPhase.Talking);
+			e.Handled = true;
+		}
+
+		#endregion
+
+		#endregion
+
+		#region イベントハンドラ
+
+		// (0.2.0.2)
+		#region *Order追加時
+		private void MyDocument_OrderAdded(object sender, GrandMutus.Data.OrderEventArgs e)
+		{
+			var q_id = e.QuestionID;
+			if (q_id.HasValue)
+			{
+				var nextQuestion = MyDocument.Questions.Get(q_id.Value);
+				this.CurrentQuestion = nextQuestion;
+				MyQuestionPlayer.Open(nextQuestion);
+				this.CurrentPhase = PlayingPhase.Ready;
+			}
+		}
+		#endregion
+
+		// (0.2.0.2)
+		#region *Order削除時
+		private void MyDocument_OrderRemoved(object sender, GrandMutus.Data.OrderEventArgs e)
+		{
+			this.CurrentPhase = PlayingPhase.Talking;
+			MyQuestionPlayer.Close();
+			this.CurrentQuestion = null;
+		}
+		#endregion
+
+		#endregion
+
+		#endregion
+
+
 
 		#region INotifyPropertyChanged実装
 
@@ -1103,8 +1510,8 @@ namespace Aldentea.SweetMutus
 			this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
 		}
 		#endregion
-
 	}
 	#endregion
+
 
 }

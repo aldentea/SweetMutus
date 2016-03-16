@@ -3,7 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:Aldentea.SweetMutus"
+  			xmlns:base="clr-namespace:Aldentea.SweetMutus.Base;assembly=SweetMutusBase"
         mc:Ignorable="d"
         Title="曲をインポートする" Height="600" Width="300">
   <Window.CommandBindings>
@@ -39,7 +39,7 @@
     <DockPanel Grid.Row="2" FlowDirection="RightToLeft">
 			<Button Content="OK" Padding="20,5" Margin="10,5" IsDefault="True" Command="Close" />
       <Button Content="インポート" Padding="20,5" Margin="10,5"
-							Command="{x:Static local:Commands.ImportCommand}"
+							Command="{x:Static base:Commands.ImportCommand}"
 							CommandParameter="{Binding ElementName=dataGridSongs, Path=SelectedItems}" />
     </DockPanel>
   </Grid>

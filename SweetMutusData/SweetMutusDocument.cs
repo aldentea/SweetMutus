@@ -40,7 +40,8 @@ namespace Aldentea.SweetMutus.Data
 		XmlWriterSettings _xmlWriterSettings;
 		#endregion
 
-		// (0.3.3)Questions関連処理を追加。
+		// (0.2.3)UndoCompletedイベントを拾うように改良．
+		// (*0.3.3)Questions関連処理を追加。
 		#region *コンストラクタ(SweetMutusDocument)
 		public SweetMutusDocument()
 		{
@@ -49,7 +50,9 @@ namespace Aldentea.SweetMutus.Data
 			//_questions.QuestionsRemoved += Questions_QuestionsRemoved;
 			_questions.ItemChanged += Songs_ItemChanged;
 			_questions.RootDirectoryChanged += Questions_RootDirectoryChanged;
-			_questions.QuestionNoChanged += Questions_QuestionNoChanged;
+			//_questions.QuestionNoChanged += Questions_QuestionNoChanged;
+			_questions.QuestionNoChangeCompleted += Questions_QuestionNoChanged;
+			this.UndoCompleted += SweetMutusDocument_UndoCompleted;
 
 			// カレントカテゴリ関連
 			//this.Opened += SweetMutusDocument_Opened;
@@ -73,19 +76,41 @@ namespace Aldentea.SweetMutus.Data
 			if (operationCache != null)
 			{
 				this.AddOperationHistory(operationCache);
-				if (operationCache is QuestionCategoryChangedCache)
-				{
-					this.QuestionCategoryChanged(this, EventArgs.Empty);
-				}
 				// ★ここに書くと，Undoのときにイベントが発生しないのでは...
-				if (operationCache is QuestionNoChangedCache)
-				{
-					this.QuestionNoChanged(this, EventArgs.Empty);
-				}
+				// →実際，発生しないので，その場合はSweetMutusDocument_UndoCompletedから同じ処理を呼び出す．
+				NotifyOperation(operationCache);
 			}
 		}
 		#endregion
 
+		// (0.2.3)
+		protected void NotifyOperation(IOperationCache operationCache)
+		{
+			if (operationCache is QuestionCategoryChangedCache)
+			{
+				this.QuestionCategoryChanged(this, EventArgs.Empty);
+			}
+			if (operationCache is QuestionNoChangedCache)
+			{
+				this.QuestionNoChanged(this, EventArgs.Empty);
+			}
+		}
+
+		/// <summary>
+		/// 問題のカテゴリ変更があったときに発生します。
+		/// </summary>
+		public event EventHandler QuestionCategoryChanged = delegate { };
+
+		/// <summary>
+		/// 問題のNo変更があったときに発生します。
+		/// </summary>
+		public event EventHandler QuestionNoChanged = delegate { };
+
+		// (0.2.3)
+		private void SweetMutusDocument_UndoCompleted(object sender, UndoCompletedEventArgs e)
+		{
+			NotifyOperation(e.OperationCache);
+		}
 
 		#region 曲関連
 
@@ -316,16 +341,6 @@ namespace Aldentea.SweetMutus.Data
 		}
 		#endregion
 
-		/// <summary>
-		/// 問題のカテゴリ変更があったときに発生します。
-		/// </summary>
-		public event EventHandler QuestionCategoryChanged = delegate { };
-
-		/// <summary>
-		/// 問題のNo変更があったときに発生します。
-		/// </summary>
-		public event EventHandler QuestionNoChanged = delegate { };
-
 		#endregion
 
 
@@ -340,6 +355,7 @@ namespace Aldentea.SweetMutus.Data
 		const string VERSION_ATTERIBUTE = "version";
 		const string SWEET_ELEMENT_NAME = "sweet";
 
+		// (0.3.0)sweet要素を生成する部分を，GenerateSweetMutusElementに分離．
 		// (0.0.1)エクスポートの場合に対応したつもりです．
 		#region *XMLを生成(GenerateXML)
 		/// <summary>
@@ -352,13 +368,29 @@ namespace Aldentea.SweetMutus.Data
 		public XDocument GenerateXml(string destination_directory, string exported_songs_root = null)
 		{
 			XDocument xdoc = new XDocument(new XElement(ROOT_ELEMENT_NAME, new XAttribute(VERSION_ATTERIBUTE, "3.0")));
-			XElement sweet = new XElement(SWEET_ELEMENT_NAME);
-			sweet.Add(Questions.GenerateElement(destination_directory, exported_songs_root));
+			XElement sweet = GenerateSweetMutusElement(destination_directory, exported_songs_root);
 			xdoc.Root.Add(sweet);
 			return xdoc;
 		}
 		#endregion
 
+		// (0.3.0)
+		#region *[virtual]sweet要素を生成(GenerateSweetMutusElement)
+		/// <summary>
+		/// sweet要素を生成します．
+		/// </summary>
+		/// <param name="destination_directory"></param>
+		/// <param name="exported_songs_root"></param>
+		/// <returns></returns>
+		protected virtual XElement GenerateSweetMutusElement(string destination_directory, string exported_songs_root = null)
+		{
+			XElement sweet = new XElement(SWEET_ELEMENT_NAME);
+			sweet.Add(Questions.GenerateElement(destination_directory, exported_songs_root));
+			return sweet;
+		}
+		#endregion
+
+		// (0.3.0) ログとかは未対応．
 		// (0.1.1)
 		#region *HyperMutusのXMLを生成(GenerateMtuXML)
 		/// <summary>
@@ -486,6 +518,7 @@ namespace Aldentea.SweetMutus.Data
 		}
 		#endregion
 
+		// (0.3.0)LoadElementsメソッドを分離．
 		bool? TryLoadSweetMutusDocument(XElement root, string fileDirectory)
 		{
 			var sweet = root.Element(SWEET_ELEMENT_NAME);
@@ -495,7 +528,7 @@ namespace Aldentea.SweetMutus.Data
 				NowLoading = true;
 				try
 				{
-					this.Questions.LoadElement(sweet.Element(SweetQuestionsCollection.ELEMENT_NAME), fileDirectory);
+					LoadElements(sweet, fileDirectory);
 				}
 				finally
 				{
@@ -508,6 +541,14 @@ namespace Aldentea.SweetMutus.Data
 				return null;
 			}
 		}
+
+		// (0.3.0)
+		protected virtual void LoadElements(XElement sweet, string fileDirectory)
+		{
+			this.Questions.LoadElement(sweet.Element(SweetQuestionsCollection.ELEMENT_NAME), fileDirectory);
+		}
+
+		#region GrandMutusドキュメント用
 
 		bool? TryLoadGrandMutusDocument(XElement root, string fileName)
 		{
@@ -559,6 +600,8 @@ namespace Aldentea.SweetMutus.Data
 			finally { NowLoading = false; }
 			return true;
 		}
+
+		#endregion
 
 		#region *[override]ファイルに保存(SaveDocument)
 		protected override bool SaveDocument(string destination)

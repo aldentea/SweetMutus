@@ -1,16 +1,17 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{A593175E-E42B-4000-ACDE-C63FD4A0D2F7}</ProjectGuid>
+    <ProjectGuid>{B4CDA394-9D55-4281-9597-AE1E432EAD38}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Aldentea.SweetMutus.Data</RootNamespace>
-    <AssemblyName>SweetMutusData</AssemblyName>
+    <RootNamespace>Aldentea.SweetMutus.Base</RootNamespace>
+    <AssemblyName>SweetMutusBase</AssemblyName>
     <TargetFrameworkVersion>v4.5.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -30,39 +31,49 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="AldenteaWpfDocument">
-      <HintPath>..\external\AldenteaWpfDocument.dll</HintPath>
-    </Reference>
-    <Reference Include="AldenteMP3TagAccessor">
-      <HintPath>..\external\AldenteMP3TagAccessor.dll</HintPath>
-    </Reference>
-    <Reference Include="AldenteMP3TagBase">
-      <HintPath>..\external\AldenteMP3TagBase.dll</HintPath>
-    </Reference>
-    <Reference Include="AldenteRIFFBase">
-      <HintPath>..\external\AldenteRIFFBase.dll</HintPath>
-    </Reference>
     <Reference Include="GrandMutusData">
       <HintPath>..\external\GrandMutusData.dll</HintPath>
     </Reference>
-    <Reference Include="RIFFMP3Tag">
-      <HintPath>..\external\RIFFMP3Tag.dll</HintPath>
+    <Reference Include="MutusBase">
+      <HintPath>..\external\MutusBase.dll</HintPath>
     </Reference>
+    <Reference Include="PresentationCore" />
+    <Reference Include="PresentationFramework" />
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Xaml" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
+    <Reference Include="System.Net.Http" />
     <Reference Include="System.Xml" />
+    <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="SweetMutusDocument.cs" />
+    <Compile Include="ChangeFileNameDialog.xaml.cs">
+      <DependentUpon>ChangeFileNameDialog.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Commands.cs" />
+    <Compile Include="Converters.cs" />
+    <Compile Include="Helpers.cs" />
+    <Compile Include="PlayingPhase.cs" />
+    <Compile Include="QuestionColumnsVisivility.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="SweetMutusGameDocument.cs" />
-    <Compile Include="SweetQuestion.cs" />
-    <Compile Include="SweetQuestionsCache.cs" />
-    <Compile Include="SweetQuestionsCollection.cs" />
+    <Compile Include="SweetQuestionPlayer.cs" />
+    <Compile Include="WindowMode.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Page Include="ChangeFileNameDialog.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\SweetMutusData\SweetMutusData.csproj">
+      <Project>{a593175e-e42b-4000-acde-c63fd4a0d2f7}</Project>
+      <Name>SweetMutusData</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

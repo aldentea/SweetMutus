@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SweetMutus", "SweetMutus\Sw
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SweetMutusData", "SweetMutusData\SweetMutusData.csproj", "{A593175E-E42B-4000-ACDE-C63FD4A0D2F7}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SweetMutusBase", "SweetMutusBase\SweetMutusBase.csproj", "{B4CDA394-9D55-4281-9597-AE1E432EAD38}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{A593175E-E42B-4000-ACDE-C63FD4A0D2F7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A593175E-E42B-4000-ACDE-C63FD4A0D2F7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A593175E-E42B-4000-ACDE-C63FD4A0D2F7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B4CDA394-9D55-4281-9597-AE1E432EAD38}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B4CDA394-9D55-4281-9597-AE1E432EAD38}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B4CDA394-9D55-4281-9597-AE1E432EAD38}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B4CDA394-9D55-4281-9597-AE1E432EAD38}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

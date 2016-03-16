@@ -5,12 +5,12 @@ using System.Runtime.InteropServices;
 // アセンブリに関する一般情報は以下の属性セットをとおして制御されます。
 // アセンブリに関連付けられている情報を変更するには、
 // これらの属性値を変更してください。
-[assembly: AssemblyTitle("SweetMutusData")]
+[assembly: AssemblyTitle("SweetMutusBase")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("SweetMutusData")]
-[assembly: AssemblyCopyright("Copyright © aldentea 2015")]
+[assembly: AssemblyProduct("SweetMutusBase")]
+[assembly: AssemblyCopyright("Copyright © aldentea 2016")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -19,18 +19,18 @@ using System.Runtime.InteropServices;
 // その型の ComVisible 属性を true に設定してください。
 [assembly: ComVisible(false)]
 
-// 次の GUID は、このプロジェクトが COM に公開される場合の、typelib の ID です
-[assembly: Guid("106e8563-1dc8-4f4c-9b44-73f44d659382")]
+// このプロジェクトが COM に公開される場合、次の GUID が typelib の ID になります
+[assembly: Guid("b4cda394-9d55-4281-9597-ae1e432ead38")]
 
-// アセンブリのバージョン情報は、以下の 4 つの値で構成されています:
+// アセンブリのバージョン情報は次の 4 つの値で構成されています:
 //
-//      Major Version
-//      Minor Version 
-//      Build Number
+//      メジャー バージョン
+//      マイナー バージョン
+//      ビルド番号
 //      Revision
 //
 // すべての値を指定するか、下のように '*' を使ってビルドおよびリビジョン番号を 
 // 既定値にすることができます:
 // [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("0.3.1.2")]
-[assembly: AssemblyFileVersion("0.3.1.2")]
+[assembly: AssemblyVersion("0.1.3.3")]
+[assembly: AssemblyFileVersion("0.1.3.3")]
