@@ -24,6 +24,8 @@ namespace Aldentea.SweetMutus.Data
 
 		#region Songのコピペ
 
+		#region ISong実装
+
 		// (0.2.2.2)get時にnullを返さない(string.Emptyを返す)ように修正。
 		#region *Titleプロパティ
 		/// <summary>
@@ -123,6 +125,8 @@ namespace Aldentea.SweetMutus.Data
 			}
 		}
 		TimeSpan _sabiPos = TimeSpan.Zero;
+		#endregion
+
 		#endregion
 
 		// (*0.3.0)Parentがnullの場合の対策をしておく(OnAddTo(null)が呼ばれるときにまずいことになったので)．
@@ -274,6 +278,18 @@ namespace Aldentea.SweetMutus.Data
 		#endregion
 
 		#endregion
+
+
+		// 正解とか出題曲表示用の文字列ってどう実装します？
+		// ToString()を使えば簡単なんだけど，それはデバッグ用に限った方がいいという考えもあるみたいなので，
+		// なにかそれ用のプロパティを用意する方向で考えてみましょう．
+		public override string Answer
+		{
+			get
+			{
+				return $"{Title} / {Artist}";	// C# 6.0 の記法を使ってみる．
+			}
+		}
 
 
 		#region XML入出力関連

@@ -119,10 +119,6 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Page Include="ChangeFileNameDialog.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
     <Page Include="ImportDialog.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -135,12 +131,6 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="ChangeFileNameDialog.xaml.cs">
-      <DependentUpon>ChangeFileNameDialog.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Commands.cs" />
-    <Compile Include="Converters.cs" />
-    <Compile Include="Helpers.cs" />
     <Compile Include="ImportDialog.xaml.cs">
       <DependentUpon>ImportDialog.xaml</DependentUpon>
     </Compile>
@@ -177,6 +167,10 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\SweetMutusBase\SweetMutusBase.csproj">
+      <Project>{b4cda394-9d55-4281-9597-ae1e432ead38}</Project>
+      <Name>SweetMutusBase</Name>
+    </ProjectReference>
     <ProjectReference Include="..\SweetMutusData\SweetMutusData.csproj">
       <Project>{a593175e-e42b-4000-acde-c63fd4a0d2f7}</Project>
       <Name>SweetMutusData</Name>

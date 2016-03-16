@@ -95,6 +95,7 @@
   <ItemGroup>
     <Compile Include="SweetMutusDocument.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SweetMutusGameDocument.cs" />
     <Compile Include="SweetQuestion.cs" />
     <Compile Include="SweetQuestionsCache.cs" />
     <Compile Include="SweetQuestionsCollection.cs" />

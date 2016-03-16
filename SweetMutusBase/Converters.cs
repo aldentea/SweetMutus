@@ -1,13 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
+using System.Globalization;
 using System.Windows.Data;
 
-namespace Aldentea.SweetMutus
+namespace Aldentea.SweetMutus.Base
 {
+	// (0.1.3.1)SweetMutusBaseに移動．
 
 	// (0.0.4)
 	#region DurationConverterクラス
@@ -113,5 +110,51 @@ namespace Aldentea.SweetMutus
 		}
 	}
 	#endregion
+
+
+	// (0.1.3.1)
+	#region EqualsConverterクラス
+	public class EqualsConverter : IValueConverter
+	{
+		public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+		{
+			return value.Equals(parameter);
+		}
+
+		public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+		{
+			throw new NotImplementedException();
+		}
+	}
+	#endregion
+
+	// (0.2.0)うーん...
+	public class FreePlayConverter : IValueConverter
+	{
+		public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+		{
+			if (value is PlayingPhase)
+			{
+				switch ((PlayingPhase)value)
+				{
+					case PlayingPhase.Judged:
+					case PlayingPhase.Talking:
+						return true;
+					default:
+						return false;
+				}
+			}
+			else
+			{
+				throw new ArgumentException("FreePlayConverterは、PlayingPhase型に対してのみ使えます。");
+			}
+		}
+
+		public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+		{
+			throw new NotImplementedException();
+		}
+
+	}
 
 }
