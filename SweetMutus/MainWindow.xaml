@@ -217,6 +217,12 @@
 						</Binding>
 					</MenuItem.IsChecked>
 				</MenuItem>
+				<MenuItem Header="リハーサル" IsCheckable="True">
+					<MenuItem.IsChecked>
+						<Binding Path="IsRehearsal">
+						</Binding>
+					</MenuItem.IsChecked>
+				</MenuItem>
 			</MenuItem>
 		</Menu>
 

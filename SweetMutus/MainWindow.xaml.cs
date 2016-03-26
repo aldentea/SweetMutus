@@ -87,6 +87,25 @@ namespace Aldentea.SweetMutus
 		WindowMode _currentMode = WindowMode.Edit;
 		#endregion
 
+		// (0.2.2)
+		#region *IsRehearsalプロパティ
+		public bool IsRehearsal
+		{
+			get
+			{
+				return MyDocument.IsRehearsal;
+			}
+			set
+			{
+				if (MyDocument.IsRehearsal != value)
+				{
+					MyDocument.IsRehearsal = value;
+					NotifyPropertyChanged("IsRehearsal");
+				}
+			}
+		}
+		#endregion
+
 		// データバインディングで実装する前の，仮実装の置き場？
 		void UpdateUI()
 		{
