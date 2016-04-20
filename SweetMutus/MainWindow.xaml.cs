@@ -913,7 +913,7 @@ namespace Aldentea.SweetMutus
 				string songsDestination = songDirectory == null ? destinationDirectory : System.IO.Path.Combine(destinationDirectory, songDirectory);
 
 				//Helpers.ExportFiles(MyDocument.Questions.Select(q => q.FileName), songsDestination);
-				ExportAllSongs(MyDocument.Questions, songsDestination);
+				ExportAllSongs(MyDocument.Questions, songsDestination, FileOverwriting.IfNew, false);
 
 				// ドキュメント保存
 				MyDocument.SaveExport(fileName, songDirectory);
