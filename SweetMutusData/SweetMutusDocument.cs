@@ -293,6 +293,19 @@ namespace Aldentea.SweetMutus.Data
 		}
 		#endregion
 
+		// (0.3.3)
+		/// <summary>
+		/// カテゴリと出題順から、問題を取得します。
+		/// 該当するものがない場合はnullを返します。
+		/// </summary>
+		/// <param name="category"></param>
+		/// <param name="no"></param>
+		/// <returns></returns>
+		public SweetQuestion GetQuestion(string category, int no)
+		{
+			return _questions.FirstOrDefault(q => { return q.Category == category && q.No == no; });
+		}
+
 		// (*0.4.1)
 		#region *問題を追加(AddQuestions)
 		/// <summary>
