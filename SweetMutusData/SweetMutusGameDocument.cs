@@ -33,6 +33,30 @@ namespace Aldentea.SweetMutus.Data
 		public event EventHandler<OrderEventArgs> OrderAdded = delegate { };
 		public event EventHandler<OrderEventArgs> OrderRemoved = delegate { };
 
+		// (0.3.2)
+		#region *IsRehearsalプロパティ
+		/// <summary>
+		/// リハーサルモードであるかどうかの値を取得／設定します。
+		/// リハーサルモードの場合は、出題関連の操作についてダーティフラグが立ちません。
+		/// </summary>
+		public bool IsRehearsal
+		{
+			get
+			{
+				return this._isRehearsal;
+			}
+			set
+			{
+				if (this.IsRehearsal != value)
+				{
+					this._isRehearsal = value;
+					NotifyPropertyChanged("IsRehearsal");
+				}
+			}
+		}
+		bool _isRehearsal = true;
+		#endregion
+
 		// (0.3.0)
 		protected override void InitializeDocument()
 		{
@@ -43,13 +67,17 @@ namespace Aldentea.SweetMutus.Data
 
 		#region ログ関連
 
+		// (0.3.2)リハーサルモードを実装。
 		// (0.3.0)
 		public void AddOrder(int? questionID)
 		{
 			if (questionID.HasValue)
 			{
 				Logs.AddOrder(questionID.Value);
-				AddOperationHistory(new AddOrderCache(this, questionID));
+				if (!IsRehearsal)
+				{
+					AddOperationHistory(new AddOrderCache(this, questionID));
+				}
 			}
 			else
 			{
@@ -64,11 +92,15 @@ namespace Aldentea.SweetMutus.Data
 		//	return Logs.AddFirstOrder();
 		//}
 
+		// (0.3.2)リハーサルモードを実装。
 		// (0.3.0)
 		public void RemoveOrder()
 		{
 			int? questionID = Logs.RemoveOrder();
-			AddOperationHistory(new RemoveOrderCache(this, questionID));
+			if (!IsRehearsal)
+			{
+				AddOperationHistory(new RemoveOrderCache(this, questionID));
+			}
 			this.OrderRemoved(this, new OrderEventArgs(null));
 		}
 
