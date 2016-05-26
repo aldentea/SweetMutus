@@ -87,6 +87,25 @@ namespace Aldentea.SweetMutus
 		WindowMode _currentMode = WindowMode.Edit;
 		#endregion
 
+		// (0.2.2)
+		#region *IsRehearsalプロパティ
+		public bool IsRehearsal
+		{
+			get
+			{
+				return MyDocument.IsRehearsal;
+			}
+			set
+			{
+				if (MyDocument.IsRehearsal != value)
+				{
+					MyDocument.IsRehearsal = value;
+					NotifyPropertyChanged("IsRehearsal");
+				}
+			}
+		}
+		#endregion
+
 		// データバインディングで実装する前の，仮実装の置き場？
 		void UpdateUI()
 		{
@@ -894,7 +913,7 @@ namespace Aldentea.SweetMutus
 				string songsDestination = songDirectory == null ? destinationDirectory : System.IO.Path.Combine(destinationDirectory, songDirectory);
 
 				//Helpers.ExportFiles(MyDocument.Questions.Select(q => q.FileName), songsDestination);
-				ExportAllSongs(MyDocument.Questions, songsDestination);
+				ExportAllSongs(MyDocument.Questions, songsDestination, FileOverwriting.IfNew, false);
 
 				// ドキュメント保存
 				MyDocument.SaveExport(fileName, songDirectory);
