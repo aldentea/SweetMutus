@@ -346,11 +346,12 @@ namespace Aldentea.SweetMutus.Data
 		}
 		#endregion
 
+		// (0.4.0) GrandMutusDataのSongsRootDirectoryChangedCacheを使うように変更。
 		// (*0.4.4)
 		#region *曲のルートディレクトリ変更時(Questions_RootDirectoryChanged)
 		void Questions_RootDirectoryChanged(object sender, ValueChangedEventArgs<string> e)
 		{
-			this.AddOperationHistory(new RootDirectoryChangedCache(this.Questions, e.PreviousValue, e.CurrentValue));
+			this.AddOperationHistory(new SongsRootDirectoryChangedCache(this.Questions, e.PreviousValue, e.CurrentValue));
 		}
 		#endregion
 

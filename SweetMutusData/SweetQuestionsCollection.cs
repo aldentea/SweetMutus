@@ -12,7 +12,8 @@ using Aldentea.Wpf.Document;
 
 namespace Aldentea.SweetMutus.Data
 {
-	public class SweetQuestionsCollection : ObservableCollection<SweetQuestion>
+	// (0.4.0)ISongsCollectionインターフェイスを追加。
+	public class SweetQuestionsCollection : ObservableCollection<SweetQuestion>, ISongsCollection
 	{
 
 		#region QuestionsCollectionのコピペ

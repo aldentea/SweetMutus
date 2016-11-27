@@ -110,7 +110,8 @@ namespace Aldentea.SweetMutus.Data
 	}
 	#endregion
 
-
+	// (0.4.0)GrandMutusDataのSongsRootDirectoryChangedクラスに統一。
+/*
 	#region RootDirectoryChangedCacheクラス
 	public class RootDirectoryChangedCache : GrandMutus.Data.PropertyChangedCache<string>
 	{
@@ -143,7 +144,7 @@ namespace Aldentea.SweetMutus.Data
 
 	}
 	#endregion
-
+	*/
 
 	// 以下，個々のアイテムの変更用．
 
