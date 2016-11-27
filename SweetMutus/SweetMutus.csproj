@@ -46,7 +46,7 @@
       <HintPath>..\external\AldenteaWpfDocument.dll</HintPath>
     </Reference>
     <Reference Include="AldenteaWpfUtility">
-      <HintPath>..\..\GrandMutus\GrandMutusClassic\external\AldenteaWpfUtility.dll</HintPath>
+      <HintPath>..\..\BaramakiMutus\external\AldenteaWpfUtility.dll</HintPath>
     </Reference>
     <Reference Include="GrandMutusBase">
       <HintPath>..\external\GrandMutusBase.dll</HintPath>
