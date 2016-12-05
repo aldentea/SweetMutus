@@ -336,6 +336,24 @@ namespace Aldentea.SweetMutus.Data
 		}
 		#endregion
 
+		// (0.4.2)
+		#region *問題リストをテキスト出力(ExportQuestionsList)
+		public void ExportQuestionsList(StreamWriter writer)
+		{
+			// TSVで出力する。
+			// id, category, no, title, artistの順。
+
+			// WriteLine以外はQuestionsCollectionsクラスでやった方がいいのかなぁ？
+			foreach (var category in Questions.Categories)
+			{
+				foreach (var question in Questions.Where(q => q.Category == category).OrderBy(q => q.No))
+				{
+					writer.WriteLine($"{question.ID}	{question.Category}	{question.No}	{question.Title}	{question.Artist}");
+				}
+			}
+		}
+		#endregion
+
 
 		// (*0.4.5.1)
 		#region *Questionの番号変更時(Questions_NoChanged)

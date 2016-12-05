@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Text;
 
 using Aldentea.Wpf.Application;
 using System.ComponentModel;
@@ -1529,7 +1530,21 @@ namespace Aldentea.SweetMutus
 			this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
 		}
 		#endregion
-	}
+
+		// (0.2.4) とりあえずイベントハンドラで実装する。
+		private void MenuItemExportQuestionsList_Click(object sender, RoutedEventArgs e)
+	{
+			var dialog = new Microsoft.Win32.SaveFileDialog();
+			if (dialog.ShowDialog() == true)
+			{
+				Encoding encoding = Encoding.UTF8;
+				using (var writer = new System.IO.StreamWriter(dialog.FileName, false, Encoding.UTF8))
+				{
+					MyDocument.ExportQuestionsList(writer);
+				}
+			}
+		}
+		}
 	#endregion
 
 
