@@ -148,11 +148,17 @@ namespace Aldentea.SweetMutus.Data
 			}
 		}
 
+		// (0.4.1)internalだったけどpublicにしておく。
+		// SweetQuestionsCollectionから呼び出されるため。
+		// いや、それだけならいいんだけど、SweetQuestionを継承して、
+		// SweetQuestionsCollectionsに相当するものを実装すると、
+		// どうにも呼び出せなくなった。
+
 		// (*0.4.3)
 		/// <summary>
 		/// RelativeFileNameプロパティが変更になりうる場合を通知します．
 		/// </summary>
-		internal void UpdateRelativeFileName()
+		public void UpdateRelativeFileName()
 		{
 			this.NotifyPropertyChanged("RelativeFileName");
 		}

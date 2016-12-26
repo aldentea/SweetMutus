@@ -181,7 +181,8 @@
 				</MenuItem>
 				<MenuItem Header="ホームフォルダ変更(_H)" Command="{x:Static grand:Commands.SetRootDirectoryCommand}" />
         <MenuItem Header="インポート(_I)" Command="{x:Static base:Commands.ImportCommand}" />
-      </MenuItem>
+				<MenuItem Header="テキスト出力(_L)..." Click="MenuItemExportQuestionsList_Click" />
+			</MenuItem>
 			<MenuItem Header="表示(_V)">
 				<MenuItem Name="menuItemCategoryVisible" Header="カテゴリ" IsCheckable="True" IsChecked="False" />
 				<Separator />
