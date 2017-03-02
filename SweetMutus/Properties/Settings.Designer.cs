@@ -141,5 +141,17 @@ namespace Aldentea.SweetMutus.Properties {
                 this["KeyGestures"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool AutoNext {
+            get {
+                return ((bool)(this["AutoNext"]));
+            }
+            set {
+                this["AutoNext"] = value;
+            }
+        }
     }
 }
