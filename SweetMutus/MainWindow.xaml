@@ -196,6 +196,8 @@
 									IsChecked="{Binding ElementName=questionsSabiPosColumn, Path=Visibility, Converter={StaticResource fileNameVisibilityConverter}}" />
 				<MenuItem Name="menuItemStopPosColumnVisible" Header="停止位置列" IsCheckable="True"
 									IsChecked="{Binding ElementName=questionsStopPosColumn, Path=Visibility, Converter={StaticResource fileNameVisibilityConverter}}" />
+				<MenuItem Name="menuItemMemoColumnVisible" Header="メモ列" IsCheckable="True"
+									IsChecked="{Binding ElementName=questionsMemoColumn, Path=Visibility, Converter={StaticResource fileNameVisibilityConverter}}" />
 			</MenuItem>
 			<MenuItem Header="曲再生(_P)">
 				<MenuItem Header="再生開始" Command="Play"
@@ -334,6 +336,8 @@
 							</Binding>
 						</DataGridTextColumn.Binding>
 					</DataGridTextColumn>
+					<DataGridTextColumn Header="メモ" Binding="{Binding Path=Memo}" Width="*"
+															Visibility="Collapsed" x:Name="questionsMemoColumn"/>
 				</DataGrid.Columns>
 				<DataGrid.CommandBindings>
 					<CommandBinding Command="Delete"

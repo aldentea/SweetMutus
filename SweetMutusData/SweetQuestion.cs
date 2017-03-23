@@ -297,6 +297,26 @@ namespace Aldentea.SweetMutus.Data
 			}
 		}
 
+		// (0.4.3)
+		// ※とりあえずSweetQuestionに置く。あとで親クラスに移す。
+		#region *Memoプロパティ
+		public string Memo
+		{
+			get
+			{
+				return _memo;
+			}
+			set
+			{
+				if (Memo != value)
+				{
+					_memo = value;
+					NotifyPropertyChanged("Memo");
+				}
+			}
+		}
+		string _memo = string.Empty;
+		#endregion
 
 		#region XML入出力関連
 
@@ -316,6 +336,9 @@ namespace Aldentea.SweetMutus.Data
 		const string FILE_NAME_ELEMENT = "file_name";
 		const string SABI_POS_ATTRIBUTE = "sabi_pos";
 
+		const string MEMO_ELEMENT = "memo";
+
+		// (0.4.3)memo要素を出力。
 		// (0.3.2)sabi_pos要素を出力．
 		#region *XML要素を生成(GenerateElement)
 		/// <summary>
@@ -326,7 +349,8 @@ namespace Aldentea.SweetMutus.Data
 		public XElement GenerateElement(string songs_root, bool exporting = false)
 		{
 			var element = new XElement(ELEMENT_NAME,
-				new XAttribute(ID_ATTRIBUTE, this.ID)
+				new XAttribute(ID_ATTRIBUTE, this.ID),
+				new XElement(MEMO_ELEMENT, this.Memo)
 			);
 			return AddSongProperty(AddIntroQuestionProperty(element), songs_root, exporting);
 		}
@@ -358,7 +382,7 @@ namespace Aldentea.SweetMutus.Data
 
 		XElement AddIntroQuestionProperty(XElement element)
 		{
-			// ※IDやSongIDはここでは追加しない！
+			// ★IDやSongIDはここでは追加しない！
 
 			if (this.No.HasValue)
 			{
@@ -377,7 +401,7 @@ namespace Aldentea.SweetMutus.Data
 				element.Add(new XAttribute(STOP_POS_ATTRIBUTE, this.StopPos.TotalSeconds));
 			}
 
-			// ☆answer要素はどうする？
+			// ※answer要素はどうする？
 			return element;
 		}
 
@@ -412,6 +436,7 @@ namespace Aldentea.SweetMutus.Data
 
 		#endregion
 
+		// (0.4.3)memo要素に対応。
 		// (0.3.3)
 		#region *[static]XML要素からオブジェクトを生成(Generate)
 		public static SweetQuestion Generate(XElement questionElement, string songsRoot = null)
@@ -456,6 +481,12 @@ namespace Aldentea.SweetMutus.Data
 			if (stop_pos.HasValue)
 			{
 				question.StopPos = TimeSpan.FromSeconds(stop_pos.Value);
+			}
+
+			var memo = (string)questionElement.Element(MEMO_ELEMENT);
+			if (!string.IsNullOrEmpty(memo))
+			{
+				question.Memo = memo;
 			}
 
 			return question;

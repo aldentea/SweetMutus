@@ -218,7 +218,7 @@ namespace Aldentea.SweetMutus
 		}
 		#endregion
 
-		// ☆次の曲の自動再生の設定を追加。
+		// (0.2.5)メモ列の表示状態を復元。次の曲の自動再生の設定も復元。
 		// (0.1.3.1)[表示]系メニューの設定を追加．
 		// (0.0.13)音声ボリュームを復元．
 		// (0.0.8.9)
@@ -254,10 +254,12 @@ namespace Aldentea.SweetMutus
 				= MySettings.DataGridColumnsVisibility.HasFlag(QuestionColumnsVisibility.SabiPosColumn) ? Visibility.Visible : Visibility.Collapsed;
 			questionsStopPosColumn.Visibility
 				= MySettings.DataGridColumnsVisibility.HasFlag(QuestionColumnsVisibility.StopPosColumn) ? Visibility.Visible : Visibility.Collapsed;
+			questionsMemoColumn.Visibility
+				= MySettings.DataGridColumnsVisibility.HasFlag(QuestionColumnsVisibility.MemoColumn) ? Visibility.Visible : Visibility.Collapsed;
 		}
 		#endregion
 
-		// ☆次の曲の自動再生の設定を追加。
+		// (0.2.5)メモ列の表示状態を復元。次の曲の自動再生の設定を追加。
 		// (0.1.3.1)[表示]系メニューの保存を追加．
 		// (0.0.13)音声ボリュームを保存．
 		// (0.0.8.9)
@@ -280,6 +282,7 @@ namespace Aldentea.SweetMutus
 			flags |= menuItemPlayPosColumnVisible.IsChecked ? QuestionColumnsVisibility.PlayPosColumn : 0;
 			flags |= menuItemSabiPosColumnVisible.IsChecked ? QuestionColumnsVisibility.SabiPosColumn : 0;
 			flags |= menuItemStopPosColumnVisible.IsChecked ? QuestionColumnsVisibility.StopPosColumn : 0;
+			flags |= menuItemMemoColumnVisible.IsChecked ? QuestionColumnsVisibility.MemoColumn : 0;
 			MySettings.DataGridColumnsVisibility = flags;
 		}
 		#endregion
@@ -645,7 +648,7 @@ namespace Aldentea.SweetMutus
 				this.AddCategory(category);
 			}
 
-			// ☆将来的にはリボンにするのがいいのかな？
+			// ※将来的にはリボンにするのがいいのかな？
 
 			// カテゴリグループボックスを表示。
 			if (Categories.Count > 1)
@@ -956,7 +959,7 @@ namespace Aldentea.SweetMutus
 			else
 			{
 				comboBoxCategories.Visibility = Visibility.Visible;
-				// ☆デフォルトでこれを表示させる必要がある．
+				// ※デフォルトでこれを表示させる必要がある．
 				expander.ToolTip = "カテゴリを追加するにはクリックして下さい．";
 			}
 		}
@@ -1057,7 +1060,7 @@ namespace Aldentea.SweetMutus
 		}
 		#endregion
 
-		// ☆
+		// (0.2.5)次の曲の自動再生を実装。
 		#region *曲終端到達時(MySongPlayer_MediaEnded)
 		private void MySongPlayer_MediaEnded(object sender, EventArgs e)
 		{
@@ -1117,7 +1120,7 @@ namespace Aldentea.SweetMutus
 		}
 		#endregion
 
-		// ☆
+		// (0.2.5)
 		void TryNextTrack()
 		{
 			var index = dataGridQuestions.Items.IndexOf(this.CurrentSong);
