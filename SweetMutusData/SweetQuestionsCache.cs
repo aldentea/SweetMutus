@@ -460,6 +460,40 @@ namespace Aldentea.SweetMutus.Data
 	}
 	#endregion
 
+	// (0.4.3)
+	#region QuestionMemoChangedCacheクラス
+	public class QuestionMemoChangedCache : GrandMutus.Data.PropertyChangedCache<string>
+	{
+		SweetQuestion _question;
+
+		public QuestionMemoChangedCache(SweetQuestion question, string from, string to)
+			: base(from, to)
+		{
+			this._question = question;
+		}
+
+		public override void Reverse()
+		{
+			_question.Artist = _previousValue;
+		}
+
+		public override bool CanCancelWith(IOperationCache other)
+		{
+			var other_cache = other as QuestionMemoChangedCache;
+			if (other_cache == null)
+			{ return false; }
+			else
+			{
+				return other_cache._question == this._question &&
+					other_cache._previousValue == this._currentValue &&
+					other_cache._currentValue == this._previousValue;
+			}
+		}
+
+	}
+	#endregion
+
+
 
 	#region 出題進行関連
 

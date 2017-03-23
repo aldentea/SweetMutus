@@ -65,13 +65,13 @@ namespace Aldentea.SweetMutus.Data
 						{
 							question.ID = GenerateNewID();
 						}
-						// ☆songのプロパティ変更をここで受け取る？MutusDocumentで行えばここでは不要？
+						// ※songのプロパティ変更をここで受け取る？MutusDocumentで行えばここでは不要？
 						//question.PropertyChanging += Question_PropertyChanging;
 						//question.PropertyChanged += Question_PropertyChanged;
 						question.NoChanged += Question_NoChanged;
 						question.OnAddedTo(this);
 
-						// ☆songのプロパティ変更をここで受け取る？MutusDocumentで行えばここでは不要？
+						// ※songのプロパティ変更をここで受け取る？MutusDocumentで行えばここでは不要？
 						// ↑とりあえずこのクラスで使っています。
 						question.PropertyChanging += Question_PropertyChanging;
 						question.PropertyChanged += Question_PropertyChanged;
@@ -195,7 +195,9 @@ namespace Aldentea.SweetMutus.Data
 		TimeSpan _stopPosCache = TimeSpan.Zero; // (0.3.1)
 		string _fileNameCache = string.Empty;
 		string _categoryCache = null;
+		string _memoCache = string.Empty;	// (0.4.3)
 
+		// (0.4.3)Memoに関する処理を追加。
 		// (0.3.1)StopPosに関する処理を追加．
 		#region *Questionのプロパティ変更前(Question_PropertyChanging)
 		void Question_PropertyChanging(object sender, System.ComponentModel.PropertyChangingEventArgs e)
@@ -225,10 +227,14 @@ namespace Aldentea.SweetMutus.Data
 					this._categoryCache = song.Category;
 					// Noは？
 					break;
+				case "Memo":
+					this._memoCache = song.Memo;
+					break;
 			}
 		}
 		#endregion
 
+		// (0.4.3)Memoに関する処理を追加。
 		// (0.3.1)StopPosに関する処理を追加．
 		#region *Questionのプロパティ変更後(Question_PropertyChanged)
 		void Question_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
@@ -284,7 +290,14 @@ namespace Aldentea.SweetMutus.Data
 					{
 						Item = new QuestionCategoryChangedCache(song, _categoryCache, song.Category)
 					});
-					_fileNameCache = null;
+					_categoryCache = null;
+					break;
+				case "Memo":
+					this.ItemChanged(this, new ItemEventArgs<IOperationCache>
+					{
+						Item = new QuestionMemoChangedCache(song, _memoCache, song.Memo)
+					});
+					_memoCache = null;
 					break;
 				case "No":
 					// 整番処理は複雑なのでここでは行わない(Question_NoChangedで行う)。

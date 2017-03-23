@@ -6,8 +6,8 @@ using System.Threading.Tasks;
 
 namespace Aldentea.SweetMutus.Base
 {
-
-	//(0.1.3.1)
+	// (0.1.4)MemoColumnを追加。
+	// (0.1.3.1)
 	#region QuestionColumnsVisibility列挙体
 
 	/// <summary>
@@ -40,6 +40,10 @@ namespace Aldentea.SweetMutus.Base
 		/// 再生停止位置列を表示します．
 		/// </summary>
 		StopPosColumn = 0x10,
+		/// <summary>
+		/// メモ列を表示します．
+		/// </summary>
+		MemoColumn = 0x20,
 		/// <summary>
 		/// デフォルトの設定です(再生開始位置列とサビ開始位置列を表示)．
 		/// </summary>

@@ -197,7 +197,7 @@ namespace Aldentea.SweetMutus
 
 			// 曲再生関連
 			//_songPlayer.Volume = App.Current.MySettings.SongPlayerVolume;
-			_songPlayer.MediaOpened += SongPlayer_MediaOpened;
+			_songPlayer.MediaOpened += MySongPlayer_MediaOpened;
 
 			CommandBindings.Add(
 				new CommandBinding(ApplicationCommands.Close,
@@ -218,6 +218,7 @@ namespace Aldentea.SweetMutus
 		}
 		#endregion
 
+		// (0.2.5)メモ列の表示状態を復元。次の曲の自動再生の設定も復元。
 		// (0.1.3.1)[表示]系メニューの設定を追加．
 		// (0.0.13)音声ボリュームを復元．
 		// (0.0.8.9)
@@ -236,7 +237,11 @@ namespace Aldentea.SweetMutus
 				this.Width = MySettings.WindowSize.Width;
 				this.Height = MySettings.WindowSize.Height;
 			}
+
+			// 曲再生関連。
 			this.MySongPlayer.Volume = MySettings.SongPlayerVolume;
+			this.MySongPlayer.MediaEnded += MySongPlayer_MediaEnded;
+			this.checkBoxAutoNext.IsChecked = MySettings.AutoNext;
 
 			// [表示]系メニューの設定．
 			questionsIDColumn.Visibility
@@ -249,9 +254,12 @@ namespace Aldentea.SweetMutus
 				= MySettings.DataGridColumnsVisibility.HasFlag(QuestionColumnsVisibility.SabiPosColumn) ? Visibility.Visible : Visibility.Collapsed;
 			questionsStopPosColumn.Visibility
 				= MySettings.DataGridColumnsVisibility.HasFlag(QuestionColumnsVisibility.StopPosColumn) ? Visibility.Visible : Visibility.Collapsed;
+			questionsMemoColumn.Visibility
+				= MySettings.DataGridColumnsVisibility.HasFlag(QuestionColumnsVisibility.MemoColumn) ? Visibility.Visible : Visibility.Collapsed;
 		}
 		#endregion
 
+		// (0.2.5)メモ列の表示状態を復元。次の曲の自動再生の設定を追加。
 		// (0.1.3.1)[表示]系メニューの保存を追加．
 		// (0.0.13)音声ボリュームを保存．
 		// (0.0.8.9)
@@ -263,7 +271,9 @@ namespace Aldentea.SweetMutus
 			MySettings.WindowPosition = new Point(this.Left, this.Top);
 			MySettings.WindowSize = new System.Windows.Size(this.Width, this.Height);
 
+			// 曲再生関連。
 			MySettings.SongPlayerVolume = this.MySongPlayer.Volume;
+			MySettings.AutoNext = checkBoxAutoNext.IsChecked == true;
 
 			// (0.1.3.1)[表示]系メニューを保存．
 			var flags = QuestionColumnsVisibility.None;
@@ -272,6 +282,7 @@ namespace Aldentea.SweetMutus
 			flags |= menuItemPlayPosColumnVisible.IsChecked ? QuestionColumnsVisibility.PlayPosColumn : 0;
 			flags |= menuItemSabiPosColumnVisible.IsChecked ? QuestionColumnsVisibility.SabiPosColumn : 0;
 			flags |= menuItemStopPosColumnVisible.IsChecked ? QuestionColumnsVisibility.StopPosColumn : 0;
+			flags |= menuItemMemoColumnVisible.IsChecked ? QuestionColumnsVisibility.MemoColumn : 0;
 			MySettings.DataGridColumnsVisibility = flags;
 		}
 		#endregion
@@ -637,7 +648,7 @@ namespace Aldentea.SweetMutus
 				this.AddCategory(category);
 			}
 
-			// ☆将来的にはリボンにするのがいいのかな？
+			// ※将来的にはリボンにするのがいいのかな？
 
 			// カテゴリグループボックスを表示。
 			if (Categories.Count > 1)
@@ -948,7 +959,7 @@ namespace Aldentea.SweetMutus
 			else
 			{
 				comboBoxCategories.Visibility = Visibility.Visible;
-				// ☆デフォルトでこれを表示させる必要がある．
+				// ※デフォルトでこれを表示させる必要がある．
 				expander.ToolTip = "カテゴリを追加するにはクリックして下さい．";
 			}
 		}
@@ -1035,8 +1046,8 @@ namespace Aldentea.SweetMutus
 		#endregion
 
 		// (*0.3.2)
-		#region *曲ファイルオープン時(SongPlayer_MediaOpened)
-		void SongPlayer_MediaOpened(object sender, EventArgs e)
+		#region *曲ファイルオープン時(MySongPlayer_MediaOpened)
+		void MySongPlayer_MediaOpened(object sender, EventArgs e)
 		{
 			if (_songPlayer.Duration.HasValue)
 			{
@@ -1045,6 +1056,17 @@ namespace Aldentea.SweetMutus
 				// 出題用
 				this.labelDuration_Play.Content = _songPlayer.Duration.Value;
 				this.sliderSeekSong_Play.Maximum = _songPlayer.Duration.Value.TotalSeconds;
+			}
+		}
+		#endregion
+
+		// (0.2.5)次の曲の自動再生を実装。
+		#region *曲終端到達時(MySongPlayer_MediaEnded)
+		private void MySongPlayer_MediaEnded(object sender, EventArgs e)
+		{
+			if (this.checkBoxAutoNext.IsChecked == true)
+			{
+				TryNextTrack();
 			}
 		}
 		#endregion
@@ -1093,16 +1115,23 @@ namespace Aldentea.SweetMutus
 			else
 			{
 				// 次の曲を再生(しようとする)。
-				var index = dataGridQuestions.Items.IndexOf(this.CurrentSong);
-				if (index >= 0 && index < dataGridQuestions.Items.Count - 1)
-				{
-					var song = (SweetQuestion)dataGridQuestions.Items.GetItemAt(index + 1);
-					System.Windows.Input.MediaCommands.Play.Execute(song, this);
-					dataGridQuestions.SelectedItem = song;
-				}
+				TryNextTrack();
 			}
 		}
 		#endregion
+
+		// (0.2.5)
+		void TryNextTrack()
+		{
+			var index = dataGridQuestions.Items.IndexOf(this.CurrentSong);
+			if (index >= 0 && index < dataGridQuestions.Items.Count - 1)
+			{
+				var song = (SweetQuestion)dataGridQuestions.Items.GetItemAt(index + 1);
+				System.Windows.Input.MediaCommands.Play.Execute(song, this);
+				dataGridQuestions.SelectedItem = song;
+			}
+
+		}
 
 		// (0.0.8.7)
 		#region PreviousTrack
@@ -1533,7 +1562,7 @@ namespace Aldentea.SweetMutus
 
 		// (0.2.4) とりあえずイベントハンドラで実装する。
 		private void MenuItemExportQuestionsList_Click(object sender, RoutedEventArgs e)
-	{
+		{
 			var dialog = new Microsoft.Win32.SaveFileDialog();
 			if (dialog.ShowDialog() == true)
 			{
@@ -1544,7 +1573,8 @@ namespace Aldentea.SweetMutus
 				}
 			}
 		}
-		}
+
+	}
 	#endregion
 
 

@@ -496,7 +496,7 @@ namespace Aldentea.SweetMutus.Data
 				var xdoc = XDocument.Load(reader);
 				var root = xdoc.Root;
 
-				// ☆ここから下は，継承先でオーバーライドできるようにしておきましょう．
+				// ※ここから下は，継承先でオーバーライドできるようにしておきましょう．
 				if (root.Name == ROOT_ELEMENT_NAME)
 				{
 					decimal? version = (decimal?)root.Attribute(VERSION_ATTERIBUTE);
