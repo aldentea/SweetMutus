@@ -11,7 +11,7 @@ namespace Aldentea.SweetMutus
 
 	// (0.2.6)
 	#region ExportTextSettingsクラス
-	public class ExportTextSettings : INotifyPropertyChanged
+	public class ExportTextSettings : Data.IExportQuestionsListParameter, INotifyPropertyChanged
 	{
 
 		#region Destinationプロパティ

@@ -1560,16 +1560,28 @@ namespace Aldentea.SweetMutus
 		}
 		#endregion
 
+		// (0.2.6) ExportTextSettingsを導入。
 		// (0.2.4) とりあえずイベントハンドラで実装する。
 		private void MenuItemExportQuestionsList_Click(object sender, RoutedEventArgs e)
 		{
 			var dialog = new Microsoft.Win32.SaveFileDialog();
 			if (dialog.ShowDialog() == true)
 			{
-				Encoding encoding = Encoding.UTF8;
-				using (var writer = new System.IO.StreamWriter(dialog.FileName, false, Encoding.UTF8))
+				var settings = new ExportTextSettings();
+				ExportTextWindow window = new ExportTextWindow
 				{
-					MyDocument.ExportQuestionsList(writer);
+					DataContext = settings
+				};
+				settings.Destination = dialog.FileName;
+
+				if (window.ShowDialog() == true)
+				{
+
+					Encoding encoding = Encoding.UTF8;
+					using (var writer = new System.IO.StreamWriter(settings.Destination, false, encoding))
+					{
+						MyDocument.ExportQuestionsList(writer, settings);
+					}
 				}
 			}
 		}

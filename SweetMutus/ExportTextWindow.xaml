@@ -21,7 +21,8 @@
 				<ColumnDefinition />
 			</Grid.ColumnDefinitions>
 			<Button Grid.Column="0" Content="ファイル名" HorizontalAlignment="Center" Padding="10,5" Margin="5,5" />
-			<TextBox Grid.Column="1" Text="" HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch" Padding="10,5" Margin="5,5" />
+			<TextBox Grid.Column="1" HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch" Padding="10,5" Margin="5,5"
+							 Text="{Binding Destination}" />
 		</Grid>
 
 		<StackPanel Grid.Row="1">
@@ -32,23 +33,23 @@
 			</StackPanel.Resources>
 			<GroupBox Header="出力列">
 				<WrapPanel>
-					<CheckBox Content="ID" />
-					<CheckBox Content="カテゴリ" />
-					<CheckBox Content="No" />
-					<CheckBox Content="曲タイトル" />
-					<CheckBox Content="アーティスト" />
-					<CheckBox Content="ファイル名" />
-					<CheckBox Content="サビ位置" />
-					<CheckBox Content="再生開始位置" />
-					<CheckBox Content="再生停止位置" />
-					<CheckBox Content="メモ" />
+					<CheckBox Content="ID" IsChecked="{Binding IDOutput}" />
+					<CheckBox Content="カテゴリ" IsChecked="{Binding CategoryOutput}" />
+					<CheckBox Content="No" IsChecked="{Binding NoOutput}" />
+					<CheckBox Content="曲タイトル" IsChecked="{Binding TitleOutput}" />
+					<CheckBox Content="アーティスト" IsChecked="{Binding ArtistOutput}" />
+					<CheckBox Content="ファイル名" IsChecked="{Binding FileNameOutput}" />
+					<CheckBox Content="サビ位置" IsChecked="{Binding SabiPosOutput}" />
+					<CheckBox Content="再生開始位置" IsChecked="{Binding PlayPosOutput}" />
+					<CheckBox Content="再生停止位置" IsChecked="{Binding StopPosOutput}" />
+					<CheckBox Content="メモ" IsChecked="{Binding MemoOutput}" />
 				</WrapPanel>
 			</GroupBox>			
 		</StackPanel>
 
 		<StackPanel Orientation="Horizontal" Grid.Row="2" FlowDirection="RightToLeft">
-			<Button Content="OK" HorizontalAlignment="Center" Padding="10,5" Margin="10,5" MinWidth="120" />
-			<Button Content="キャンセル" HorizontalAlignment="Center" Padding="10,5" Margin="10,5" MinWidth="120" />
+			<Button Content="OK" HorizontalAlignment="Center" Padding="10,5" Margin="10,5" MinWidth="120" IsDefault="True" Click="Button_Click"  />
+			<Button Content="キャンセル" HorizontalAlignment="Center" Padding="10,5" Margin="10,5" MinWidth="120" IsCancel="True" />
 		</StackPanel>
 
 	</Grid>
