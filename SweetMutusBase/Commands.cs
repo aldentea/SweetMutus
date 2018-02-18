@@ -18,6 +18,11 @@ namespace Aldentea.SweetMutus.Base
 		/// </summary>
 		public static RoutedCommand ExportCommand = new RoutedCommand();
 
+		/// <summary>
+		/// 出題リストをエクスポートします．
+		/// </summary>
+		public static RoutedCommand ExportQuestionsListCommand = new RoutedCommand();
+
 		public static RoutedCommand SetPlayPosCommand = new RoutedCommand();
 
 		// (0.1.3.1)

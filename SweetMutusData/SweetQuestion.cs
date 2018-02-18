@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Xml.Linq;
 using System.IO;
+using System.Collections.Generic;
 
 namespace Aldentea.SweetMutus.Data
 {
@@ -318,6 +319,19 @@ namespace Aldentea.SweetMutus.Data
 		string _memo = string.Empty;
 		#endregion
 
+		// (0.6.0)
+		#region *SeekPositionListプロパティ
+		public List<SeekPosition> SeekPositionList
+		{
+			get
+			{
+				return _seekPositionList;
+			}
+		}
+		List<SeekPosition> _seekPositionList = new List<SeekPosition>();
+		#endregion
+
+
 		#region XML入出力関連
 
 		// どこに置くかは未定．
@@ -338,6 +352,7 @@ namespace Aldentea.SweetMutus.Data
 
 		const string MEMO_ELEMENT = "memo";
 
+		// (0.6.0)SeekPositionListを出力。
 		// (0.4.3)memo要素を出力。
 		// (0.3.2)sabi_pos要素を出力．
 		#region *XML要素を生成(GenerateElement)
@@ -352,6 +367,10 @@ namespace Aldentea.SweetMutus.Data
 				new XAttribute(ID_ATTRIBUTE, this.ID),
 				new XElement(MEMO_ELEMENT, this.Memo)
 			);
+			foreach (var position in SeekPositionList)
+			{
+				element.Add(position.GenerateElement());
+			}
 			return AddSongProperty(AddIntroQuestionProperty(element), songs_root, exporting);
 		}
 		#endregion
@@ -436,6 +455,7 @@ namespace Aldentea.SweetMutus.Data
 
 		#endregion
 
+		// (0.6.0)SeekPositionに対応、
 		// (0.4.3)memo要素に対応。
 		// (0.3.3)
 		#region *[static]XML要素からオブジェクトを生成(Generate)
@@ -488,6 +508,11 @@ namespace Aldentea.SweetMutus.Data
 			{
 				question.Memo = memo;
 			}
+
+			foreach (var seek_element in questionElement.Elements(SeekPosition.ELEMENT_NAME))
+			{
+				question.SeekPositionList.Add(SeekPosition.Generate(seek_element));
+;			}
 
 			return question;
 		}

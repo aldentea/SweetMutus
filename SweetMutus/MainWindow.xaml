@@ -105,6 +105,10 @@
 		<CommandBinding Command="{x:Static base:Commands.EnterQuestionsCommand}"
 										Executed="EnterQuestions_Executed"
 										CanExecute="IncrementNo_CanExecute" />
+		<CommandBinding Command="{x:Static base:Commands.ExportQuestionsListCommand}"
+										Executed="ExportQuestionsList_Executed"
+										CanExecute="Always_CanExecute" />
+
 		<CommandBinding
 			Command="{x:Static base:Commands.ImportCommand}"
 			Executed="Import_Executed"
@@ -184,7 +188,7 @@
 				</MenuItem>
 				<MenuItem Header="ホームフォルダ変更(_H)..." Command="{x:Static grand:Commands.SetRootDirectoryCommand}" />
         <MenuItem Header="インポート(_I)..." Command="{x:Static base:Commands.ImportCommand}" />
-				<MenuItem Header="テキスト出力(_L)..." Click="MenuItemExportQuestionsList_Click" />
+				<MenuItem Header="テキスト出力(_L)..." Command="{x:Static base:Commands.ExportQuestionsListCommand}" />
 			</MenuItem>
 			<MenuItem Header="表示(_V)">
 				<MenuItem Name="menuItemCategoryVisible" Header="カテゴリ" IsCheckable="True" IsChecked="False" />
