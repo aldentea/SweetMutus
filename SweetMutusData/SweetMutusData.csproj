@@ -93,6 +93,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="IExportQuestionsListParameter.cs" />
+    <Compile Include="SeekPosition.cs" />
     <Compile Include="SweetMutusDocument.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SweetMutusGameDocument.cs" />

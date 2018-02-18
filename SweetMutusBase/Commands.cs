@@ -18,6 +18,11 @@ namespace Aldentea.SweetMutus.Base
 		/// </summary>
 		public static RoutedCommand ExportCommand = new RoutedCommand();
 
+		/// <summary>
+		/// 出題リストをエクスポートします．
+		/// </summary>
+		public static RoutedCommand ExportQuestionsListCommand = new RoutedCommand();
+
 		public static RoutedCommand SetPlayPosCommand = new RoutedCommand();
 
 		// (0.1.3.1)
@@ -52,6 +57,11 @@ namespace Aldentea.SweetMutus.Base
 
 		// (0.1.3.1)
 		public static RoutedCommand SetWindowModeCommand = new RoutedCommand();
+
+		// (0.1.4.1)
+		// どこに置くべきかな？
+		public static RoutedCommand OptionsCommand = new RoutedCommand();
+
 
 		// ※とりあえずここに置いておくが，QuizCommandsに入れた方がいいかな？
 		public static RoutedCommand NextQuestionCommand = new RoutedCommand();

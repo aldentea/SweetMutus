@@ -336,9 +336,10 @@ namespace Aldentea.SweetMutus.Data
 		}
 		#endregion
 
+		// (0.5.0) parameter引数を追加。
 		// (0.4.2)
 		#region *問題リストをテキスト出力(ExportQuestionsList)
-		public void ExportQuestionsList(StreamWriter writer)
+		public void ExportQuestionsList(StreamWriter writer, IExportQuestionsListParameter parameter)
 		{
 			// TSVで出力する。
 			// id, category, no, title, artistの順。
@@ -348,7 +349,49 @@ namespace Aldentea.SweetMutus.Data
 			{
 				foreach (var question in Questions.Where(q => q.Category == category).OrderBy(q => q.No))
 				{
-					writer.WriteLine($"{question.ID}	{question.Category}	{question.No}	{question.Title}	{question.Artist}");
+					List<string> columns = new List<string>();
+					if (parameter.IDOutput)
+					{
+						columns.Add($"{question.ID}");
+					}
+					if (parameter.CategoryOutput)
+					{
+						columns.Add(question.Category);
+					}
+					if (parameter.NoOutput)
+					{
+						columns.Add($"{question.No}");
+					}
+					if (parameter.TitleOutput)
+					{
+						columns.Add(question.Title);
+					}
+					if (parameter.ArtistOutput)
+					{
+						columns.Add(question.Artist);
+					}
+					if (parameter.FileNameOutput)
+					{
+						columns.Add(question.RelativeFileName);
+					}
+					if (parameter.SabiPosOutput)
+					{
+						columns.Add($"{question.SabiPos}");
+					}
+					if (parameter.PlayPosOutput)
+					{
+						columns.Add($"{question.PlayPos}");
+					}
+					if (parameter.StopPosOutput)
+					{
+						columns.Add($"{question.StopPos}");
+					}
+					if (parameter.MemoOutput)
+					{
+						columns.Add(question.Memo);
+					}
+
+					writer.WriteLine(string.Join("\t", columns));
 				}
 			}
 		}
