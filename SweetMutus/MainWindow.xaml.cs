@@ -13,8 +13,6 @@ using System.ComponentModel;
 using System.Collections.ObjectModel;
 
 using GrandMutus.Base;
-using System.Windows.Media;
-using System.Windows.Media.Animation;
 
 namespace Aldentea.SweetMutus
 {
@@ -1045,55 +1043,51 @@ namespace Aldentea.SweetMutus
 		SweetQuestion _currentSong = null;
 		#endregion
 
+		// (0.2.6)DurationはNullableではなくなりました。
 		// (*0.3.2)
 		#region *曲ファイルオープン時(MySongPlayer_MediaOpened)
 		void MySongPlayer_MediaOpened(object sender, EventArgs e)
 		{
-			if (_songPlayer.Duration.HasValue)
-			{
-				this.labelDuration.Content = _songPlayer.Duration.Value;
-				this.sliderSeekSong.Maximum = _songPlayer.Duration.Value.TotalSeconds;
+			//if (_songPlayer.Duration.HasValue)
+			//{
+				this.labelDuration.Content = _songPlayer.Duration;
+				this.sliderSeekSong.Maximum = _songPlayer.Duration.TotalSeconds;
 				// 出題用
-				this.labelDuration_Play.Content = _songPlayer.Duration.Value;
-				this.sliderSeekSong_Play.Maximum = _songPlayer.Duration.Value.TotalSeconds;
-			}
+				this.labelDuration_Play.Content = _songPlayer.Duration;
+				this.sliderSeekSong_Play.Maximum = _songPlayer.Duration.TotalSeconds;
+			//}
 		}
 		#endregion
 
+		// (0.2.6)async化。
 		// (0.2.5)次の曲の自動再生を実装。
 		#region *曲終端到達時(MySongPlayer_MediaEnded)
-		private void MySongPlayer_MediaEnded(object sender, EventArgs e)
+		private async void MySongPlayer_MediaEnded(object sender, EventArgs e)
 		{
 			if (this.checkBoxAutoNext.IsChecked == true)
 			{
-				TryNextTrack();
+				await TryNextTrack(true);
 			}
 		}
 		#endregion
 
 		//AutoResetEvent _mediaOpenedEvent = new AutoResetEvent(false);
 
+		// (0.2.6)async化。
 		// (0.1.0)再生開始位置から再生するように修正。
 		#region Playコマンド
-		void Play_Executed(object sender, ExecutedRoutedEventArgs e)
+		async void Play_Executed(object sender, ExecutedRoutedEventArgs e)
 		{
 			if (e.Parameter is SweetQuestion)
 			{
 				var song = (SweetQuestion)e.Parameter;
-				_songPlayer.Open(song.FileName);
 
-				// このまま次の処理に進むと、まだファイルが開いていないうちにCurrentPositionを設定しまうことがある！
-				// ＝ここでの設定が反映されない！
-				// 同期をとればよい？が、そのやり方がよくわからないので適当にDelayを挟む。
-				Task.Delay(10);
-
-				this.CurrentSong = song;
-				_songPlayer.CurrentPosition = song.PlayPos;
-				_songPlayer.Play();
+				await OpenTrack(song, true);
 
 				this.expanderSongPlayer.IsExpanded = true;  // ←これはここに書くべきものなのか？
 			}
 		}
+
 
 		void Play_CanExecute(object sender, CanExecuteRoutedEventArgs e)
 		{
@@ -1102,10 +1096,11 @@ namespace Aldentea.SweetMutus
 		}
 		#endregion
 
+		// (0.2.6)async化。
 		// (0.1.0)現在の場所が再生開始位置より前であれば、(現在の曲の)再生開始位置にSeekするように修正。
 		// (0.0.8.7)
 		#region NextTrack
-		void NextTrack_Executed(object sender, ExecutedRoutedEventArgs e)
+		async void NextTrack_Executed(object sender, ExecutedRoutedEventArgs e)
 		{
 			if (_songPlayer.CurrentPosition < this.CurrentSong.PlayPos)
 			{
@@ -1115,19 +1110,27 @@ namespace Aldentea.SweetMutus
 			else
 			{
 				// 次の曲を再生(しようとする)。
-				TryNextTrack();
+				await TryNextTrack();
 			}
 		}
 		#endregion
 
+		// (0.2.6) 曲を自動再生するかどうかは、アプリケーション設定のAutoPlayOnNextで制御する。async化。
 		// (0.2.5)
-		void TryNextTrack()
+		async Task TryNextTrack(bool forcePlay = false)
 		{
 			var index = dataGridQuestions.Items.IndexOf(this.CurrentSong);
 			if (index >= 0 && index < dataGridQuestions.Items.Count - 1)
 			{
 				var song = (SweetQuestion)dataGridQuestions.Items.GetItemAt(index + 1);
-				System.Windows.Input.MediaCommands.Play.Execute(song, this);
+				if (MySettings.AutoPlayOnNext)
+				{
+					MediaCommands.Play.Execute(song, this);
+				}
+				else
+				{
+					await OpenTrack(song, forcePlay || MySettings.AutoPlayOnNext);
+				}
 				dataGridQuestions.SelectedItem = song;
 			}
 
@@ -1165,6 +1168,30 @@ namespace Aldentea.SweetMutus
 		//}
 		#endregion
 
+		// (0.2.6)
+		/// <summary>
+		/// 曲をオープンします。再生中であるか、forcePlayにtrueが与えられると、再生も開始します。
+		/// </summary>
+		/// <param name="song"></param>
+		/// <param name="forcePlay"></param>
+		/// <returns></returns>
+		async Task OpenTrack(SweetQuestion song, bool forcePlay)
+		{
+			_songPlayer.Open(song.FileName);
+
+			// このまま次の処理に進むと、まだファイルが開いていないうちにCurrentPositionを設定しまうことがある！
+			// ＝ここでの設定が反映されない！
+			// 同期をとればよい？が、そのやり方がよくわからないので適当にDelayを挟む。
+			await Task.Delay(10);
+
+			this.CurrentSong = song;
+			_songPlayer.CurrentPosition = song.PlayPos;
+			if (forcePlay || _songPlayer.CurrentState == SongPlayerState.Playing)
+			{
+				_songPlayer.Play();
+			}
+		}
+
 		#region SwitchPlayPauseコマンド
 
 		// 動作を2つ用意する．
@@ -1178,7 +1205,7 @@ namespace Aldentea.SweetMutus
 			{
 				MediaCommands.Play.Execute(q, this);
 			}
-			else if (_songPlayer.CurrentState != SongPlayer.State.Inactive)
+			else if (_songPlayer.CurrentState != SongPlayerState.Inactive)
 			{
 				_songPlayer.TogglePlayPause();
 			}
@@ -1186,7 +1213,7 @@ namespace Aldentea.SweetMutus
 
 		void SwitchPlayPause_CanExecute(object sender, CanExecuteRoutedEventArgs e)
 		{
-			e.CanExecute = (e.Parameter is SweetQuestion) || _songPlayer.CurrentState != SongPlayer.State.Inactive;
+			e.CanExecute = (e.Parameter is SweetQuestion) || _songPlayer.CurrentState != SongPlayerState.Inactive;
 		}
 
 		#endregion
@@ -1194,7 +1221,7 @@ namespace Aldentea.SweetMutus
 		#region SeekRelative
 		void SeekRelative_Executed(object sender, ExecutedRoutedEventArgs e)
 		{
-			if (_songPlayer.CurrentState != SongPlayer.State.Inactive)
+			if (_songPlayer.CurrentState != SongPlayerState.Inactive)
 			{
 				double sec;
 				if (Double.TryParse(e.Parameter.ToString(), out sec))
@@ -1210,7 +1237,7 @@ namespace Aldentea.SweetMutus
 
 		void SeekSabi_Executed(object sender, ExecutedRoutedEventArgs e)
 		{
-			if (_songPlayer.CurrentState != SongPlayer.State.Inactive)
+			if (_songPlayer.CurrentState != SongPlayerState.Inactive)
 			{
 				_songPlayer.CurrentPosition = _currentSong.SabiPos;
 			}
@@ -1218,7 +1245,7 @@ namespace Aldentea.SweetMutus
 
 		void SongPlayer_CanExecute(object sender, CanExecuteRoutedEventArgs e)
 		{
-			e.CanExecute = _songPlayer.CurrentState != SongPlayer.State.Inactive;
+			e.CanExecute = _songPlayer.CurrentState != SongPlayerState.Inactive;
 		}
 
 		#endregion
@@ -1226,7 +1253,7 @@ namespace Aldentea.SweetMutus
 		#region SetSabiPosコマンド
 		void SetSabiPos_Executed(object sender, ExecutedRoutedEventArgs e)
 		{
-			if (_songPlayer.CurrentState != SongPlayer.State.Inactive)
+			if (_songPlayer.CurrentState != SongPlayerState.Inactive)
 			{
 				_currentSong.SabiPos = _songPlayer.CurrentPosition;
 			}
@@ -1237,7 +1264,7 @@ namespace Aldentea.SweetMutus
 		#region SetPlayPosコマンド
 		void SetPlayPos_Executed(object sender, ExecutedRoutedEventArgs e)
 		{
-			if (_songPlayer.CurrentState != SongPlayer.State.Inactive)
+			if (_songPlayer.CurrentState != SongPlayerState.Inactive)
 			{
 				_currentSong.PlayPos = _songPlayer.CurrentPosition;
 			}
@@ -1248,7 +1275,7 @@ namespace Aldentea.SweetMutus
 		#region SetStopPosコマンド
 		void SetStopPos_Executed(object sender, ExecutedRoutedEventArgs e)
 		{
-			if (_songPlayer.CurrentState != SongPlayer.State.Inactive)
+			if (_songPlayer.CurrentState != SongPlayerState.Inactive)
 			{
 				_currentSong.StopPos = _songPlayer.CurrentPosition;
 			}
@@ -1547,6 +1574,33 @@ namespace Aldentea.SweetMutus
 		#endregion
 
 		#endregion
+
+		// (0.2.6)
+		#region Options
+		void Options_Executed(object sender, ExecutedRoutedEventArgs e)
+		{
+			OptionDialog dialog = new OptionDialog
+			{
+				AutoPlayOnNext = MySettings.AutoPlayOnNext
+			};
+
+			var result = dialog.ShowDialog();
+			if (result == true)
+			{
+				MySettings.AutoPlayOnNext = dialog.AutoPlayOnNext;
+			}
+
+
+		}
+
+		void Options_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+		{
+			// とりあえず。
+			e.CanExecute = true;
+		}
+
+		#endregion
+
 
 
 
