@@ -54,6 +54,9 @@ namespace Aldentea.SweetMutus.Data
 				}
 			}
 		}
+
+		public PlayersCollection Players => throw new NotImplementedException();
+
 		bool _isRehearsal = true;
 		#endregion
 
@@ -107,7 +110,7 @@ namespace Aldentea.SweetMutus.Data
 		// (0.3.0)
 		public void AddLog(string code, decimal value)
 		{
-			Logs.AddLog(code, value);
+			Logs.AddLog(null, code, value);
 		}
 
 		#endregion
@@ -138,6 +141,47 @@ namespace Aldentea.SweetMutus.Data
 				Logs.LoadElement(logsElement);
 			}
 		}
+
+
+		#region IMutusGameDocumentの未実装メンバー
+
+		public event EventHandler<LogEventArgs> LogAdded;
+		public event EventHandler<LogEventArgs> LogRemoved;
+		public event EventHandler<PlayerEventArgs> PlayerAdded;
+		public event EventHandler<PlayerEventArgs> PlayerRemoved;
+
+
+		public void AddLog(int? player_id, string code, decimal value)
+		{
+			throw new NotImplementedException();
+		}
+
+		public void AddLog(Log log, int order_id)
+		{
+			throw new NotImplementedException();
+		}
+
+		public void RemoveLog(int log_id)
+		{
+			throw new NotImplementedException();
+		}
+
+		public void RemoveLog(int order_id, string code, decimal value, int? player_id)
+		{
+			throw new NotImplementedException();
+		}
+
+		public void AddPlayer(string name)
+		{
+			throw new NotImplementedException();
+		}
+
+		public void RemovePlayer(string name)
+		{
+			throw new NotImplementedException();
+		}
+
+		#endregion
 
 		#endregion
 	}
