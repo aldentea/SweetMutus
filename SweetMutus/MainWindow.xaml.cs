@@ -75,7 +75,7 @@ namespace Aldentea.SweetMutus
 					this._currentMode = value;
 					UpdateUI();
 					SetKeyBindings();
-					if (_currentMode == WindowMode.Play)
+					if (_currentMode == WindowMode.Game)
 					{
 						MyDocument.AddOrder(null);
 					}
@@ -106,25 +106,28 @@ namespace Aldentea.SweetMutus
 		#endregion
 
 		// データバインディングで実装する前の，仮実装の置き場？
+		// WindowModeに応じてUIを調整します。
 		void UpdateUI()
 		{
 
 			// ※たぶんデータバインディングで実現可能．
-			dataGridQuestions.IsReadOnly = CurrentMode == WindowMode.Play;
+			dataGridQuestions.IsReadOnly = (CurrentMode != WindowMode.Edit);
 
 			MySongPlayer.Close();
 			// ※とりあえずここに書く．
 
-			if (CurrentMode == WindowMode.Edit)
-			{
-				numberingColumn.Width = GridLength.Auto;
-			}
-			else
+			if (CurrentMode == WindowMode.Game)
 			{
 				numberingColumn.Width = new GridLength(0);
 			}
-			expanderSongPlayer.Visibility = CurrentMode == WindowMode.Edit ? Visibility.Visible : Visibility.Collapsed;
-			expanderQuestionPlayer.Visibility = CurrentMode == WindowMode.Play ? Visibility.Visible : Visibility.Collapsed;
+			else
+			{
+				numberingColumn.Width = GridLength.Auto;
+			}
+			expanderSongPlayer.Visibility = CurrentMode == WindowMode.Game ? Visibility.Collapsed : Visibility.Visible;
+			expanderQuestionPlayer.Visibility = CurrentMode == WindowMode.Game ? Visibility.Visible : Visibility.Collapsed;
+
+			SetPositionTabControl.Visibility = CurrentMode == WindowMode.Edit ? Visibility.Visible : Visibility.Collapsed;
 
 		}
 
@@ -146,7 +149,7 @@ namespace Aldentea.SweetMutus
 					this.InputBindings.Add(SetPlayKeyBinding);
 					this.InputBindings.Add(SetStopKeyBinding);
 					break;
-				case WindowMode.Play:
+				case WindowMode.Game:
 					this.InputBindings.Remove(SetSabiKeyBinding);
 					this.InputBindings.Remove(SetPlayKeyBinding);
 					this.InputBindings.Remove(SetStopKeyBinding);
@@ -1559,7 +1562,7 @@ namespace Aldentea.SweetMutus
 
 		void Play_SwitchPlayPause_Executed(object sender, ExecutedRoutedEventArgs e)
 		{
-			if (CurrentMode == WindowMode.Play
+			if (CurrentMode == WindowMode.Game
 								&& (CurrentPhase == PlayingPhase.Judged || CurrentPhase == PlayingPhase.Talking))
 			{
 				MyQuestionPlayer.SwitchPlayPause();
@@ -1568,7 +1571,7 @@ namespace Aldentea.SweetMutus
 
 		void Play_SwitchPlayPause_CanExecute(object sender, CanExecuteRoutedEventArgs e)
 		{
-			e.CanExecute = CurrentMode == WindowMode.Play
+			e.CanExecute = CurrentMode == WindowMode.Game
 					&& (CurrentPhase == PlayingPhase.Judged || CurrentPhase == PlayingPhase.Talking);
 			e.Handled = true;
 		}

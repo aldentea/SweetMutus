@@ -219,11 +219,19 @@
 						</Binding>
 					</MenuItem.IsChecked>
 				</MenuItem>
-				<MenuItem Header="出題モード" Name="menuItemPlayMode"
+				<MenuItem Header="再生モード" Name="menuItemPlayMode"
 									Command="{x:Static base:Commands.SetWindowModeCommand}" CommandParameter="{x:Static base:WindowMode.Play}">
 					<MenuItem.IsChecked>
 						<Binding Path="CurrentMode" Converter="{StaticResource equalsConverter}"
 									 ConverterParameter="{x:Static base:WindowMode.Play}">
+						</Binding>
+					</MenuItem.IsChecked>
+				</MenuItem>
+				<MenuItem Header="出題モード" Name="menuItemGameMode"
+									Command="{x:Static base:Commands.SetWindowModeCommand}" CommandParameter="{x:Static base:WindowMode.Game}">
+					<MenuItem.IsChecked>
+						<Binding Path="CurrentMode" Converter="{StaticResource equalsConverter}"
+									 ConverterParameter="{x:Static base:WindowMode.Game}">
 						</Binding>
 					</MenuItem.IsChecked>
 				</MenuItem>
@@ -408,7 +416,7 @@
 					<Button Content="サビ" DockPanel.Dock="Left"
 								Command="{x:Static hypermutus:Commands.SeekSabiCommand}" />
 					<TabControl DockPanel.Dock="Left" Margin="10,0,0,0" Height="80" HorizontalAlignment="Left"
-										TabStripPlacement="Left">
+										TabStripPlacement="Left" Name="SetPositionTabControl">
 						<TabControl.Resources>
 							<Style TargetType="StackPanel">
 								<Setter Property="Orientation" Value="Horizontal" />
