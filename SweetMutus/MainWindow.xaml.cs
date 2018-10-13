@@ -127,8 +127,21 @@ namespace Aldentea.SweetMutus
 			expanderSongPlayer.Visibility = CurrentMode == WindowMode.Game ? Visibility.Collapsed : Visibility.Visible;
 			expanderQuestionPlayer.Visibility = CurrentMode == WindowMode.Game ? Visibility.Visible : Visibility.Collapsed;
 
-			SetPositionTabControl.Visibility = CurrentMode == WindowMode.Edit ? Visibility.Visible : Visibility.Collapsed;
+			tabControlSetPosition.Visibility = CurrentMode == WindowMode.Edit ? Visibility.Visible : Visibility.Collapsed;
+			groupBoxChangeCategory.Visibility = CurrentMode == WindowMode.Edit ? Visibility.Visible : Visibility.Collapsed;
 
+			if (this.CurrentMode == WindowMode.Edit)
+			{
+				//comboBoxCategories.Visibility = Visibility.Visible;
+				//expanderNewCategory.ToolTip = "カテゴリを追加するにはクリックして下さい．";
+				expanderNewCategory.Visibility = Visibility.Visible;
+				expanderNewCategory.IsExpanded = false;
+			}
+			else
+			{
+				comboBoxCategories.Visibility = Visibility.Visible;
+				expanderNewCategory.Visibility = Visibility.Collapsed;
+			}
 		}
 
 		static KeyBinding SetSabiKeyBinding = new KeyBinding(GrandMutus.Base.Commands.SetSabiPosCommand, new KeyGesture(Key.F9));
@@ -403,7 +416,7 @@ namespace Aldentea.SweetMutus
 
 		private void AddCategory_CanExecute(object sender, CanExecuteRoutedEventArgs e)
 		{
-			e.CanExecute = (e.Parameter is string) && !this.Categories.Contains((string)e.Parameter);
+			e.CanExecute = this.CurrentMode == WindowMode.Edit && (e.Parameter is string) && !this.Categories.Contains((string)e.Parameter);
 		}
 
 		#endregion
@@ -423,7 +436,7 @@ namespace Aldentea.SweetMutus
 
 		private void ChangeCategory_CanExecute(object sender, CanExecuteRoutedEventArgs e)
 		{
-			e.CanExecute = (e.Parameter is string) && (string)e.Parameter != this.CurrentCategory
+			e.CanExecute = (this.CurrentMode == WindowMode.Edit) && (e.Parameter is string) && (string)e.Parameter != this.CurrentCategory
 				&& this.dataGridQuestions.SelectedItems.Count > 0;
 		}
 
@@ -483,7 +496,7 @@ namespace Aldentea.SweetMutus
 
 		private void ChangeFileName_CanExecute(object sender, CanExecuteRoutedEventArgs e)
 		{
-			e.CanExecute = (e.Parameter is SweetQuestion);
+			e.CanExecute = (this.CurrentMode == WindowMode.Edit) && (e.Parameter is SweetQuestion);
 		}
 
 		#endregion
@@ -510,10 +523,23 @@ namespace Aldentea.SweetMutus
 			}
 		}
 
-		private void IncrementNo_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+		private void EditQuestion_CanExecute(object sender, CanExecuteRoutedEventArgs e)
 		{
-			var items = e.Parameter as System.Collections.IList;
-			e.CanExecute = items != null && items.Count > 0;
+			if (this.CurrentMode == WindowMode.Edit)
+			{
+				var items = e.Parameter as System.Collections.IList;
+				e.CanExecute = items != null && items.Count > 0;
+			}
+			else
+			{
+				e.CanExecute = false;
+			}
+		}
+
+
+		private void EditQuestions_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+		{
+			e.CanExecute = this.CurrentMode == WindowMode.Edit;
 		}
 
 		#endregion

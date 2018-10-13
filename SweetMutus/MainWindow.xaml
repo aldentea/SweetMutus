@@ -48,9 +48,9 @@
 	</Window.Title>
 	<Window.CommandBindings>
 		<CommandBinding Command="{x:Static grand:Commands.AddQuestionsCommand}"
-										Executed="AddQuestions_Executed" CanExecute="Always_CanExecute"/>
+										Executed="AddQuestions_Executed" CanExecute="EditQuestions_CanExecute"/>
 		<CommandBinding Command="{x:Static base:Commands.ExportCommand}"
-										Executed="Export_Executed" CanExecute="Always_CanExecute" />
+										Executed="Export_Executed" CanExecute="EditQuestions_CanExecute" />
 		<CommandBinding Command="{x:Static grand:Commands.SetRootDirectoryCommand}"
 										Executed="SetRootDirectory_Executed" CanExecute="Always_CanExecute" />
 		<CommandBinding Command="{x:Static base:Commands.SaveAsMtqCommand}"
@@ -95,24 +95,23 @@
 										CanExecute="ChangeFileName_CanExecute" />
 		<CommandBinding Command="{x:Static base:Commands.IncrementNoCommand}"
 										Executed="IncrementNo_Executed"
-										CanExecute="IncrementNo_CanExecute" />
+										CanExecute="EditQuestion_CanExecute" />
 		<CommandBinding Command="{x:Static base:Commands.DecrementNoCommand}"
 										Executed="DecrementNo_Executed"
-										CanExecute="IncrementNo_CanExecute" />
+										CanExecute="EditQuestion_CanExecute" />
 		<CommandBinding Command="{x:Static base:Commands.OmitQuestionsCommand}"
 										Executed="OmitQuestions_Executed"
-										CanExecute="IncrementNo_CanExecute" />
+										CanExecute="EditQuestion_CanExecute" />
 		<CommandBinding Command="{x:Static base:Commands.EnterQuestionsCommand}"
 										Executed="EnterQuestions_Executed"
-										CanExecute="IncrementNo_CanExecute" />
+										CanExecute="EditQuestion_CanExecute" />
 		<CommandBinding Command="{x:Static base:Commands.ExportQuestionsListCommand}"
 										Executed="ExportQuestionsList_Executed"
 										CanExecute="Always_CanExecute" />
 
-		<CommandBinding
-			Command="{x:Static base:Commands.ImportCommand}"
-			Executed="Import_Executed"
-			CanExecute="Always_CanExecute" />
+		<CommandBinding	Command="{x:Static base:Commands.ImportCommand}"
+										Executed="Import_Executed"
+										CanExecute="EditQuestions_CanExecute" />
 		<CommandBinding Command="{x:Static base:Commands.SetWindowModeCommand}"
 										Executed="SetWindowMode_Executed"
 										CanExecute="Always_CanExecute" />
@@ -187,7 +186,7 @@
 					</MenuItem.CommandParameter>
 				</MenuItem>
 				<MenuItem Header="ホームフォルダ変更(_H)..." Command="{x:Static grand:Commands.SetRootDirectoryCommand}" />
-        <MenuItem Header="インポート(_I)..." Command="{x:Static base:Commands.ImportCommand}" />
+				<MenuItem Header="インポート(_I)..." Command="{x:Static base:Commands.ImportCommand}" />
 				<MenuItem Header="テキスト出力(_L)..." Command="{x:Static base:Commands.ExportQuestionsListCommand}" />
 			</MenuItem>
 			<MenuItem Header="表示(_V)">
@@ -269,7 +268,7 @@
 					</Expander>
 				</StackPanel>
 			</GroupBox>
-			<GroupBox Header="カテゴリ移動" Width="200">
+			<GroupBox Header="カテゴリ移動" Width="200" Name="groupBoxChangeCategory">
 				<Grid>
 					<ComboBox Name="comboBoxDestinationCategory"  Height="30"
 										VerticalAlignment="Top" Margin="0,5"
@@ -330,7 +329,7 @@
 								<Binding.ValidationRules>
 									<base:DurationValidationRule />
 								</Binding.ValidationRules>
-							</Binding> 
+							</Binding>
 						</DataGridTextColumn.Binding>
 					</DataGridTextColumn>
 					<DataGridTextColumn Header="サビ"	x:Name="questionsSabiPosColumn"
@@ -416,7 +415,7 @@
 					<Button Content="サビ" DockPanel.Dock="Left"
 								Command="{x:Static hypermutus:Commands.SeekSabiCommand}" />
 					<TabControl DockPanel.Dock="Left" Margin="10,0,0,0" Height="80" HorizontalAlignment="Left"
-										TabStripPlacement="Left" Name="SetPositionTabControl">
+										TabStripPlacement="Left" Name="tabControlSetPosition">
 						<TabControl.Resources>
 							<Style TargetType="StackPanel">
 								<Setter Property="Orientation" Value="Horizontal" />
@@ -536,8 +535,8 @@
 				<Grid.RowDefinitions>
 					<RowDefinition Height="Auto" />
 					<RowDefinition Height="Auto" />
-                    <RowDefinition Height="Auto" />
-                </Grid.RowDefinitions>
+					<RowDefinition Height="Auto" />
+				</Grid.RowDefinitions>
 				<DockPanel Grid.Row="0">
 					<Button Content="NEXT" DockPanel.Dock="Left" Margin="10,5" Width="100"
 								Command="{x:Static base:Commands.NextQuestionCommand}" />
