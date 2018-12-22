@@ -232,6 +232,7 @@ namespace Aldentea.SweetMutus
 		}
 		#endregion
 
+		// (0.3.0)再生制御ボタンパネルの表示状態を復元。
 		// (0.2.5)メモ列の表示状態を復元。次の曲の自動再生の設定も復元。
 		// (0.1.3.1)[表示]系メニューの設定を追加．
 		// (0.0.13)音声ボリュームを復元．
@@ -270,9 +271,13 @@ namespace Aldentea.SweetMutus
 				= MySettings.DataGridColumnsVisibility.HasFlag(QuestionColumnsVisibility.StopPosColumn) ? Visibility.Visible : Visibility.Collapsed;
 			questionsMemoColumn.Visibility
 				= MySettings.DataGridColumnsVisibility.HasFlag(QuestionColumnsVisibility.MemoColumn) ? Visibility.Visible : Visibility.Collapsed;
+
+			ButtonsPanel.Visibility	= MySettings.ButtonsPanelVisibility;
+
 		}
 		#endregion
 
+		// (0.3.0)再生制御ボタンパネルの表示状態を保存。
 		// (0.2.5)メモ列の表示状態を復元。次の曲の自動再生の設定を追加。
 		// (0.1.3.1)[表示]系メニューの保存を追加．
 		// (0.0.13)音声ボリュームを保存．
@@ -298,6 +303,9 @@ namespace Aldentea.SweetMutus
 			flags |= menuItemStopPosColumnVisible.IsChecked ? QuestionColumnsVisibility.StopPosColumn : 0;
 			flags |= menuItemMemoColumnVisible.IsChecked ? QuestionColumnsVisibility.MemoColumn : 0;
 			MySettings.DataGridColumnsVisibility = flags;
+
+			MySettings.ButtonsPanelVisibility = ButtonsPanel.Visibility;
+
 		}
 		#endregion
 
