@@ -1430,19 +1430,12 @@ namespace Aldentea.SweetMutus
 		PlayingPhase _currentPhase = PlayingPhase.Talking;
 		#endregion
 
-		public SweetQuestionPlayer MyQuestionPlayer
-		{
-			get
-			{
-				return _questionPlayer;
-			}
-		}
-		SweetQuestionPlayer _questionPlayer = new SweetQuestionPlayer();
+		public SweetQuestionPlayer MyQuestionPlayer { get; } = new SweetQuestionPlayer();
 
 		void InitializeQuestionPlayer()
 		{
-			_questionPlayer.MediaOpened += questionPlayer_MediaOpened;
-			_questionPlayer.QuestionStopped += questionPlayer_QuestionStopped;
+			MyQuestionPlayer.MediaOpened += questionPlayer_MediaOpened;
+			MyQuestionPlayer.QuestionStopped += questionPlayer_QuestionStopped;
 		}
 
 
@@ -1519,6 +1512,7 @@ namespace Aldentea.SweetMutus
 		{
 			if (CurrentQuestion.Memo.Split(' ', '　').Contains("#random"))
 			{
+				// ※この時点ではMySongPlayer.Durationを取得できない。
 				var start_pos = _random.NextDouble() * 0.95 * MySongPlayer.Duration.TotalSeconds;
 				MyDocument.AddLog("開始位置", Convert.ToDecimal(start_pos));
 				MyQuestionPlayer.Start(start_pos, start_pos + 20);

@@ -80,6 +80,8 @@ namespace Aldentea.SweetMutus
 			}
 			#endregion
 
+			bool _pre = false;
+
 			#region *CurrentPhaseプロパティ
 			protected Phase CurrentPhase
 			{
@@ -126,8 +128,14 @@ namespace Aldentea.SweetMutus
 			#region メディアオープン時
 			private void questionMediaPlayer_MediaOpened(object sender, EventArgs e)
 			{
+				if (_pre)
+				{
+					_questionMediaPlayer.Clock.Controller.Pause();
+
+				}
+
 				// _followClockをsetした後にもこのイベントが呼び出される！
-				if (CurrentPhase == Phase.Question)
+				else if (CurrentPhase == Phase.Question)
 				{
 					_currentSongDuration = _questionMediaPlayer.NaturalDuration.TimeSpan;
 					NotifyPropertyChanged("Duration");
@@ -140,7 +148,7 @@ namespace Aldentea.SweetMutus
 			public event EventHandler MediaOpened = delegate { };
 			#endregion
 
-			// ※ClockのDurationに到達したときは発生しない！
+			// ※ClockのDurationに到達したときは発生しない！→その場合も対処しましょう。
 			#region 再生停止位置到達時
 			private void questionMediaPlayer_MediaEnded(object sender, EventArgs e)
 			{
@@ -169,6 +177,15 @@ namespace Aldentea.SweetMutus
 				_questionTimeLine = new MediaTimeline(new Uri(question.FileName));
 				//_questionTimeLine.Completed += question_Completed;
 				CurrentQuestion = question;
+
+				// ※ここで仮再生するのか？
+				_pre = true;
+				_questionClock = (MediaClock)_questionTimeLine.CreateClock(true);
+				//_questionClock.Controller.Seek(startPos, TimeSeekOrigin.BeginTime);
+				_questionClock.Completed += question_Completed;
+				_questionMediaPlayer.Clock = _questionClock;
+				//_timer.Start();
+
 			}
 			#endregion
 
@@ -206,8 +223,6 @@ namespace Aldentea.SweetMutus
 				_questionClock.Controller.Seek(startPos, TimeSeekOrigin.BeginTime);
 				_questionClock.Completed += question_Completed;
 				_questionMediaPlayer.Clock = _questionClock;
-				Task.Delay(1000).Wait();
-				_questionMediaPlayer.Clock.Controller.Pause();
 				_timer.Start();
 
 			}
@@ -295,8 +310,13 @@ namespace Aldentea.SweetMutus
 			public event PropertyChangedEventHandler PropertyChanged = delegate { };
 			#endregion
 
+			// (0.3.0)Preを追加してみた。必要かどうかはわからない。
 			protected enum Phase
 			{
+				/// <summary>
+				/// ランダムラントロ出題にあたってのプレ再生です。
+				/// </summary>
+				Pre,
 				Question,
 				Follow
 			}
