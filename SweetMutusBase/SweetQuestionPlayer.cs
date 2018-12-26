@@ -175,10 +175,25 @@ namespace Aldentea.SweetMutus
 			#region *出題開始(Start)
 			public void Start()
 			{
-				// 停止位置設定を行う．
-				if (CurrentQuestion.StopPos > TimeSpan.Zero)
+				StartBase(CurrentQuestion.PlayPos, CurrentQuestion.StopPos);
+			}
+
+			public void Start(double start_pos, double play_duration)
+			{
+				var stop_pos =  TimeSpan.FromSeconds(start_pos + play_duration);
+				if (stop_pos > _currentSongDuration)
 				{
-					_questionTimeLine.Duration = CurrentQuestion.StopPos;
+					stop_pos = _currentSongDuration;
+				}
+				StartBase(TimeSpan.FromSeconds(start_pos), stop_pos);
+			}
+
+			void StartBase(TimeSpan startPos, TimeSpan stopPos)
+			{
+				// 停止位置設定を行う．
+				if (stopPos > TimeSpan.Zero)
+				{
+					_questionTimeLine.Duration = stopPos;
 				}
 
 				// CurrentPosition更新通知用のタイマーを動かす。
@@ -188,12 +203,15 @@ namespace Aldentea.SweetMutus
 
 				// 再生を開始する。
 				_questionClock = (MediaClock)_questionTimeLine.CreateClock(true);
-				_questionClock.Controller.Seek(CurrentQuestion.PlayPos, TimeSeekOrigin.BeginTime);
+				_questionClock.Controller.Seek(startPos, TimeSeekOrigin.BeginTime);
 				_questionClock.Completed += question_Completed;
 				_questionMediaPlayer.Clock = _questionClock;
+				Task.Delay(1000).Wait();
+				_questionMediaPlayer.Clock.Controller.Pause();
 				_timer.Start();
 
 			}
+
 			#endregion
 
 			private void question_Completed(object sender, EventArgs e)

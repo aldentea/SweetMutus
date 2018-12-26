@@ -1511,10 +1511,23 @@ namespace Aldentea.SweetMutus
 
 		#endregion
 
+		// とりあえずここに置いておく。
+		Random _random = new Random();
+
 		#region Start
 		void StartQuestion_Executed(object sender, ExecutedRoutedEventArgs e)
 		{
-			MyQuestionPlayer.Start();
+			if (CurrentQuestion.Memo.Split(' ', '　').Contains("#random"))
+			{
+				var start_pos = _random.NextDouble() * 0.95 * MySongPlayer.Duration.TotalSeconds;
+				MyDocument.AddLog("開始位置", Convert.ToDecimal(start_pos));
+				MyQuestionPlayer.Start(start_pos, start_pos + 20);
+			}
+			else
+			{
+				MyQuestionPlayer.Start();
+			}
+
 			CurrentPhase = PlayingPhase.Playing;
 		}
 
