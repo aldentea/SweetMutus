@@ -1480,13 +1480,21 @@ namespace Aldentea.SweetMutus
 		void NextQuestion_Executed(object sender, ExecutedRoutedEventArgs e)
 		{
 			// どうにかして問題を決定．
-			//MyDocument.FindQuestion();
+			var next_question = MyDocument.DefineNextQuestion(CurrentCategory);
 
-			// とりあえず安易に...
-			var nextQuestion = dataGridQuestions.SelectedItem as SweetQuestion;
-			if (nextQuestion != null)
+			if (next_question == null)
 			{
-				MyDocument.AddOrder(nextQuestion.ID);
+				// とりあえず安易に...
+				next_question = dataGridQuestions.SelectedItem as SweetQuestion;
+			}
+
+			if (next_question == null)
+			{
+				MessageBox.Show("次の問題を決定できませんでした。問題リストから曲を選択して再度実行してください。");
+			}
+			else
+			{
+				MyDocument.AddOrder(next_question.ID);
 			}
 		}
 

@@ -67,6 +67,28 @@ namespace Aldentea.SweetMutus.Data
 			Logs.Initialize();
 		}
 
+		// (0.5.0)
+		/// <summary>
+		/// 次に出題する問題を決定して、それを返します。
+		/// </summary>
+		/// <returns></returns>
+		public SweetQuestion DefineNextQuestion(string category = "")
+		{
+			var question_list = Questions.Where(q => q.Category == category && q.No.HasValue).OrderBy(q => q.No.Value);
+			var question_id_list = question_list.Select(q => q.ID).ToList();
+
+			var last = Logs.LastOrDefault(o => o.QuestionID.HasValue && question_id_list.Contains(o.QuestionID.Value));
+			if (last != null)
+			{
+				var last_no = FindQuestion(last.QuestionID.Value).No.Value;
+				return GetQuestion(category, last_no + 1);
+			}
+			else
+			{
+				return GetQuestion(category, 1);
+			}
+		}
+
 
 		#region ログ関連
 
