@@ -1438,19 +1438,12 @@ namespace Aldentea.SweetMutus
 		PlayingPhase _currentPhase = PlayingPhase.Talking;
 		#endregion
 
-		public SweetQuestionPlayer MyQuestionPlayer
-		{
-			get
-			{
-				return _questionPlayer;
-			}
-		}
-		SweetQuestionPlayer _questionPlayer = new SweetQuestionPlayer();
+		public SweetQuestionPlayer MyQuestionPlayer { get; } = new SweetQuestionPlayer();
 
 		void InitializeQuestionPlayer()
 		{
-			_questionPlayer.MediaOpened += questionPlayer_MediaOpened;
-			_questionPlayer.QuestionStopped += questionPlayer_QuestionStopped;
+			MyQuestionPlayer.MediaOpened += questionPlayer_MediaOpened;
+			MyQuestionPlayer.QuestionStopped += questionPlayer_QuestionStopped;
 		}
 
 
@@ -1488,13 +1481,21 @@ namespace Aldentea.SweetMutus
 		void NextQuestion_Executed(object sender, ExecutedRoutedEventArgs e)
 		{
 			// どうにかして問題を決定．
-			//MyDocument.FindQuestion();
+			var next_question = MyDocument.DefineNextQuestion(CurrentCategory);
 
-			// とりあえず安易に...
-			var nextQuestion = dataGridQuestions.SelectedItem as SweetQuestion;
-			if (nextQuestion != null)
+			if (next_question == null)
 			{
-				MyDocument.AddOrder(nextQuestion.ID);
+				// とりあえず安易に...
+				next_question = dataGridQuestions.SelectedItem as SweetQuestion;
+			}
+
+			if (next_question == null)
+			{
+				MessageBox.Show("次の問題を決定できませんでした。問題リストから曲を選択して再度実行してください。");
+			}
+			else
+			{
+				MyDocument.AddOrder(next_question.ID);
 			}
 		}
 
@@ -1507,14 +1508,35 @@ namespace Aldentea.SweetMutus
 		private void questionPlayer_MediaOpened(object sender, EventArgs e)
 		{
 			sliderSeekSong_Play.Maximum = MyQuestionPlayer.Duration.TotalSeconds;
+			// ランダムラントロのシークをここで行う。
+			if (CurrentQuestion.IsRandomRantro)
+			{
+				var start_pos = _random.NextDouble() * 0.95 * MyQuestionPlayer.Duration.TotalSeconds;
+				MyDocument.AddLog("開始位置", Convert.ToDecimal(start_pos));
+				MyQuestionPlayer.SeekStart(TimeSpan.FromSeconds(start_pos));
+			}
 		}
 
 		#endregion
 
+		// とりあえずここに置いておく。
+		Random _random = new Random();
+
 		#region Start
 		void StartQuestion_Executed(object sender, ExecutedRoutedEventArgs e)
 		{
-			MyQuestionPlayer.Start();
+			//if (CurrentQuestion.IsRandomRantro)
+			//{
+			//	// ※この時点ではMySongPlayer.Durationを取得できない。
+			//	var start_pos = _random.NextDouble() * 0.95 * MySongPlayer.Duration.TotalSeconds;
+			//	MyDocument.AddLog("開始位置", Convert.ToDecimal(start_pos));
+			//	MyQuestionPlayer.Start(start_pos, start_pos + 20);
+			//}
+			//else
+			//{
+				MyQuestionPlayer.Start();
+			//}
+
 			CurrentPhase = PlayingPhase.Playing;
 		}
 
