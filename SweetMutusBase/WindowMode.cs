@@ -6,9 +6,20 @@ using System.Threading.Tasks;
 
 namespace Aldentea.SweetMutus.Base
 {
+	// (0.2.0)再生モードを追加。
 	public enum WindowMode
 	{
+		/// <summary>
+		/// 編集モード。
+		/// </summary>
 		Edit,
-		Play
+		/// <summary>
+		/// 再生モード。
+		/// </summary>
+		Play,
+		/// <summary>
+		/// 出題モード。
+		/// </summary>
+		Game
 	}
 }

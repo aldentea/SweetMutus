@@ -48,9 +48,9 @@
 	</Window.Title>
 	<Window.CommandBindings>
 		<CommandBinding Command="{x:Static grand:Commands.AddQuestionsCommand}"
-										Executed="AddQuestions_Executed" CanExecute="Always_CanExecute"/>
+										Executed="AddQuestions_Executed" CanExecute="EditQuestions_CanExecute"/>
 		<CommandBinding Command="{x:Static base:Commands.ExportCommand}"
-										Executed="Export_Executed" CanExecute="Always_CanExecute" />
+										Executed="Export_Executed" CanExecute="EditQuestions_CanExecute" />
 		<CommandBinding Command="{x:Static grand:Commands.SetRootDirectoryCommand}"
 										Executed="SetRootDirectory_Executed" CanExecute="Always_CanExecute" />
 		<CommandBinding Command="{x:Static base:Commands.SaveAsMtqCommand}"
@@ -95,24 +95,23 @@
 										CanExecute="ChangeFileName_CanExecute" />
 		<CommandBinding Command="{x:Static base:Commands.IncrementNoCommand}"
 										Executed="IncrementNo_Executed"
-										CanExecute="IncrementNo_CanExecute" />
+										CanExecute="EditQuestion_CanExecute" />
 		<CommandBinding Command="{x:Static base:Commands.DecrementNoCommand}"
 										Executed="DecrementNo_Executed"
-										CanExecute="IncrementNo_CanExecute" />
+										CanExecute="EditQuestion_CanExecute" />
 		<CommandBinding Command="{x:Static base:Commands.OmitQuestionsCommand}"
 										Executed="OmitQuestions_Executed"
-										CanExecute="IncrementNo_CanExecute" />
+										CanExecute="EditQuestion_CanExecute" />
 		<CommandBinding Command="{x:Static base:Commands.EnterQuestionsCommand}"
 										Executed="EnterQuestions_Executed"
-										CanExecute="IncrementNo_CanExecute" />
+										CanExecute="EditQuestion_CanExecute" />
 		<CommandBinding Command="{x:Static base:Commands.ExportQuestionsListCommand}"
 										Executed="ExportQuestionsList_Executed"
 										CanExecute="Always_CanExecute" />
 
-		<CommandBinding
-			Command="{x:Static base:Commands.ImportCommand}"
-			Executed="Import_Executed"
-			CanExecute="Always_CanExecute" />
+		<CommandBinding	Command="{x:Static base:Commands.ImportCommand}"
+										Executed="Import_Executed"
+										CanExecute="EditQuestions_CanExecute" />
 		<CommandBinding Command="{x:Static base:Commands.SetWindowModeCommand}"
 										Executed="SetWindowMode_Executed"
 										CanExecute="Always_CanExecute" />
@@ -187,7 +186,7 @@
 					</MenuItem.CommandParameter>
 				</MenuItem>
 				<MenuItem Header="ホームフォルダ変更(_H)..." Command="{x:Static grand:Commands.SetRootDirectoryCommand}" />
-        <MenuItem Header="インポート(_I)..." Command="{x:Static base:Commands.ImportCommand}" />
+				<MenuItem Header="インポート(_I)..." Command="{x:Static base:Commands.ImportCommand}" />
 				<MenuItem Header="テキスト出力(_L)..." Command="{x:Static base:Commands.ExportQuestionsListCommand}" />
 			</MenuItem>
 			<MenuItem Header="表示(_V)">
@@ -205,6 +204,10 @@
 									IsChecked="{Binding ElementName=questionsStopPosColumn, Path=Visibility, Converter={StaticResource fileNameVisibilityConverter}}" />
 				<MenuItem Name="menuItemMemoColumnVisible" Header="メモ列" IsCheckable="True"
 									IsChecked="{Binding ElementName=questionsMemoColumn, Path=Visibility, Converter={StaticResource fileNameVisibilityConverter}}" />
+				<Separator />
+				<MenuItem Name="menuItemButtonsColumnVisible" Header="再生制御ボタン" IsCheckable="True"
+									IsChecked="{Binding ElementName=ButtonsPanel, Path=Visibility, Converter={StaticResource fileNameVisibilityConverter}}" />
+
 			</MenuItem>
 			<MenuItem Header="曲再生(_P)">
 				<MenuItem Header="再生開始" Command="Play"
@@ -219,11 +222,19 @@
 						</Binding>
 					</MenuItem.IsChecked>
 				</MenuItem>
-				<MenuItem Header="出題モード" Name="menuItemPlayMode"
+				<MenuItem Header="再生モード" Name="menuItemPlayMode"
 									Command="{x:Static base:Commands.SetWindowModeCommand}" CommandParameter="{x:Static base:WindowMode.Play}">
 					<MenuItem.IsChecked>
 						<Binding Path="CurrentMode" Converter="{StaticResource equalsConverter}"
 									 ConverterParameter="{x:Static base:WindowMode.Play}">
+						</Binding>
+					</MenuItem.IsChecked>
+				</MenuItem>
+				<MenuItem Header="出題モード" Name="menuItemGameMode"
+									Command="{x:Static base:Commands.SetWindowModeCommand}" CommandParameter="{x:Static base:WindowMode.Game}">
+					<MenuItem.IsChecked>
+						<Binding Path="CurrentMode" Converter="{StaticResource equalsConverter}"
+									 ConverterParameter="{x:Static base:WindowMode.Game}">
 						</Binding>
 					</MenuItem.IsChecked>
 				</MenuItem>
@@ -261,7 +272,7 @@
 					</Expander>
 				</StackPanel>
 			</GroupBox>
-			<GroupBox Header="カテゴリ移動" Width="200">
+			<GroupBox Header="カテゴリ移動" Width="200" Name="groupBoxChangeCategory">
 				<Grid>
 					<ComboBox Name="comboBoxDestinationCategory"  Height="30"
 										VerticalAlignment="Top" Margin="0,5"
@@ -322,7 +333,7 @@
 								<Binding.ValidationRules>
 									<base:DurationValidationRule />
 								</Binding.ValidationRules>
-							</Binding> 
+							</Binding>
 						</DataGridTextColumn.Binding>
 					</DataGridTextColumn>
 					<DataGridTextColumn Header="サビ"	x:Name="questionsSabiPosColumn"
@@ -392,6 +403,7 @@
 				<Grid.RowDefinitions>
 					<RowDefinition Height="Auto" />
 					<RowDefinition Height="Auto" />
+					<RowDefinition Height="Auto" />
 				</Grid.RowDefinitions>
 				<DockPanel Grid.Row="0">
 					<DockPanel.Resources>
@@ -408,7 +420,7 @@
 					<Button Content="サビ" DockPanel.Dock="Left"
 								Command="{x:Static hypermutus:Commands.SeekSabiCommand}" />
 					<TabControl DockPanel.Dock="Left" Margin="10,0,0,0" Height="80" HorizontalAlignment="Left"
-										TabStripPlacement="Left">
+										TabStripPlacement="Left" Name="tabControlSetPosition">
 						<TabControl.Resources>
 							<Style TargetType="StackPanel">
 								<Setter Property="Orientation" Value="Horizontal" />
@@ -511,6 +523,21 @@
 								Value="{Binding RelativeSource={RelativeSource AncestorType=Window},
 												Path=MySongPlayer.CurrentPosition, Mode=TwoWay, Converter={StaticResource timeSpanDoubleConverter}}"/>
 				</DockPanel>
+				<StackPanel Grid.Row="2" Orientation="Horizontal" Name="ButtonsPanel" Visibility="Collapsed">
+					<StackPanel.Resources>
+						<Style TargetType="Button">
+							<Setter Property="Width" Value="80" />
+							<Setter Property="Height" Value="60" />
+							<Setter Property="Margin" Value="10,10,0,10" />
+						</Style>
+					</StackPanel.Resources>
+					<Button Content="前へ" Command="PreviousTrack" />
+					<Button Content="次へ" Command="NextTrack" />
+					<Button Content="-30秒" Command="{x:Static hypermutus:Commands.SeekRelativeCommand}" CommandParameter="-30" />
+					<Button Content="-5秒" Command="{x:Static hypermutus:Commands.SeekRelativeCommand}" CommandParameter="-5" />
+					<Button Content="+5秒" Command="{x:Static hypermutus:Commands.SeekRelativeCommand}" CommandParameter="5" />
+					<Button Content="+30秒" Command="{x:Static hypermutus:Commands.SeekRelativeCommand}" CommandParameter="30" />
+				</StackPanel>
 			</Grid>
 		</Expander>
 		<Expander Header="出題" Name="expanderQuestionPlayer" Visibility="Collapsed" Margin="0" Grid.Row="4"
@@ -528,8 +555,8 @@
 				<Grid.RowDefinitions>
 					<RowDefinition Height="Auto" />
 					<RowDefinition Height="Auto" />
-                    <RowDefinition Height="Auto" />
-                </Grid.RowDefinitions>
+					<RowDefinition Height="Auto" />
+				</Grid.RowDefinitions>
 				<DockPanel Grid.Row="0">
 					<Button Content="NEXT" DockPanel.Dock="Left" Margin="10,5" Width="100"
 								Command="{x:Static base:Commands.NextQuestionCommand}" />

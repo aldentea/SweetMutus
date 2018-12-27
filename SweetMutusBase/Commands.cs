@@ -58,6 +58,12 @@ namespace Aldentea.SweetMutus.Base
 		// (0.1.3.1)
 		public static RoutedCommand SetWindowModeCommand = new RoutedCommand();
 
+		// (0.1.6)
+		public static RoutedCommand SwitchSetPositionCommand = new RoutedCommand();
+
+		// (0.1.6)
+		public static RoutedCommand SetPositionCommand = new RoutedCommand();
+
 		// (0.1.4.1)
 		// どこに置くべきかな？
 		public static RoutedCommand OptionsCommand = new RoutedCommand();

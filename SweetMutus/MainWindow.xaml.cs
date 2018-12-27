@@ -75,7 +75,7 @@ namespace Aldentea.SweetMutus
 					this._currentMode = value;
 					UpdateUI();
 					SetKeyBindings();
-					if (_currentMode == WindowMode.Play)
+					if (_currentMode == WindowMode.Game)
 					{
 						MyDocument.AddOrder(null);
 					}
@@ -106,26 +106,42 @@ namespace Aldentea.SweetMutus
 		#endregion
 
 		// データバインディングで実装する前の，仮実装の置き場？
+		// WindowModeに応じてUIを調整します。
 		void UpdateUI()
 		{
 
 			// ※たぶんデータバインディングで実現可能．
-			dataGridQuestions.IsReadOnly = CurrentMode == WindowMode.Play;
+			dataGridQuestions.IsReadOnly = (CurrentMode != WindowMode.Edit);
 
 			MySongPlayer.Close();
 			// ※とりあえずここに書く．
 
-			if (CurrentMode == WindowMode.Edit)
-			{
-				numberingColumn.Width = GridLength.Auto;
-			}
-			else
+			if (CurrentMode == WindowMode.Game)
 			{
 				numberingColumn.Width = new GridLength(0);
 			}
-			expanderSongPlayer.Visibility = CurrentMode == WindowMode.Edit ? Visibility.Visible : Visibility.Collapsed;
-			expanderQuestionPlayer.Visibility = CurrentMode == WindowMode.Play ? Visibility.Visible : Visibility.Collapsed;
+			else
+			{
+				numberingColumn.Width = GridLength.Auto;
+			}
+			expanderSongPlayer.Visibility = CurrentMode == WindowMode.Game ? Visibility.Collapsed : Visibility.Visible;
+			expanderQuestionPlayer.Visibility = CurrentMode == WindowMode.Game ? Visibility.Visible : Visibility.Collapsed;
 
+			tabControlSetPosition.Visibility = CurrentMode == WindowMode.Edit ? Visibility.Visible : Visibility.Collapsed;
+			groupBoxChangeCategory.Visibility = CurrentMode == WindowMode.Edit ? Visibility.Visible : Visibility.Collapsed;
+
+			if (this.CurrentMode == WindowMode.Edit)
+			{
+				//comboBoxCategories.Visibility = Visibility.Visible;
+				//expanderNewCategory.ToolTip = "カテゴリを追加するにはクリックして下さい．";
+				expanderNewCategory.Visibility = Visibility.Visible;
+				expanderNewCategory.IsExpanded = false;
+			}
+			else
+			{
+				comboBoxCategories.Visibility = Visibility.Visible;
+				expanderNewCategory.Visibility = Visibility.Collapsed;
+			}
 		}
 
 		static KeyBinding SetSabiKeyBinding = new KeyBinding(GrandMutus.Base.Commands.SetSabiPosCommand, new KeyGesture(Key.F9));
@@ -146,7 +162,7 @@ namespace Aldentea.SweetMutus
 					this.InputBindings.Add(SetPlayKeyBinding);
 					this.InputBindings.Add(SetStopKeyBinding);
 					break;
-				case WindowMode.Play:
+				case WindowMode.Game:
 					this.InputBindings.Remove(SetSabiKeyBinding);
 					this.InputBindings.Remove(SetPlayKeyBinding);
 					this.InputBindings.Remove(SetStopKeyBinding);
@@ -216,6 +232,7 @@ namespace Aldentea.SweetMutus
 		}
 		#endregion
 
+		// (0.3.0)再生制御ボタンパネルの表示状態を復元。
 		// (0.2.5)メモ列の表示状態を復元。次の曲の自動再生の設定も復元。
 		// (0.1.3.1)[表示]系メニューの設定を追加．
 		// (0.0.13)音声ボリュームを復元．
@@ -254,9 +271,13 @@ namespace Aldentea.SweetMutus
 				= MySettings.DataGridColumnsVisibility.HasFlag(QuestionColumnsVisibility.StopPosColumn) ? Visibility.Visible : Visibility.Collapsed;
 			questionsMemoColumn.Visibility
 				= MySettings.DataGridColumnsVisibility.HasFlag(QuestionColumnsVisibility.MemoColumn) ? Visibility.Visible : Visibility.Collapsed;
+
+			ButtonsPanel.Visibility	= MySettings.ButtonsPanelVisibility;
+
 		}
 		#endregion
 
+		// (0.3.0)再生制御ボタンパネルの表示状態を保存。
 		// (0.2.5)メモ列の表示状態を復元。次の曲の自動再生の設定を追加。
 		// (0.1.3.1)[表示]系メニューの保存を追加．
 		// (0.0.13)音声ボリュームを保存．
@@ -282,6 +303,9 @@ namespace Aldentea.SweetMutus
 			flags |= menuItemStopPosColumnVisible.IsChecked ? QuestionColumnsVisibility.StopPosColumn : 0;
 			flags |= menuItemMemoColumnVisible.IsChecked ? QuestionColumnsVisibility.MemoColumn : 0;
 			MySettings.DataGridColumnsVisibility = flags;
+
+			MySettings.ButtonsPanelVisibility = ButtonsPanel.Visibility;
+
 		}
 		#endregion
 
@@ -400,7 +424,7 @@ namespace Aldentea.SweetMutus
 
 		private void AddCategory_CanExecute(object sender, CanExecuteRoutedEventArgs e)
 		{
-			e.CanExecute = (e.Parameter is string) && !this.Categories.Contains((string)e.Parameter);
+			e.CanExecute = this.CurrentMode == WindowMode.Edit && (e.Parameter is string) && !this.Categories.Contains((string)e.Parameter);
 		}
 
 		#endregion
@@ -420,7 +444,7 @@ namespace Aldentea.SweetMutus
 
 		private void ChangeCategory_CanExecute(object sender, CanExecuteRoutedEventArgs e)
 		{
-			e.CanExecute = (e.Parameter is string) && (string)e.Parameter != this.CurrentCategory
+			e.CanExecute = (this.CurrentMode == WindowMode.Edit) && (e.Parameter is string) && (string)e.Parameter != this.CurrentCategory
 				&& this.dataGridQuestions.SelectedItems.Count > 0;
 		}
 
@@ -480,7 +504,7 @@ namespace Aldentea.SweetMutus
 
 		private void ChangeFileName_CanExecute(object sender, CanExecuteRoutedEventArgs e)
 		{
-			e.CanExecute = (e.Parameter is SweetQuestion);
+			e.CanExecute = (this.CurrentMode == WindowMode.Edit) && (e.Parameter is SweetQuestion);
 		}
 
 		#endregion
@@ -507,10 +531,23 @@ namespace Aldentea.SweetMutus
 			}
 		}
 
-		private void IncrementNo_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+		private void EditQuestion_CanExecute(object sender, CanExecuteRoutedEventArgs e)
 		{
-			var items = e.Parameter as System.Collections.IList;
-			e.CanExecute = items != null && items.Count > 0;
+			if (this.CurrentMode == WindowMode.Edit)
+			{
+				var items = e.Parameter as System.Collections.IList;
+				e.CanExecute = items != null && items.Count > 0;
+			}
+			else
+			{
+				e.CanExecute = false;
+			}
+		}
+
+
+		private void EditQuestions_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+		{
+			e.CanExecute = this.CurrentMode == WindowMode.Edit;
 		}
 
 		#endregion
@@ -1401,19 +1438,12 @@ namespace Aldentea.SweetMutus
 		PlayingPhase _currentPhase = PlayingPhase.Talking;
 		#endregion
 
-		public SweetQuestionPlayer MyQuestionPlayer
-		{
-			get
-			{
-				return _questionPlayer;
-			}
-		}
-		SweetQuestionPlayer _questionPlayer = new SweetQuestionPlayer();
+		public SweetQuestionPlayer MyQuestionPlayer { get; } = new SweetQuestionPlayer();
 
 		void InitializeQuestionPlayer()
 		{
-			_questionPlayer.MediaOpened += questionPlayer_MediaOpened;
-			_questionPlayer.QuestionStopped += questionPlayer_QuestionStopped;
+			MyQuestionPlayer.MediaOpened += questionPlayer_MediaOpened;
+			MyQuestionPlayer.QuestionStopped += questionPlayer_QuestionStopped;
 		}
 
 
@@ -1451,13 +1481,21 @@ namespace Aldentea.SweetMutus
 		void NextQuestion_Executed(object sender, ExecutedRoutedEventArgs e)
 		{
 			// どうにかして問題を決定．
-			//MyDocument.FindQuestion();
+			var next_question = MyDocument.DefineNextQuestion(CurrentCategory);
 
-			// とりあえず安易に...
-			var nextQuestion = dataGridQuestions.SelectedItem as SweetQuestion;
-			if (nextQuestion != null)
+			if (next_question == null)
 			{
-				MyDocument.AddOrder(nextQuestion.ID);
+				// とりあえず安易に...
+				next_question = dataGridQuestions.SelectedItem as SweetQuestion;
+			}
+
+			if (next_question == null)
+			{
+				MessageBox.Show("次の問題を決定できませんでした。問題リストから曲を選択して再度実行してください。");
+			}
+			else
+			{
+				MyDocument.AddOrder(next_question.ID);
 			}
 		}
 
@@ -1470,14 +1508,35 @@ namespace Aldentea.SweetMutus
 		private void questionPlayer_MediaOpened(object sender, EventArgs e)
 		{
 			sliderSeekSong_Play.Maximum = MyQuestionPlayer.Duration.TotalSeconds;
+			// ランダムラントロのシークをここで行う。
+			if (CurrentQuestion.IsRandomRantro)
+			{
+				var start_pos = _random.NextDouble() * 0.95 * MyQuestionPlayer.Duration.TotalSeconds;
+				MyDocument.AddLog("開始位置", Convert.ToDecimal(start_pos));
+				MyQuestionPlayer.SeekStart(TimeSpan.FromSeconds(start_pos));
+			}
 		}
 
 		#endregion
 
+		// とりあえずここに置いておく。
+		Random _random = new Random();
+
 		#region Start
 		void StartQuestion_Executed(object sender, ExecutedRoutedEventArgs e)
 		{
-			MyQuestionPlayer.Start();
+			//if (CurrentQuestion.IsRandomRantro)
+			//{
+			//	// ※この時点ではMySongPlayer.Durationを取得できない。
+			//	var start_pos = _random.NextDouble() * 0.95 * MySongPlayer.Duration.TotalSeconds;
+			//	MyDocument.AddLog("開始位置", Convert.ToDecimal(start_pos));
+			//	MyQuestionPlayer.Start(start_pos, start_pos + 20);
+			//}
+			//else
+			//{
+				MyQuestionPlayer.Start();
+			//}
+
 			CurrentPhase = PlayingPhase.Playing;
 		}
 
@@ -1559,7 +1618,7 @@ namespace Aldentea.SweetMutus
 
 		void Play_SwitchPlayPause_Executed(object sender, ExecutedRoutedEventArgs e)
 		{
-			if (CurrentMode == WindowMode.Play
+			if (CurrentMode == WindowMode.Game
 								&& (CurrentPhase == PlayingPhase.Judged || CurrentPhase == PlayingPhase.Talking))
 			{
 				MyQuestionPlayer.SwitchPlayPause();
@@ -1568,7 +1627,7 @@ namespace Aldentea.SweetMutus
 
 		void Play_SwitchPlayPause_CanExecute(object sender, CanExecuteRoutedEventArgs e)
 		{
-			e.CanExecute = CurrentMode == WindowMode.Play
+			e.CanExecute = CurrentMode == WindowMode.Game
 					&& (CurrentPhase == PlayingPhase.Judged || CurrentPhase == PlayingPhase.Talking);
 			e.Handled = true;
 		}
