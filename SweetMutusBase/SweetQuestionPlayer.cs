@@ -46,6 +46,7 @@ namespace Aldentea.SweetMutus
 			SweetQuestion _currentQuestion = null;
 			#endregion
 
+			#region *CurrentPositionプロパティ
 			/// <summary>
 			/// 現在の再生位置を取得／設定します。設定は、フォロー時のみ可能です。
 			/// </summary>
@@ -66,6 +67,7 @@ namespace Aldentea.SweetMutus
 					}
 				}
 			}
+			#endregion
 
 			#region *Durationプロパティ
 			/// <summary>
@@ -123,9 +125,18 @@ namespace Aldentea.SweetMutus
 			}
 			#endregion
 
+			// (0.3.0)ランダムラントロ出題に対応。Start、SeekStartなどを参照。
 			#region メディアオープン時
 			private void questionMediaPlayer_MediaOpened(object sender, EventArgs e)
 			{
+				if (CurrentQuestion.IsRandomRantro)
+				{
+					_questionMediaPlayer.Clock.Controller.Pause();
+					// いったん一時停止する。
+					// 呼び出し元で出題開始位置を決定し、SeekStartで再生を再開する。
+					// ※こっちで出題開始位置を決定して、イベントを通して呼び出し元に渡す仕様でもいいかもしれない。
+				}
+
 				// _followClockをsetした後にもこのイベントが呼び出される！
 				if (CurrentPhase == Phase.Question)
 				{
@@ -140,7 +151,7 @@ namespace Aldentea.SweetMutus
 			public event EventHandler MediaOpened = delegate { };
 			#endregion
 
-			// ※ClockのDurationに到達したときは発生しない！
+			// ※ClockのDurationに到達したときは発生しない！→その場合も対処しましょう。
 			#region 再生停止位置到達時
 			private void questionMediaPlayer_MediaEnded(object sender, EventArgs e)
 			{
@@ -169,32 +180,56 @@ namespace Aldentea.SweetMutus
 				_questionTimeLine = new MediaTimeline(new Uri(question.FileName));
 				//_questionTimeLine.Completed += question_Completed;
 				CurrentQuestion = question;
+
 			}
 			#endregion
 
+			// (0.3.0)ランダムラントロ出題に対応。SeekStart、questionMediaPlayer_MediaOpenedなどを参照。
 			#region *出題開始(Start)
 			public void Start()
 			{
-				// 停止位置設定を行う．
-				if (CurrentQuestion.StopPos > TimeSpan.Zero)
+				if (!CurrentQuestion.IsRandomRantro)
 				{
-					_questionTimeLine.Duration = CurrentQuestion.StopPos;
+					// 停止位置設定を行う．
+					if (CurrentQuestion.StopPos > TimeSpan.Zero)
+					{
+						_questionTimeLine.Duration = CurrentQuestion.StopPos;
+					}
 				}
-
 				// CurrentPosition更新通知用のタイマーを動かす。
 				_timer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(250) };
 				_timer.Tick += (sender, e) => { NotifyPropertyChanged("CurrentPosition"); };
 
-
 				// 再生を開始する。
 				_questionClock = (MediaClock)_questionTimeLine.CreateClock(true);
-				_questionClock.Controller.Seek(CurrentQuestion.PlayPos, TimeSeekOrigin.BeginTime);
+				if (!CurrentQuestion.IsRandomRantro)
+				{
+					_questionClock.Controller.Seek(CurrentQuestion.PlayPos, TimeSeekOrigin.BeginTime);
+				}
 				_questionClock.Completed += question_Completed;
 				_questionMediaPlayer.Clock = _questionClock;
 				_timer.Start();
 
 			}
+
 			#endregion
+
+			// (0.3.0)
+			#region *シークして出題開始(SeekStart)
+			/// <summary>
+			/// 曲をシークした後に、出題を開始します。ランダムラントロ専用のメソッドです。
+			/// </summary>
+			/// <param name="startPosition"></param>
+			public void SeekStart(TimeSpan startPosition)
+			{
+				if (CurrentQuestion.IsRandomRantro)
+				{
+					_questionClock.Controller.Seek(startPosition, TimeSeekOrigin.BeginTime);
+					_questionClock.Controller.Resume();
+				}
+			}
+			#endregion
+
 
 			private void question_Completed(object sender, EventArgs e)
 			{
