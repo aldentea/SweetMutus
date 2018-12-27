@@ -38,5 +38,8 @@
     <Setting Name="AutoPlayOnNext" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">True</Value>
     </Setting>
+    <Setting Name="ButtonsPanelVisibility" Type="System.Windows.Visibility" Scope="User">
+      <Value Profile="(Default)">Collapsed</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

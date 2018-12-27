@@ -204,6 +204,10 @@
 									IsChecked="{Binding ElementName=questionsStopPosColumn, Path=Visibility, Converter={StaticResource fileNameVisibilityConverter}}" />
 				<MenuItem Name="menuItemMemoColumnVisible" Header="メモ列" IsCheckable="True"
 									IsChecked="{Binding ElementName=questionsMemoColumn, Path=Visibility, Converter={StaticResource fileNameVisibilityConverter}}" />
+				<Separator />
+				<MenuItem Name="menuItemButtonsColumnVisible" Header="再生制御ボタン" IsCheckable="True"
+									IsChecked="{Binding ElementName=ButtonsPanel, Path=Visibility, Converter={StaticResource fileNameVisibilityConverter}}" />
+
 			</MenuItem>
 			<MenuItem Header="曲再生(_P)">
 				<MenuItem Header="再生開始" Command="Play"
@@ -399,6 +403,7 @@
 				<Grid.RowDefinitions>
 					<RowDefinition Height="Auto" />
 					<RowDefinition Height="Auto" />
+					<RowDefinition Height="Auto" />
 				</Grid.RowDefinitions>
 				<DockPanel Grid.Row="0">
 					<DockPanel.Resources>
@@ -518,6 +523,21 @@
 								Value="{Binding RelativeSource={RelativeSource AncestorType=Window},
 												Path=MySongPlayer.CurrentPosition, Mode=TwoWay, Converter={StaticResource timeSpanDoubleConverter}}"/>
 				</DockPanel>
+				<StackPanel Grid.Row="2" Orientation="Horizontal" Name="ButtonsPanel" Visibility="Collapsed">
+					<StackPanel.Resources>
+						<Style TargetType="Button">
+							<Setter Property="Width" Value="80" />
+							<Setter Property="Height" Value="60" />
+							<Setter Property="Margin" Value="10,10,0,10" />
+						</Style>
+					</StackPanel.Resources>
+					<Button Content="前へ" Command="PreviousTrack" />
+					<Button Content="次へ" Command="NextTrack" />
+					<Button Content="-30秒" Command="{x:Static hypermutus:Commands.SeekRelativeCommand}" CommandParameter="-30" />
+					<Button Content="-5秒" Command="{x:Static hypermutus:Commands.SeekRelativeCommand}" CommandParameter="-5" />
+					<Button Content="+5秒" Command="{x:Static hypermutus:Commands.SeekRelativeCommand}" CommandParameter="5" />
+					<Button Content="+30秒" Command="{x:Static hypermutus:Commands.SeekRelativeCommand}" CommandParameter="30" />
+				</StackPanel>
 			</Grid>
 		</Expander>
 		<Expander Header="出題" Name="expanderQuestionPlayer" Visibility="Collapsed" Margin="0" Grid.Row="4"
