@@ -320,6 +320,35 @@ namespace Aldentea.SweetMutus.Data
 		#endregion
 
 		// (0.6.0)
+		#region *SeperatedMemoプロパティ
+		/// <summary>
+		/// 全角半角空白で分割したメモを取得します。
+		/// </summary>
+		public ICollection<string> SeparatedMemo
+		{
+			get
+			{
+				return Memo.Split(' ', '　');
+			}
+		}
+		#endregion
+
+		// (0.6.0)
+		#region *IsRandomRantroプロパティ
+		/// <summary>
+		/// この問題がランダムラントロであるかどうかの値を取得します。
+		/// </summary>
+		public bool IsRandomRantro
+		{
+			get
+			{
+				return SeparatedMemo.Contains("#random");
+			}
+		}
+		#endregion
+
+
+		// (0.6.0)
 		#region *SeekPositionListプロパティ
 		public List<SeekPosition> SeekPositionList
 		{
@@ -330,6 +359,7 @@ namespace Aldentea.SweetMutus.Data
 		}
 		List<SeekPosition> _seekPositionList = new List<SeekPosition>();
 		#endregion
+
 
 
 		#region XML入出力関連

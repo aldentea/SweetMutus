@@ -1500,6 +1500,13 @@ namespace Aldentea.SweetMutus
 		private void questionPlayer_MediaOpened(object sender, EventArgs e)
 		{
 			sliderSeekSong_Play.Maximum = MyQuestionPlayer.Duration.TotalSeconds;
+			// ランダムラントロのシークをここで行う。
+			if (CurrentQuestion.IsRandomRantro)
+			{
+				var start_pos = _random.NextDouble() * 0.95 * MyQuestionPlayer.Duration.TotalSeconds;
+				MyDocument.AddLog("開始位置", Convert.ToDecimal(start_pos));
+				MyQuestionPlayer.SeekStart(TimeSpan.FromSeconds(start_pos));
+			}
 		}
 
 		#endregion
@@ -1510,17 +1517,17 @@ namespace Aldentea.SweetMutus
 		#region Start
 		void StartQuestion_Executed(object sender, ExecutedRoutedEventArgs e)
 		{
-			if (CurrentQuestion.Memo.Split(' ', '　').Contains("#random"))
-			{
-				// ※この時点ではMySongPlayer.Durationを取得できない。
-				var start_pos = _random.NextDouble() * 0.95 * MySongPlayer.Duration.TotalSeconds;
-				MyDocument.AddLog("開始位置", Convert.ToDecimal(start_pos));
-				MyQuestionPlayer.Start(start_pos, start_pos + 20);
-			}
-			else
-			{
+			//if (CurrentQuestion.IsRandomRantro)
+			//{
+			//	// ※この時点ではMySongPlayer.Durationを取得できない。
+			//	var start_pos = _random.NextDouble() * 0.95 * MySongPlayer.Duration.TotalSeconds;
+			//	MyDocument.AddLog("開始位置", Convert.ToDecimal(start_pos));
+			//	MyQuestionPlayer.Start(start_pos, start_pos + 20);
+			//}
+			//else
+			//{
 				MyQuestionPlayer.Start();
-			}
+			//}
 
 			CurrentPhase = PlayingPhase.Playing;
 		}

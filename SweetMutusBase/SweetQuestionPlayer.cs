@@ -46,6 +46,7 @@ namespace Aldentea.SweetMutus
 			SweetQuestion _currentQuestion = null;
 			#endregion
 
+			#region *CurrentPositionプロパティ
 			/// <summary>
 			/// 現在の再生位置を取得／設定します。設定は、フォロー時のみ可能です。
 			/// </summary>
@@ -66,6 +67,7 @@ namespace Aldentea.SweetMutus
 					}
 				}
 			}
+			#endregion
 
 			#region *Durationプロパティ
 			/// <summary>
@@ -79,8 +81,6 @@ namespace Aldentea.SweetMutus
 				}
 			}
 			#endregion
-
-			bool _pre = false;
 
 			#region *CurrentPhaseプロパティ
 			protected Phase CurrentPhase
@@ -125,17 +125,20 @@ namespace Aldentea.SweetMutus
 			}
 			#endregion
 
+			// (0.3.0)ランダムラントロ出題に対応。Start、SeekStartなどを参照。
 			#region メディアオープン時
 			private void questionMediaPlayer_MediaOpened(object sender, EventArgs e)
 			{
-				if (_pre)
+				if (CurrentQuestion.IsRandomRantro)
 				{
 					_questionMediaPlayer.Clock.Controller.Pause();
-
+					// いったん一時停止する。
+					// 呼び出し元で出題開始位置を決定し、SeekStartで再生を再開する。
+					// ※こっちで出題開始位置を決定して、イベントを通して呼び出し元に渡す仕様でもいいかもしれない。
 				}
 
 				// _followClockをsetした後にもこのイベントが呼び出される！
-				else if (CurrentPhase == Phase.Question)
+				if (CurrentPhase == Phase.Question)
 				{
 					_currentSongDuration = _questionMediaPlayer.NaturalDuration.TimeSpan;
 					NotifyPropertyChanged("Duration");
@@ -178,49 +181,31 @@ namespace Aldentea.SweetMutus
 				//_questionTimeLine.Completed += question_Completed;
 				CurrentQuestion = question;
 
-				// ※ここで仮再生するのか？
-				_pre = true;
-				_questionClock = (MediaClock)_questionTimeLine.CreateClock(true);
-				//_questionClock.Controller.Seek(startPos, TimeSeekOrigin.BeginTime);
-				_questionClock.Completed += question_Completed;
-				_questionMediaPlayer.Clock = _questionClock;
-				//_timer.Start();
-
 			}
 			#endregion
 
+			// (0.3.0)ランダムラントロ出題に対応。SeekStart、questionMediaPlayer_MediaOpenedなどを参照。
 			#region *出題開始(Start)
 			public void Start()
 			{
-				StartBase(CurrentQuestion.PlayPos, CurrentQuestion.StopPos);
-			}
-
-			public void Start(double start_pos, double play_duration)
-			{
-				var stop_pos =  TimeSpan.FromSeconds(start_pos + play_duration);
-				if (stop_pos > _currentSongDuration)
+				if (!CurrentQuestion.IsRandomRantro)
 				{
-					stop_pos = _currentSongDuration;
+					// 停止位置設定を行う．
+					if (CurrentQuestion.StopPos > TimeSpan.Zero)
+					{
+						_questionTimeLine.Duration = CurrentQuestion.StopPos;
+					}
 				}
-				StartBase(TimeSpan.FromSeconds(start_pos), stop_pos);
-			}
-
-			void StartBase(TimeSpan startPos, TimeSpan stopPos)
-			{
-				// 停止位置設定を行う．
-				if (stopPos > TimeSpan.Zero)
-				{
-					_questionTimeLine.Duration = stopPos;
-				}
-
 				// CurrentPosition更新通知用のタイマーを動かす。
 				_timer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(250) };
 				_timer.Tick += (sender, e) => { NotifyPropertyChanged("CurrentPosition"); };
 
-
 				// 再生を開始する。
 				_questionClock = (MediaClock)_questionTimeLine.CreateClock(true);
-				_questionClock.Controller.Seek(startPos, TimeSeekOrigin.BeginTime);
+				if (!CurrentQuestion.IsRandomRantro)
+				{
+					_questionClock.Controller.Seek(CurrentQuestion.PlayPos, TimeSeekOrigin.BeginTime);
+				}
 				_questionClock.Completed += question_Completed;
 				_questionMediaPlayer.Clock = _questionClock;
 				_timer.Start();
@@ -228,6 +213,23 @@ namespace Aldentea.SweetMutus
 			}
 
 			#endregion
+
+			// (0.3.0)
+			#region *シークして出題開始(SeekStart)
+			/// <summary>
+			/// 曲をシークした後に、出題を開始します。ランダムラントロ専用のメソッドです。
+			/// </summary>
+			/// <param name="startPosition"></param>
+			public void SeekStart(TimeSpan startPosition)
+			{
+				if (CurrentQuestion.IsRandomRantro)
+				{
+					_questionClock.Controller.Seek(startPosition, TimeSeekOrigin.BeginTime);
+					_questionClock.Controller.Resume();
+				}
+			}
+			#endregion
+
 
 			private void question_Completed(object sender, EventArgs e)
 			{
@@ -310,13 +312,8 @@ namespace Aldentea.SweetMutus
 			public event PropertyChangedEventHandler PropertyChanged = delegate { };
 			#endregion
 
-			// (0.3.0)Preを追加してみた。必要かどうかはわからない。
 			protected enum Phase
 			{
-				/// <summary>
-				/// ランダムラントロ出題にあたってのプレ再生です。
-				/// </summary>
-				Pre,
 				Question,
 				Follow
 			}
