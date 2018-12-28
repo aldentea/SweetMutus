@@ -386,9 +386,10 @@ namespace Aldentea.SweetMutus
 
 		#region Export
 
-		private void Export_Executed(object sender, ExecutedRoutedEventArgs e)
+		// (0.4.0)async化。
+		private async void Export_Executed(object sender, ExecutedRoutedEventArgs e)
 		{
-			this.Export();
+			await this.Export();
 		}
 
 
@@ -976,9 +977,10 @@ namespace Aldentea.SweetMutus
 			}
 		}
 
+		// (0.4.0)async化。
 		// (0.0.13)SweetMutus形式に加えて，HyperMutus形式でエクスポートできるように改良．
 		#region *エクスポート(Export)
-		void Export()
+		async Task Export()
 		{
 			// ファイル名選択
 			var dialog = new HyperMutus.ExportDialog { FileFilter = "SweetMutusファイル(*.smt)|*.smt|HyperMutusファイル(*.mtq)|*.mtq" };
@@ -996,7 +998,7 @@ namespace Aldentea.SweetMutus
 				ExportAllSongs(MyDocument.Questions, songsDestination, FileOverwriting.IfNew, false);
 
 				// ドキュメント保存
-				MyDocument.SaveExport(fileName, songDirectory);
+				await MyDocument.SaveExport(fileName, songDirectory);
 			}
 
 		}

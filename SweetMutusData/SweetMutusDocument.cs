@@ -7,7 +7,7 @@ using System.Xml;
 using System.Xml.Linq;
 using GrandMutus.Data;
 using System.IO;
-
+using System.Threading.Tasks;
 
 namespace Aldentea.SweetMutus.Data
 {
@@ -489,6 +489,7 @@ namespace Aldentea.SweetMutus.Data
 		#endregion
 
 
+		// (0.4.0)async化。
 		// (0.1.10).mtqファイルのエクスポートに対応．
 		#region *エクスポート時にファイルを保存(SaveExport)
 		/// <summary>
@@ -497,7 +498,7 @@ namespace Aldentea.SweetMutus.Data
 		/// </summary>
 		/// <param name="destination"></param>
 		/// <param name="songs_root"></param>
-		public void SaveExport(string destination, string songs_root)
+		public async Task SaveExport(string destination, string songs_root)
 		{
 			switch (Path.GetExtension(destination))
 			{
@@ -505,13 +506,13 @@ namespace Aldentea.SweetMutus.Data
 					// case ".mtu":
 					using (XmlWriter writer = XmlWriter.Create(destination, this.WriterSettings))
 					{
-						GenerateMtuXml(Path.GetDirectoryName(destination), songs_root).WriteTo(writer);
+						await GenerateMtuXml(Path.GetDirectoryName(destination), songs_root).WriteToAsync(writer);
 					}
 					break;
 				default:
 					using (XmlWriter writer = XmlWriter.Create(destination, this.WriterSettings))
 					{
-						GenerateXml(Path.GetDirectoryName(destination), songs_root).WriteTo(writer);
+						await GenerateXml(Path.GetDirectoryName(destination), songs_root).WriteToAsync(writer);
 					}
 					break;
 			}
@@ -528,15 +529,16 @@ namespace Aldentea.SweetMutus.Data
 			Questions.Initialize();
 		}
 
+		// (0.4.0)async化。
 		// (0.1.10)HyperMutusのファイルに対応...したつもり．
 		// (0.1.3)mutus2のファイルに対応？
 		// (*0.4.0.1)Songs.RootDirectoryの設定を追加。
 		#region *[override]ファイルからロード(LoadDocument)
-		protected override bool LoadDocument(string fileName)
+		protected async override Task<bool> LoadDocument(string fileName)
 		{
 			using (XmlReader reader = XmlReader.Create(fileName))
 			{
-				var xdoc = XDocument.Load(reader);
+				var xdoc = await XDocumentExtension.LoadAsync(reader);
 				var root = xdoc.Root;
 
 				// ※ここから下は，継承先でオーバーライドできるようにしておきましょう．
@@ -678,8 +680,9 @@ namespace Aldentea.SweetMutus.Data
 
 		#endregion
 
+		// (0.4.0)async化。
 		#region *[override]ファイルに保存(SaveDocument)
-		protected override bool SaveDocument(string destination)
+		protected async override Task<bool> SaveDocument(string destination)
 		{
 			
 			// 拡張子に応じてフォーマットを決める。
@@ -689,9 +692,9 @@ namespace Aldentea.SweetMutus.Data
 			{
 				case ".mtu":
 				case ".mtq":
-					return SaveMtqDocument(destination);
+					return await SaveMtqDocument(destination);
 				default:
-					return SaveSmtDocument(destination);
+					return await SaveSmtDocument(destination);
 			}
 
 		}
@@ -699,22 +702,24 @@ namespace Aldentea.SweetMutus.Data
 
 		#region 保存関連メソッド
 
-		bool SaveSmtDocument(string destination)
+		// (0.4.0)async化。
+		async Task<bool> SaveSmtDocument(string destination)
 		{
 			using (XmlWriter writer = XmlWriter.Create(destination, this.WriterSettings))
 			{
-				GenerateXml(Path.GetDirectoryName(destination)).WriteTo(writer);
+				await GenerateXml(Path.GetDirectoryName(destination)).WriteToAsync(writer);
 			}
 			// 基本的にtrueを返せばよろしい．
 			// falseを返すべきなのは，保存する前にキャンセルした時とかかな？
 			return true;
 		}
 
-		bool SaveMtqDocument(string destination)
+		// (0.4.0)async化。
+		async Task<bool> SaveMtqDocument(string destination)
 		{
 			using (XmlWriter writer = XmlWriter.Create(destination, this.WriterSettings))
 			{
-				GenerateMtuXml(Path.GetDirectoryName(destination)).WriteTo(writer);
+				await GenerateMtuXml(Path.GetDirectoryName(destination)).WriteToAsync(writer);
 			}
 			return true;
 		}
