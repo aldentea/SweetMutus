@@ -133,6 +133,25 @@ namespace Aldentea.SweetMutus.Data
 
 		#endregion
 
+		// (0.6.0)
+		// noがついている問題があれば、それらの間でシャッフルを行う。
+		// なければ全ての問題でシャッフルを行いnoを付与する。
+		#region *出題順をシャッフル(Shuffle)
+		public void Shuffle(string category)
+		{
+			var questions = this.Where(q => q.Category == category && q.No.HasValue);
+			if (questions.Count() > 0)
+			{
+				
+			}
+			else
+			{
+				questions = this.Where(q => q.Category == category);
+			}
+		}
+		#endregion
+
+
 		#region SongsCollectionのコピペ
 
 		#region RootDirectory関連

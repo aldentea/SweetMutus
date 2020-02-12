@@ -397,6 +397,15 @@ namespace Aldentea.SweetMutus.Data
 		}
 		#endregion
 
+		// (0.6.0)
+		#region *出題順をシャッフル(ShuffleQuestions)
+		public void ShuffleQuestions(string category)
+		{
+			Questions.Shuffle(category);
+		}
+		#endregion
+
+
 
 		// (*0.4.5.1)
 		#region *Questionの番号変更時(Questions_NoChanged)
@@ -489,7 +498,7 @@ namespace Aldentea.SweetMutus.Data
 		#endregion
 
 
-		// (0.4.0)async化。
+		// (0.6.0)async化。
 		// (0.1.10).mtqファイルのエクスポートに対応．
 		#region *エクスポート時にファイルを保存(SaveExport)
 		/// <summary>
@@ -529,7 +538,7 @@ namespace Aldentea.SweetMutus.Data
 			Questions.Initialize();
 		}
 
-		// (0.4.0)async化。
+		// (0.6.0)async化。
 		// (0.1.10)HyperMutusのファイルに対応...したつもり．
 		// (0.1.3)mutus2のファイルに対応？
 		// (*0.4.0.1)Songs.RootDirectoryの設定を追加。
@@ -680,7 +689,7 @@ namespace Aldentea.SweetMutus.Data
 
 		#endregion
 
-		// (0.4.0)async化。
+		// (0.6.0)async化。
 		#region *[override]ファイルに保存(SaveDocument)
 		protected async override Task<bool> SaveDocument(string destination)
 		{
@@ -702,7 +711,7 @@ namespace Aldentea.SweetMutus.Data
 
 		#region 保存関連メソッド
 
-		// (0.4.0)async化。
+		// (0.6.0)async化。
 		async Task<bool> SaveSmtDocument(string destination)
 		{
 			using (XmlWriter writer = XmlWriter.Create(destination, this.WriterSettings))
@@ -714,7 +723,7 @@ namespace Aldentea.SweetMutus.Data
 			return true;
 		}
 
-		// (0.4.0)async化。
+		// (0.6.0)async化。
 		async Task<bool> SaveMtqDocument(string destination)
 		{
 			using (XmlWriter writer = XmlWriter.Create(destination, this.WriterSettings))
