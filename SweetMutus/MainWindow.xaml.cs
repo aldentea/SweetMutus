@@ -47,6 +47,35 @@ namespace Aldentea.SweetMutus
 		ObservableCollection<string> _categories = new ObservableCollection<string>(new string[] { string.Empty });
 		#endregion
 
+		#region *RandomRantroプロパティ
+		public bool RandomRantro { get => _randomRantro;
+			set {
+				if (_randomRantro != value)
+				{
+					_randomRantro = value;
+					NotifyPropertyChanged("RandomRantro");
+				}
+			}
+		}
+		bool _randomRantro = false;
+		#endregion
+
+		#region *RandomRantroFactorプロパティ
+		public double RandomRantroFactor
+		{
+			get => _randomRantroFactor;
+			set
+			{
+				if (_randomRantroFactor != value)
+				{
+					_randomRantroFactor = value;
+					NotifyPropertyChanged("RandomRantroFactor");
+				}
+			}
+		}
+		double _randomRantroFactor = 0.97;
+		#endregion
+
 		#endregion
 
 		// (0.0.6)
@@ -764,10 +793,7 @@ namespace Aldentea.SweetMutus
 		#endregion
 
 		// (0.0.8)
-		internal void UpdateFilter()
-		{
-			UpdateFilter(CurrentCategory);
-		}
+		internal void UpdateFilter() => UpdateFilter(CurrentCategory);
 
 		internal void UpdateFilter(string category)
 		{
@@ -1240,6 +1266,8 @@ namespace Aldentea.SweetMutus
 		//}
 		#endregion
 
+
+		// (0.4.0) mutus2ライクなランダムラントロに対応。
 		// (0.2.6)
 		/// <summary>
 		/// 曲をオープンします。再生中であるか、forcePlayにtrueが与えられると、再生も開始します。
@@ -1257,7 +1285,14 @@ namespace Aldentea.SweetMutus
 			await Task.Delay(10);
 
 			this.CurrentSong = song;
-			_songPlayer.CurrentPosition = song.PlayPos;
+			// 再生開始位置を設定する。
+			var play_pos = song.PlayPos;
+			if (RandomRantro)
+			{
+				Random r = new Random();
+				play_pos = TimeSpan.FromSeconds(_songPlayer.Duration.TotalSeconds * r.NextDouble() * RandomRantroFactor); 
+			}
+			_songPlayer.CurrentPosition = play_pos;
 			if (forcePlay || _songPlayer.CurrentState == SongPlayerState.Playing)
 			{
 				_songPlayer.Play();

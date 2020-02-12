@@ -212,6 +212,8 @@
 			<MenuItem Header="曲再生(_P)">
 				<MenuItem Header="再生開始" Command="Play"
 									CommandParameter="{Binding ElementName=dataGridQuestions, Path=SelectedItem}" />
+				<MenuItem Header="ランダムラントロ" Name="menuItemMutus2RandomRantro"
+									IsCheckable="True" IsChecked="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=local:MainWindow}, Path=RandomRantro}"  />
 			</MenuItem>
 			<MenuItem Header="設定(_C)" Name="menuItemMode" DataContext="{Binding RelativeSource={RelativeSource AncestorType=Window}}">
 				<MenuItem Header="編集モード" Name="menuItemEditMode"
