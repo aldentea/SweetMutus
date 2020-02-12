@@ -48,16 +48,18 @@ namespace Aldentea.SweetMutus
 		#endregion
 
 		#region *RandomRantroプロパティ
-		public bool RandomRantro { get => _randomRantro;
+		/// <summary>
+		/// 編集モードにおいて（再生モードも？）曲再生がランダムラントロモードであるかどうかの値を取得／設定します。
+		/// </summary>
+		public bool RandomRantro { get => _songPlayer.IsRandomRantro;
 			set {
-				if (_randomRantro != value)
+				if (_songPlayer.IsRandomRantro != value)
 				{
-					_randomRantro = value;
+					_songPlayer.IsRandomRantro = value;
 					NotifyPropertyChanged("RandomRantro");
 				}
 			}
 		}
-		bool _randomRantro = false;
 		#endregion
 
 		#region *RandomRantroFactorプロパティ
@@ -1150,6 +1152,12 @@ namespace Aldentea.SweetMutus
 			//{
 				this.labelDuration.Content = _songPlayer.Duration;
 				this.sliderSeekSong.Maximum = _songPlayer.Duration.TotalSeconds;
+			if (RandomRantro)
+			{
+				// ここで再生開始位置を設定する。
+					var play_pos = TimeSpan.FromSeconds(_songPlayer.Duration.TotalSeconds * _random.NextDouble() * RandomRantroFactor);
+					_songPlayer.SeekPlay(play_pos);
+			}
 				// 出題用
 				this.labelDuration_Play.Content = _songPlayer.Duration;
 				this.sliderSeekSong_Play.Maximum = _songPlayer.Duration.TotalSeconds;
@@ -1211,7 +1219,7 @@ namespace Aldentea.SweetMutus
 				await TryNextTrack();
 			}
 		}
-		#endregion
+
 
 		// (0.2.6) 曲を自動再生するかどうかは、アプリケーション設定のAutoPlayOnNextで制御する。async化。
 		// (0.2.5)
@@ -1233,6 +1241,7 @@ namespace Aldentea.SweetMutus
 			}
 
 		}
+		#endregion
 
 		// (0.0.8.7)
 		#region PreviousTrack
@@ -1285,14 +1294,10 @@ namespace Aldentea.SweetMutus
 			await Task.Delay(10);
 
 			this.CurrentSong = song;
-			// 再生開始位置を設定する。
-			var play_pos = song.PlayPos;
-			if (RandomRantro)
+			if (!RandomRantro)
 			{
-				Random r = new Random();
-				play_pos = TimeSpan.FromSeconds(_songPlayer.Duration.TotalSeconds * r.NextDouble() * RandomRantroFactor); 
+				_songPlayer.CurrentPosition = CurrentSong.PlayPos;
 			}
-			_songPlayer.CurrentPosition = play_pos;
 			if (forcePlay || _songPlayer.CurrentState == SongPlayerState.Playing)
 			{
 				_songPlayer.Play();
@@ -1544,6 +1549,8 @@ namespace Aldentea.SweetMutus
 
 		private void questionPlayer_MediaOpened(object sender, EventArgs e)
 		{
+			// 曲のDurationに依存する処理は、ここで行います。
+
 			sliderSeekSong_Play.Maximum = MyQuestionPlayer.Duration.TotalSeconds;
 			// ランダムラントロのシークをここで行う。
 			if (CurrentQuestion.IsRandomRantro)
