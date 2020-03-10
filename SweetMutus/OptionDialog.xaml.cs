@@ -56,7 +56,19 @@ namespace Aldentea.SweetMutus
 
 		public static DependencyProperty UseMutus2RandomRantroProperty
 			= DependencyProperty.Register(
-				"UseMutus2RandomRantro", typeof(bool), typeof(OptionDialog), new PropertyMetadata(true));
+				"UseMutus2RandomRantro", typeof(bool), typeof(OptionDialog), new PropertyMetadata(false));
+
+		public double Mutus2RandomRantroFactor
+		{
+			get => (double)GetValue(RandomRantroFactorProperty);
+			set => SetValue(RandomRantroFactorProperty, value);
+		}
+
+		public static DependencyProperty RandomRantroFactorProperty
+			= DependencyProperty.Register(
+				"RandomRantroFactor", typeof(double), typeof(OptionDialog), new PropertyMetadata(0.97));
+
+
 
 		public OptionDialog()
 		{

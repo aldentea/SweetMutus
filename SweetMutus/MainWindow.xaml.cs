@@ -62,8 +62,8 @@ namespace Aldentea.SweetMutus
 		}
 		#endregion
 
-		#region *RandomRantroFactorプロパティ
-		public double RandomRantroFactor
+		#region *Mutus2RandomRantroFactorプロパティ
+		public double Mutus2RandomRantroFactor
 		{
 			get => _randomRantroFactor;
 			set
@@ -290,6 +290,8 @@ namespace Aldentea.SweetMutus
 			this.checkBoxAutoNext.IsChecked = MySettings.AutoNext;
 			this.MySongPlayer.IsRandomRantro = MySettings.Mutus2RandomRantro;
 
+			this.Mutus2RandomRantroFactor = MySettings.Mutus2RandomRantroFactor;
+
 			// [表示]系メニューの設定．
 			questionsIDColumn.Visibility
 				= MySettings.DataGridColumnsVisibility.HasFlag(QuestionColumnsVisibility.IdColumn) ? Visibility.Visible : Visibility.Collapsed;
@@ -338,6 +340,8 @@ namespace Aldentea.SweetMutus
 			// 曲再生関連。
 			MySettings.SongPlayerVolume = this.MySongPlayer.Volume;
 			MySettings.AutoNext = checkBoxAutoNext.IsChecked == true;
+
+			MySettings.Mutus2RandomRantroFactor = this.Mutus2RandomRantroFactor;
 
 			// (0.1.3.1)[表示]系メニューを保存．
 			var flags = QuestionColumnsVisibility.None;
@@ -1170,7 +1174,7 @@ namespace Aldentea.SweetMutus
 			if (RandomRantro)
 			{
 				// ここで再生開始位置を設定する。
-					var play_pos = TimeSpan.FromSeconds(_songPlayer.Duration.TotalSeconds * _random.NextDouble() * RandomRantroFactor);
+					var play_pos = TimeSpan.FromSeconds(_songPlayer.Duration.TotalSeconds * _random.NextDouble() * Mutus2RandomRantroFactor);
 					_songPlayer.SeekPlay(play_pos);
 			}
 				// 出題用
@@ -1570,6 +1574,7 @@ namespace Aldentea.SweetMutus
 			// ランダムラントロのシークをここで行う。
 			if (CurrentQuestion.IsRandomRantro)
 			{
+				// ※こっちのfactorは固定されている！
 				var start_pos = _random.NextDouble() * 0.95 * MyQuestionPlayer.Duration.TotalSeconds;
 				MyDocument.AddLog("開始位置", Convert.ToDecimal(start_pos));
 				MyQuestionPlayer.SeekStart(TimeSpan.FromSeconds(start_pos));
@@ -1733,7 +1738,8 @@ namespace Aldentea.SweetMutus
 			OptionDialog dialog = new OptionDialog
 			{
 				AutoPlayOnNext = MySettings.AutoPlayOnNext,
-				UseMutus2RandomRantro = MySettings.UseMutus2RandomRantro
+				UseMutus2RandomRantro = MySettings.UseMutus2RandomRantro,
+				Mutus2RandomRantroFactor = this.Mutus2RandomRantroFactor
 			};
 
 			var result = dialog.ShowDialog();
@@ -1745,6 +1751,7 @@ namespace Aldentea.SweetMutus
 				{
 					MySettings.Mutus2RandomRantro = false;
 				}
+				this.Mutus2RandomRantroFactor = dialog.Mutus2RandomRantroFactor;
 				SetupMenuItems();
 			}
 

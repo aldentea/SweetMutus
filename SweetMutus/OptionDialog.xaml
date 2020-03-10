@@ -15,9 +15,13 @@
 			<CheckBox Content="次の曲に移ったときに自動的に再生する"
 								IsChecked="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}, Path=AutoPlayOnNext}"
 								Margin="5" />
-			<CheckBox Content="mutus2のようなランダムラントロモードを使用する"
+			<StackPanel Orientation="Horizontal">
+				<CheckBox Content="mutus2のようなランダムラントロモードを使用する"
 								IsChecked="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}, Path=UseMutus2RandomRantro}"
 								Margin="5" />
+				<Label Margin="50,0,10,0">ファクター</Label>
+				<TextBox MinWidth="80" Text="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}, Path=Mutus2RandomRantroFactor}"  />
+			</StackPanel>
 		</StackPanel>
 		<StackPanel Grid.Row="1" Orientation="Horizontal" FlowDirection="RightToLeft">
 			<StackPanel.Resources>
@@ -28,8 +32,8 @@
 					<Setter Property="Margin" Value="10" />
 				</Style>
 			</StackPanel.Resources>
-			<Button Content="OK" Click="ButtonOK_Click" IsDefault="True" ToolTip="変更を反映せずにダイアログを閉じます" />
-			<Button Content="キャンセル" IsCancel="True" ToolTip="変更を反映してダイアログを閉じます" />
+			<Button Content="OK" Click="ButtonOK_Click" IsDefault="True" ToolTip="変更を反映してダイアログを閉じます" />
+			<Button Content="キャンセル" IsCancel="True" ToolTip="変更を反映せずにダイアログを閉じます" />
 		</StackPanel>
 	</Grid>
 </Window>
