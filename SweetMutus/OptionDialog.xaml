@@ -15,6 +15,9 @@
 			<CheckBox Content="次の曲に移ったときに自動的に再生する"
 								IsChecked="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}, Path=AutoPlayOnNext}"
 								Margin="5" />
+			<CheckBox Content="mutus2のようなランダムラントロモードを使用する"
+								IsChecked="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}, Path=UseMutus2RandomRantro}"
+								Margin="5" />
 		</StackPanel>
 		<StackPanel Grid.Row="1" Orientation="Horizontal" FlowDirection="RightToLeft">
 			<StackPanel.Resources>

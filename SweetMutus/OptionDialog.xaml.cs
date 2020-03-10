@@ -43,6 +43,21 @@ namespace Aldentea.SweetMutus
 				"AutoPlayOnNext", typeof(bool), typeof(OptionDialog), new PropertyMetadata(true));
 		#endregion
 
+		#region *UseMutus2RandomRantroプロパティ
+		public bool UseMutus2RandomRantro
+		{
+			get => (bool)GetValue(UseMutus2RandomRantroProperty);
+			set
+			{
+				SetValue(UseMutus2RandomRantroProperty, value);
+			}
+		}
+		#endregion
+
+		public static DependencyProperty UseMutus2RandomRantroProperty
+			= DependencyProperty.Register(
+				"UseMutus2RandomRantro", typeof(bool), typeof(OptionDialog), new PropertyMetadata(true));
+
 		public OptionDialog()
 		{
 			InitializeComponent();

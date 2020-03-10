@@ -288,6 +288,7 @@ namespace Aldentea.SweetMutus
 			this.MySongPlayer.Volume = MySettings.SongPlayerVolume;
 			this.MySongPlayer.MediaEnded += MySongPlayer_MediaEnded;
 			this.checkBoxAutoNext.IsChecked = MySettings.AutoNext;
+			this.MySongPlayer.IsRandomRantro = MySettings.Mutus2RandomRantro;
 
 			// [表示]系メニューの設定．
 			questionsIDColumn.Visibility
@@ -305,8 +306,21 @@ namespace Aldentea.SweetMutus
 
 			ButtonsPanel.Visibility	= MySettings.ButtonsPanelVisibility;
 
+			// メニュー項目の設定。
+			SetupMenuItems();
 		}
 		#endregion
+
+		void SetupMenuItems()
+		{
+			menuItemMutus2RandomRantro.Visibility = MySettings.UseMutus2RandomRantro ? Visibility.Visible : Visibility.Collapsed;
+			if (!MySettings.UseMutus2RandomRantro)
+			{
+				// ↓これではメニュー項目の方には反映されない。
+				// MySongPlayer.IsRandomRantro = false;
+				this.menuItemMutus2RandomRantro.SetValue(MenuItem.IsCheckedProperty, false);
+			}
+		}
 
 		// (0.3.0)再生制御ボタンパネルの表示状態を保存。
 		// (0.2.5)メモ列の表示状態を復元。次の曲の自動再生の設定を追加。
@@ -337,6 +351,7 @@ namespace Aldentea.SweetMutus
 
 			MySettings.ButtonsPanelVisibility = ButtonsPanel.Visibility;
 
+			MySettings.Mutus2RandomRantro = MySongPlayer.IsRandomRantro;
 		}
 		#endregion
 
@@ -1717,13 +1732,20 @@ namespace Aldentea.SweetMutus
 		{
 			OptionDialog dialog = new OptionDialog
 			{
-				AutoPlayOnNext = MySettings.AutoPlayOnNext
+				AutoPlayOnNext = MySettings.AutoPlayOnNext,
+				UseMutus2RandomRantro = MySettings.UseMutus2RandomRantro
 			};
 
 			var result = dialog.ShowDialog();
 			if (result == true)
 			{
 				MySettings.AutoPlayOnNext = dialog.AutoPlayOnNext;
+				MySettings.UseMutus2RandomRantro = dialog.UseMutus2RandomRantro;
+				if (!MySettings.UseMutus2RandomRantro)
+				{
+					MySettings.Mutus2RandomRantro = false;
+				}
+				SetupMenuItems();
 			}
 
 
