@@ -4,7 +4,6 @@
 				xmlns:sys="clr-namespace:System;assembly=mscorlib"
 				xmlns:appbase="clr-namespace:Aldentea.Wpf.Application;assembly=AldenteaWpfApplication"
         xmlns:util="clr-namespace:Aldentea.Wpf.Utility;assembly=AldenteaWpfUtility"
-				xmlns:hypermutus="clr-namespace:HyperMutus;assembly=MutusBase"
 				xmlns:grand="clr-namespace:GrandMutus.Base;assembly=GrandMutusBase"
 				xmlns:base="clr-namespace:Aldentea.SweetMutus.Base;assembly=SweetMutusBase"
 				xmlns:local="clr-namespace:Aldentea.SweetMutus"
@@ -58,12 +57,14 @@
 		<CommandBinding Command="Play"
 										Executed="Play_Executed"
 										CanExecute="Play_CanExecute" />
-		<CommandBinding
-										Command="{x:Static hypermutus:Commands.SwitchPlayPauseCommand}"
+		<CommandBinding	Command="{x:Static grand:Commands.SwitchPlayPauseCommand}"
 										Executed="SwitchPlayPause_Executed"
 										CanExecute="SwitchPlayPause_CanExecute" />
+		<CommandBinding Command="{x:Static base:Commands.ForceReopenCommand}"
+										Executed="ForceReopen_Executed"
+										CanExecute="ForceReopen_CanExecute" />
 		<CommandBinding
-										Command="{x:Static hypermutus:Commands.SeekSabiCommand}"
+										Command="{x:Static grand:Commands.SeekSabiCommand}"
 										Executed="SeekSabi_Executed"
 										CanExecute="SongPlayer_CanExecute" />
 		<CommandBinding Command="{x:Static grand:Commands.SetSabiPosCommand}"
@@ -75,7 +76,7 @@
 		<CommandBinding Command="{x:Static base:Commands.SetStopPosCommand}"
 										Executed="SetStopPos_Executed"
 										CanExecute="SongPlayer_CanExecute" />
-		<CommandBinding Command="{x:Static hypermutus:Commands.SeekRelativeCommand}"
+		<CommandBinding Command="{x:Static grand:Commands.SeekRelativeCommand}"
 										Executed="SeekRelative_Executed"
 										CanExecute="SongPlayer_CanExecute" />
 		<CommandBinding Command="NextTrack"
@@ -119,13 +120,13 @@
 										Executed="Options_Executed"
 										CanExecute="Options_CanExecute" />
 		<!-- 以下，出題関連 -->
-		<CommandBinding Command="{x:Static hypermutus:QuizCommands.Start}"
+		<CommandBinding Command="{x:Static grand:QuizCommands.Start}"
 										Executed="StartQuestion_Executed"
 										CanExecute="StartQuestion_CanExecute" />
 		<CommandBinding Command="{x:Static base:Commands.NextQuestionCommand}"
 										Executed="NextQuestion_Executed"
 										CanExecute="NextQuestion_CanExecute" />
-		<CommandBinding Command="{x:Static hypermutus:QuizCommands.Stop}"
+		<CommandBinding Command="{x:Static grand:QuizCommands.Stop}"
 										Executed="StopQuestion_Executed"
 										CanExecute="StopQuestion_CanExecute" />
 		<CommandBinding Command="{x:Static base:Commands.JudgeCommand}"
@@ -134,12 +135,12 @@
 
 	</Window.CommandBindings>
 	<Window.InputBindings>
-		<KeyBinding Key="F5" Command="{x:Static  hypermutus:Commands.SwitchPlayPauseCommand}" />
-		<KeyBinding Key="F7" Modifiers="Shift" Command="{x:Static hypermutus:Commands.SeekRelativeCommand}" CommandParameter="30" />
-		<KeyBinding Key="F7" Command="{x:Static hypermutus:Commands.SeekRelativeCommand}" CommandParameter="5" />
-		<KeyBinding Key="F4" Command="{x:Static hypermutus:Commands.SeekRelativeCommand}" CommandParameter="-5" />
-		<KeyBinding Key="F4" Modifiers="Shift" Command="{x:Static hypermutus:Commands.SeekRelativeCommand}" CommandParameter="-30" />
-		<KeyBinding Key="F6" Command="{x:Static hypermutus:Commands.SeekSabiCommand}" />
+		<KeyBinding Key="F5" Command="{x:Static grand:Commands.SwitchPlayPauseCommand}" /> 
+		<KeyBinding Key="F7" Modifiers="Shift" Command="{x:Static grand:Commands.SeekRelativeCommand}" CommandParameter="30" />
+		<KeyBinding Key="F7" Command="{x:Static grand:Commands.SeekRelativeCommand}" CommandParameter="5" />
+		<KeyBinding Key="F4" Command="{x:Static grand:Commands.SeekRelativeCommand}" CommandParameter="-5" />
+		<KeyBinding Key="F4" Modifiers="Shift" Command="{x:Static grand:Commands.SeekRelativeCommand}" CommandParameter="-30" />
+		<KeyBinding Key="F6" Command="{x:Static grand:Commands.SeekSabiCommand}" />
 		<KeyBinding Key="F6" Modifiers="Shift" Command="{x:Static grand:Commands.SetSabiPosCommand}" />
 		<KeyBinding Key="F6" Modifiers="Ctrl" Command="{x:Static base:Commands.SetPlayPosCommand}" />
 		<KeyBinding Key="F3" Command="PreviousTrack" />
@@ -367,8 +368,15 @@
 				</DataGrid.CommandBindings>
 				<DataGrid.InputBindings>
 					<KeyBinding 
-						Key="F5" 
-						Command="{x:Static hypermutus:Commands.SwitchPlayPauseCommand}"
+						Key="F5" Modifiers="Ctrl"
+						Command="{x:Static base:Commands.ForceReopenCommand}"
+						CommandParameter="{Binding
+							RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=DataGrid},
+							Path=SelectedItem}"
+					/>
+					<KeyBinding 
+						Key="F5"
+						Command="{x:Static grand:Commands.SwitchPlayPauseCommand}"
 						CommandParameter="{Binding
 							RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=DataGrid},
 							Path=SelectedItem}"
@@ -418,9 +426,9 @@
 						</Style>
 					</DockPanel.Resources>
 					<Button Content="再生" DockPanel.Dock="Left"
-								Command="{x:Static hypermutus:Commands.SwitchPlayPauseCommand}" />
+								Command="{x:Static grand:Commands.SwitchPlayPauseCommand}" />
 					<Button Content="サビ" DockPanel.Dock="Left"
-								Command="{x:Static hypermutus:Commands.SeekSabiCommand}" />
+								Command="{x:Static grand:Commands.SeekSabiCommand}" />
 					<TabControl DockPanel.Dock="Left" Margin="10,0,0,0" Height="80" HorizontalAlignment="Left"
 										TabStripPlacement="Left" Name="tabControlSetPosition">
 						<TabControl.Resources>
@@ -535,21 +543,21 @@
 					</StackPanel.Resources>
 					<Button Content="前へ" Command="PreviousTrack" />
 					<Button Content="次へ" Command="NextTrack" />
-					<Button Content="-30秒" Command="{x:Static hypermutus:Commands.SeekRelativeCommand}" CommandParameter="-30" />
-					<Button Content="-5秒" Command="{x:Static hypermutus:Commands.SeekRelativeCommand}" CommandParameter="-5" />
-					<Button Content="+5秒" Command="{x:Static hypermutus:Commands.SeekRelativeCommand}" CommandParameter="5" />
-					<Button Content="+30秒" Command="{x:Static hypermutus:Commands.SeekRelativeCommand}" CommandParameter="30" />
+					<Button Content="-30秒" Command="{x:Static grand:Commands.SeekRelativeCommand}" CommandParameter="-30" />
+					<Button Content="-5秒" Command="{x:Static grand:Commands.SeekRelativeCommand}" CommandParameter="-5" />
+					<Button Content="+5秒" Command="{x:Static grand:Commands.SeekRelativeCommand}" CommandParameter="5" />
+					<Button Content="+30秒" Command="{x:Static grand:Commands.SeekRelativeCommand}" CommandParameter="30" />
 				</StackPanel>
 			</Grid>
 		</Expander>
 		<Expander Header="出題" Name="expanderQuestionPlayer" Visibility="Collapsed" Margin="0" Grid.Row="4"
 							DataContext="{Binding RelativeSource={RelativeSource AncestorType=Window}, Path=MyQuestionPlayer}">
 			<Expander.CommandBindings>
-				<CommandBinding	Command="{x:Static hypermutus:Commands.SeekSabiCommand}"
+				<CommandBinding	Command="{x:Static grand:Commands.SeekSabiCommand}"
 										Executed="Play_SeekSabi_Executed"
 										CanExecute="Play_SongPlayer_CanExecute" />
 				<CommandBinding
-										Command="{x:Static hypermutus:Commands.SwitchPlayPauseCommand}"
+										Command="{x:Static grand:Commands.SwitchPlayPauseCommand}"
 										Executed="Play_SwitchPlayPause_Executed"
 										CanExecute="Play_SwitchPlayPause_CanExecute" />
 			</Expander.CommandBindings>
@@ -567,9 +575,9 @@
 				</DockPanel>
 				<DockPanel Grid.Row="1">
 					<Button Content="開始" DockPanel.Dock="Left" Margin="10,5" Width="100"
-								Command="{x:Static hypermutus:QuizCommands.Start}" />
+								Command="{x:Static grand:QuizCommands.Start}" />
 					<Button Content="停止" DockPanel.Dock="Left" Margin="10,5" Width="100"
-								Command="{x:Static hypermutus:QuizCommands.Stop}" />
+								Command="{x:Static grand:QuizCommands.Stop}" />
 					<Button Content="○" DockPanel.Dock="Left" Margin="10,5" Width="70"
 								Command="{x:Static base:Commands.JudgeCommand}" CommandParameter="○" />
 					<Button Content="×" DockPanel.Dock="Left" Margin="10,5" Width="70"
@@ -580,11 +588,11 @@
 				</DockPanel>
 				<DockPanel Grid.Row="2">
 					<Button Content="再生" DockPanel.Dock="Left" Margin="10,5" Width="100"
-									Command="{x:Static hypermutus:Commands.SwitchPlayPauseCommand}"
+									Command="{x:Static grand:Commands.SwitchPlayPauseCommand}"
 									IsEnabled="{Binding RelativeSource={RelativeSource AncestorType=Window}, Path=CurrentPhase,
 																			Converter={StaticResource freePlayConverter}}"/>
 					<Button Content="サビ" DockPanel.Dock="Left" Margin="10,5" Width="100"
-									Command="{x:Static hypermutus:Commands.SeekSabiCommand}"
+									Command="{x:Static grand:Commands.SeekSabiCommand}"
 									/>
 					<Label Name="labelDuration_Play" DockPanel.Dock="Right" HorizontalContentAlignment="Right" MinWidth="60"
 								HorizontalAlignment="Right" ContentStringFormat="m\:ss" Content="{Binding Path=Duration}"

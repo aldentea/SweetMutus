@@ -9,7 +9,6 @@ using System.Text;
 
 using Aldentea.Wpf.Application;
 using System.ComponentModel;
-//using HyperMutus;
 using System.Collections.ObjectModel;
 
 using GrandMutus.Base;
@@ -1030,7 +1029,7 @@ namespace Aldentea.SweetMutus
 		async Task Export()
 		{
 			// ファイル名選択
-			var dialog = new HyperMutus.ExportDialog { FileFilter = "SweetMutusファイル(*.smt)|*.smt|HyperMutusファイル(*.mtq)|*.mtq" };
+			var dialog = new GrandMutus.Base.ExportDialog { FileFilter = "SweetMutusファイル(*.smt)|*.smt|HyperMutusファイル(*.mtq)|*.mtq" };
 			if (dialog.ShowDialog() == true)
 			{
 				string fileName = dialog.Destination;
@@ -1162,6 +1161,8 @@ namespace Aldentea.SweetMutus
 		SweetQuestion _currentSong = null;
 		#endregion
 
+
+		// 同じファイルをOpenした場合はこのイベントは発生しないらしい。
 		// (0.2.6)DurationはNullableではなくなりました。
 		// (*0.3.2)
 		#region *曲ファイルオープン時(MySongPlayer_MediaOpened)
@@ -1174,7 +1175,7 @@ namespace Aldentea.SweetMutus
 			if (RandomRantro)
 			{
 				// ここで再生開始位置を設定する。
-					var play_pos = TimeSpan.FromSeconds(_songPlayer.Duration.TotalSeconds * _random.NextDouble() * Mutus2RandomRantroFactor);
+					var play_pos = GetRandomRantroPlayPos(Mutus2RandomRantroFactor);
 					_songPlayer.SeekPlay(play_pos);
 			}
 				// 出題用
@@ -1183,6 +1184,12 @@ namespace Aldentea.SweetMutus
 			//}
 		}
 		#endregion
+
+		protected TimeSpan GetRandomRantroPlayPos(double factor)
+		{
+			// とりあえずfactorのvalidationは行わない。
+			return TimeSpan.FromSeconds(_songPlayer.Duration.TotalSeconds* _random.NextDouble() * factor);
+		}
 
 		// (0.2.6)async化。
 		// (0.2.5)次の曲の自動再生を実装。
@@ -1220,6 +1227,8 @@ namespace Aldentea.SweetMutus
 			e.CanExecute = e.Parameter is SweetQuestion;
 		}
 		#endregion
+
+
 
 		// (0.2.6)async化。
 		// (0.1.0)現在の場所が再生開始位置より前であれば、(現在の曲の)再生開始位置にSeekするように修正。
@@ -1332,19 +1341,61 @@ namespace Aldentea.SweetMutus
 		void SwitchPlayPause_Executed(object sender, ExecutedRoutedEventArgs e)
 		{
 			SweetQuestion q = e.Parameter as SweetQuestion;
-			if (q != null && q != CurrentSong)
+			SwitchPlayPause(q, false);
+		}
+
+		void SwitchPlayPause(SweetQuestion question, bool forceReopen = false)
+		{
+			if (question != null)
 			{
-				MediaCommands.Play.Execute(q, this);
+				if (question != CurrentSong)
+				{
+					MediaCommands.Play.Execute(question, this);
+					return;
+				}
+				if (forceReopen)
+				{
+					// 同じ曲を再度開く。
+					// ↑と同様にPlayすればいいと思ったが、内部的な動作が違ってくるので、個別に処理を記述する。
+					var play_pos = RandomRantro ? GetRandomRantroPlayPos(Mutus2RandomRantroFactor) : CurrentQuestion.PlayPos;
+					if (MySettings.AutoPlayOnNext)
+					{
+						MySongPlayer.SeekPlay(play_pos);
+					}
+					else
+					{
+						MySongPlayer.CurrentPosition = play_pos;
+					}
+					return;
+				}
 			}
-			else if (_songPlayer.CurrentState != SongPlayerState.Inactive)
+
+			if (_songPlayer.CurrentState != SongPlayerState.Inactive)
 			{
+				// question == null で forceReopen = trueの時は、一応SwitchPlayPauseと同じ動作にしておく。
 				_songPlayer.TogglePlayPause();
 			}
+
 		}
+
 
 		void SwitchPlayPause_CanExecute(object sender, CanExecuteRoutedEventArgs e)
 		{
 			e.CanExecute = (e.Parameter is SweetQuestion) || _songPlayer.CurrentState != SongPlayerState.Inactive;
+		}
+
+		#endregion
+
+		#region ForceReopen
+
+		void ForceReopen_Executed(object sender, ExecutedRoutedEventArgs e)
+		{
+			SwitchPlayPause(e.Parameter as SweetQuestion, true);
+		}
+
+		void ForceReopen_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+		{
+			e.CanExecute = e.Parameter is SweetQuestion;
 		}
 
 		#endregion
