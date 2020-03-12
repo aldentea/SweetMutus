@@ -1030,7 +1030,7 @@ namespace Aldentea.SweetMutus
 		async Task Export()
 		{
 			// ファイル名選択
-			var dialog = new HyperMutus.ExportDialog { FileFilter = "SweetMutusファイル(*.smt)|*.smt|HyperMutusファイル(*.mtq)|*.mtq" };
+			var dialog = new GrandMutus.Base.ExportDialog { FileFilter = "SweetMutusファイル(*.smt)|*.smt|HyperMutusファイル(*.mtq)|*.mtq" };
 			if (dialog.ShowDialog() == true)
 			{
 				string fileName = dialog.Destination;
@@ -1220,6 +1220,8 @@ namespace Aldentea.SweetMutus
 			e.CanExecute = e.Parameter is SweetQuestion;
 		}
 		#endregion
+
+
 
 		// (0.2.6)async化。
 		// (0.1.0)現在の場所が再生開始位置より前であれば、(現在の曲の)再生開始位置にSeekするように修正。
