@@ -68,6 +68,9 @@ namespace Aldentea.SweetMutus.Base
 		// どこに置くべきかな？
 		public static RoutedCommand OptionsCommand = new RoutedCommand();
 
+		// (0.4.0)
+		public static RoutedCommand ForceReopenCommand = new RoutedCommand();
+
 
 		// ※とりあえずここに置いておくが，QuizCommandsに入れた方がいいかな？
 		public static RoutedCommand NextQuestionCommand = new RoutedCommand();
