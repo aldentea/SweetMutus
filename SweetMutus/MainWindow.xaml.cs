@@ -9,7 +9,6 @@ using System.Text;
 
 using Aldentea.Wpf.Application;
 using System.ComponentModel;
-//using HyperMutus;
 using System.Collections.ObjectModel;
 
 using GrandMutus.Base;
@@ -45,6 +44,37 @@ namespace Aldentea.SweetMutus
 			}
 		}
 		ObservableCollection<string> _categories = new ObservableCollection<string>(new string[] { string.Empty });
+		#endregion
+
+		#region *RandomRantroプロパティ
+		/// <summary>
+		/// 編集モードにおいて（再生モードも？）曲再生がランダムラントロモードであるかどうかの値を取得／設定します。
+		/// </summary>
+		public bool RandomRantro { get => _songPlayer.IsRandomRantro;
+			set {
+				if (_songPlayer.IsRandomRantro != value)
+				{
+					_songPlayer.IsRandomRantro = value;
+					NotifyPropertyChanged("RandomRantro");
+				}
+			}
+		}
+		#endregion
+
+		#region *Mutus2RandomRantroFactorプロパティ
+		public double Mutus2RandomRantroFactor
+		{
+			get => _randomRantroFactor;
+			set
+			{
+				if (_randomRantroFactor != value)
+				{
+					_randomRantroFactor = value;
+					NotifyPropertyChanged("RandomRantroFactor");
+				}
+			}
+		}
+		double _randomRantroFactor = 0.97;
 		#endregion
 
 		#endregion
@@ -257,6 +287,9 @@ namespace Aldentea.SweetMutus
 			this.MySongPlayer.Volume = MySettings.SongPlayerVolume;
 			this.MySongPlayer.MediaEnded += MySongPlayer_MediaEnded;
 			this.checkBoxAutoNext.IsChecked = MySettings.AutoNext;
+			this.MySongPlayer.IsRandomRantro = MySettings.Mutus2RandomRantro;
+
+			this.Mutus2RandomRantroFactor = MySettings.Mutus2RandomRantroFactor;
 
 			// [表示]系メニューの設定．
 			questionsIDColumn.Visibility
@@ -274,8 +307,21 @@ namespace Aldentea.SweetMutus
 
 			ButtonsPanel.Visibility	= MySettings.ButtonsPanelVisibility;
 
+			// メニュー項目の設定。
+			SetupMenuItems();
 		}
 		#endregion
+
+		void SetupMenuItems()
+		{
+			menuItemMutus2RandomRantro.Visibility = MySettings.UseMutus2RandomRantro ? Visibility.Visible : Visibility.Collapsed;
+			if (!MySettings.UseMutus2RandomRantro)
+			{
+				// ↓これではメニュー項目の方には反映されない。
+				// MySongPlayer.IsRandomRantro = false;
+				this.menuItemMutus2RandomRantro.SetValue(MenuItem.IsCheckedProperty, false);
+			}
+		}
 
 		// (0.3.0)再生制御ボタンパネルの表示状態を保存。
 		// (0.2.5)メモ列の表示状態を復元。次の曲の自動再生の設定を追加。
@@ -294,6 +340,8 @@ namespace Aldentea.SweetMutus
 			MySettings.SongPlayerVolume = this.MySongPlayer.Volume;
 			MySettings.AutoNext = checkBoxAutoNext.IsChecked == true;
 
+			MySettings.Mutus2RandomRantroFactor = this.Mutus2RandomRantroFactor;
+
 			// (0.1.3.1)[表示]系メニューを保存．
 			var flags = QuestionColumnsVisibility.None;
 			flags |= menuItemIDColumnVisible.IsChecked ? QuestionColumnsVisibility.IdColumn : 0;
@@ -306,6 +354,7 @@ namespace Aldentea.SweetMutus
 
 			MySettings.ButtonsPanelVisibility = ButtonsPanel.Visibility;
 
+			MySettings.Mutus2RandomRantro = MySongPlayer.IsRandomRantro;
 		}
 		#endregion
 
@@ -386,9 +435,10 @@ namespace Aldentea.SweetMutus
 
 		#region Export
 
-		private void Export_Executed(object sender, ExecutedRoutedEventArgs e)
+		// (0.4.0)async化。
+		private async void Export_Executed(object sender, ExecutedRoutedEventArgs e)
 		{
-			this.Export();
+			await this.Export();
 		}
 
 
@@ -763,10 +813,7 @@ namespace Aldentea.SweetMutus
 		#endregion
 
 		// (0.0.8)
-		internal void UpdateFilter()
-		{
-			UpdateFilter(CurrentCategory);
-		}
+		internal void UpdateFilter() => UpdateFilter(CurrentCategory);
 
 		internal void UpdateFilter(string category)
 		{
@@ -976,12 +1023,13 @@ namespace Aldentea.SweetMutus
 			}
 		}
 
+		// (0.4.0)async化。
 		// (0.0.13)SweetMutus形式に加えて，HyperMutus形式でエクスポートできるように改良．
 		#region *エクスポート(Export)
-		void Export()
+		async Task Export()
 		{
 			// ファイル名選択
-			var dialog = new HyperMutus.ExportDialog { FileFilter = "SweetMutusファイル(*.smt)|*.smt|HyperMutusファイル(*.mtq)|*.mtq" };
+			var dialog = new GrandMutus.Base.ExportDialog { FileFilter = "SweetMutusファイル(*.smt)|*.smt|HyperMutusファイル(*.mtq)|*.mtq" };
 			if (dialog.ShowDialog() == true)
 			{
 				string fileName = dialog.Destination;
@@ -996,7 +1044,7 @@ namespace Aldentea.SweetMutus
 				ExportAllSongs(MyDocument.Questions, songsDestination, FileOverwriting.IfNew, false);
 
 				// ドキュメント保存
-				MyDocument.SaveExport(fileName, songDirectory);
+				await MyDocument.SaveExport(fileName, songDirectory);
 			}
 
 		}
@@ -1113,6 +1161,8 @@ namespace Aldentea.SweetMutus
 		SweetQuestion _currentSong = null;
 		#endregion
 
+
+		// 同じファイルをOpenした場合はこのイベントは発生しないらしい。
 		// (0.2.6)DurationはNullableではなくなりました。
 		// (*0.3.2)
 		#region *曲ファイルオープン時(MySongPlayer_MediaOpened)
@@ -1122,12 +1172,24 @@ namespace Aldentea.SweetMutus
 			//{
 				this.labelDuration.Content = _songPlayer.Duration;
 				this.sliderSeekSong.Maximum = _songPlayer.Duration.TotalSeconds;
+			if (RandomRantro)
+			{
+				// ここで再生開始位置を設定する。
+					var play_pos = GetRandomRantroPlayPos(Mutus2RandomRantroFactor);
+					_songPlayer.SeekPlay(play_pos);
+			}
 				// 出題用
 				this.labelDuration_Play.Content = _songPlayer.Duration;
 				this.sliderSeekSong_Play.Maximum = _songPlayer.Duration.TotalSeconds;
 			//}
 		}
 		#endregion
+
+		protected TimeSpan GetRandomRantroPlayPos(double factor)
+		{
+			// とりあえずfactorのvalidationは行わない。
+			return TimeSpan.FromSeconds(_songPlayer.Duration.TotalSeconds* _random.NextDouble() * factor);
+		}
 
 		// (0.2.6)async化。
 		// (0.2.5)次の曲の自動再生を実装。
@@ -1166,6 +1228,8 @@ namespace Aldentea.SweetMutus
 		}
 		#endregion
 
+
+
 		// (0.2.6)async化。
 		// (0.1.0)現在の場所が再生開始位置より前であれば、(現在の曲の)再生開始位置にSeekするように修正。
 		// (0.0.8.7)
@@ -1183,7 +1247,7 @@ namespace Aldentea.SweetMutus
 				await TryNextTrack();
 			}
 		}
-		#endregion
+
 
 		// (0.2.6) 曲を自動再生するかどうかは、アプリケーション設定のAutoPlayOnNextで制御する。async化。
 		// (0.2.5)
@@ -1205,6 +1269,7 @@ namespace Aldentea.SweetMutus
 			}
 
 		}
+		#endregion
 
 		// (0.0.8.7)
 		#region PreviousTrack
@@ -1238,6 +1303,8 @@ namespace Aldentea.SweetMutus
 		//}
 		#endregion
 
+
+		// (0.4.0) mutus2ライクなランダムラントロに対応。
 		// (0.2.6)
 		/// <summary>
 		/// 曲をオープンします。再生中であるか、forcePlayにtrueが与えられると、再生も開始します。
@@ -1255,7 +1322,10 @@ namespace Aldentea.SweetMutus
 			await Task.Delay(10);
 
 			this.CurrentSong = song;
-			_songPlayer.CurrentPosition = song.PlayPos;
+			if (!RandomRantro)
+			{
+				_songPlayer.CurrentPosition = CurrentSong.PlayPos;
+			}
 			if (forcePlay || _songPlayer.CurrentState == SongPlayerState.Playing)
 			{
 				_songPlayer.Play();
@@ -1271,19 +1341,61 @@ namespace Aldentea.SweetMutus
 		void SwitchPlayPause_Executed(object sender, ExecutedRoutedEventArgs e)
 		{
 			SweetQuestion q = e.Parameter as SweetQuestion;
-			if (q != null && q != CurrentSong)
+			SwitchPlayPause(q, false);
+		}
+
+		void SwitchPlayPause(SweetQuestion question, bool forceReopen = false)
+		{
+			if (question != null)
 			{
-				MediaCommands.Play.Execute(q, this);
+				if (question != CurrentSong)
+				{
+					MediaCommands.Play.Execute(question, this);
+					return;
+				}
+				if (forceReopen)
+				{
+					// 同じ曲を再度開く。
+					// ↑と同様にPlayすればいいと思ったが、内部的な動作が違ってくるので、個別に処理を記述する。
+					var play_pos = RandomRantro ? GetRandomRantroPlayPos(Mutus2RandomRantroFactor) : CurrentSong.PlayPos;
+					if (MySettings.AutoPlayOnNext)
+					{
+						MySongPlayer.SeekPlay(play_pos);
+					}
+					else
+					{
+						MySongPlayer.CurrentPosition = play_pos;
+					}
+					return;
+				}
 			}
-			else if (_songPlayer.CurrentState != SongPlayerState.Inactive)
+
+			if (_songPlayer.CurrentState != SongPlayerState.Inactive)
 			{
+				// question == null で forceReopen = trueの時は、一応SwitchPlayPauseと同じ動作にしておく。
 				_songPlayer.TogglePlayPause();
 			}
+
 		}
+
 
 		void SwitchPlayPause_CanExecute(object sender, CanExecuteRoutedEventArgs e)
 		{
 			e.CanExecute = (e.Parameter is SweetQuestion) || _songPlayer.CurrentState != SongPlayerState.Inactive;
+		}
+
+		#endregion
+
+		#region ForceReopen
+
+		void ForceReopen_Executed(object sender, ExecutedRoutedEventArgs e)
+		{
+			SwitchPlayPause(e.Parameter as SweetQuestion, true);
+		}
+
+		void ForceReopen_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+		{
+			e.CanExecute = e.Parameter is SweetQuestion;
 		}
 
 		#endregion
@@ -1507,10 +1619,13 @@ namespace Aldentea.SweetMutus
 
 		private void questionPlayer_MediaOpened(object sender, EventArgs e)
 		{
+			// 曲のDurationに依存する処理は、ここで行います。
+
 			sliderSeekSong_Play.Maximum = MyQuestionPlayer.Duration.TotalSeconds;
 			// ランダムラントロのシークをここで行う。
 			if (CurrentQuestion.IsRandomRantro)
 			{
+				// ※こっちのfactorは固定されている！
 				var start_pos = _random.NextDouble() * 0.95 * MyQuestionPlayer.Duration.TotalSeconds;
 				MyDocument.AddLog("開始位置", Convert.ToDecimal(start_pos));
 				MyQuestionPlayer.SeekStart(TimeSpan.FromSeconds(start_pos));
@@ -1673,13 +1788,22 @@ namespace Aldentea.SweetMutus
 		{
 			OptionDialog dialog = new OptionDialog
 			{
-				AutoPlayOnNext = MySettings.AutoPlayOnNext
+				AutoPlayOnNext = MySettings.AutoPlayOnNext,
+				UseMutus2RandomRantro = MySettings.UseMutus2RandomRantro,
+				Mutus2RandomRantroFactor = this.Mutus2RandomRantroFactor
 			};
 
 			var result = dialog.ShowDialog();
 			if (result == true)
 			{
 				MySettings.AutoPlayOnNext = dialog.AutoPlayOnNext;
+				MySettings.UseMutus2RandomRantro = dialog.UseMutus2RandomRantro;
+				if (!MySettings.UseMutus2RandomRantro)
+				{
+					MySettings.Mutus2RandomRantro = false;
+				}
+				this.Mutus2RandomRantroFactor = dialog.Mutus2RandomRantroFactor;
+				SetupMenuItems();
 			}
 
 

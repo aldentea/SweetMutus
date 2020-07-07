@@ -12,7 +12,7 @@ namespace Aldentea.SweetMutus.Properties {
     
     
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "15.9.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "16.4.0.0")]
     internal sealed partial class Settings : global::System.Configuration.ApplicationSettingsBase {
         
         private static Settings defaultInstance = ((Settings)(global::System.Configuration.ApplicationSettingsBase.Synchronized(new Settings())));
@@ -175,6 +175,42 @@ namespace Aldentea.SweetMutus.Properties {
             }
             set {
                 this["ButtonsPanelVisibility"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool Mutus2RandomRantro {
+            get {
+                return ((bool)(this["Mutus2RandomRantro"]));
+            }
+            set {
+                this["Mutus2RandomRantro"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool UseMutus2RandomRantro {
+            get {
+                return ((bool)(this["UseMutus2RandomRantro"]));
+            }
+            set {
+                this["UseMutus2RandomRantro"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0.97")]
+        public double Mutus2RandomRantroFactor {
+            get {
+                return ((double)(this["Mutus2RandomRantroFactor"]));
+            }
+            set {
+                this["Mutus2RandomRantroFactor"] = value;
             }
         }
     }
