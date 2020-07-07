@@ -9,7 +9,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Aldentea.SweetMutus.Base</RootNamespace>
     <AssemblyName>SweetMutusBase</AssemblyName>
-    <TargetFrameworkVersion>v4.5.1</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
   </PropertyGroup>
@@ -69,9 +69,6 @@
   <ItemGroup>
     <Reference Include="GrandMutusData">
       <HintPath>..\external\GrandMutusData.dll</HintPath>
-    </Reference>
-    <Reference Include="MutusBase">
-      <HintPath>..\external\MutusBase.dll</HintPath>
     </Reference>
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />

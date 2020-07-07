@@ -15,6 +15,20 @@
 			<CheckBox Content="次の曲に移ったときに自動的に再生する"
 								IsChecked="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}, Path=AutoPlayOnNext}"
 								Margin="5" />
+			<WrapPanel Orientation="Horizontal">
+				<CheckBox Content="mutus2のようなランダムラントロモードを使用する" Name="UseRandomRantro"
+								IsChecked="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}, Path=UseMutus2RandomRantro}"
+								Margin="5" />
+				<StackPanel Margin="20,0"  Orientation="Horizontal"  IsEnabled="{Binding ElementName=UseRandomRantro, Path=IsChecked}">
+					
+					<Label Margin="10,0,10,0">ファクター</Label>
+					<Label Margin="10,0"  Width="60" Content="{Binding ElementName=sliderFactor, Mode=OneWay, Path=Value}"
+								 HorizontalContentAlignment="Right" />
+					<Slider Maximum="1" Minimum="0" SmallChange="0.01" LargeChange="0.1" Name="sliderFactor"
+									Value="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}, Path=Mutus2RandomRantroFactor, NotifyOnTargetUpdated=True}"
+									MinWidth="200" Width="300" />
+				</StackPanel>
+			</WrapPanel>
 		</StackPanel>
 		<StackPanel Grid.Row="1" Orientation="Horizontal" FlowDirection="RightToLeft">
 			<StackPanel.Resources>
@@ -25,8 +39,8 @@
 					<Setter Property="Margin" Value="10" />
 				</Style>
 			</StackPanel.Resources>
-			<Button Content="OK" Click="ButtonOK_Click" IsDefault="True" ToolTip="変更を反映せずにダイアログを閉じます" />
-			<Button Content="キャンセル" IsCancel="True" ToolTip="変更を反映してダイアログを閉じます" />
+			<Button Content="OK" Click="ButtonOK_Click" IsDefault="True" ToolTip="変更を反映してダイアログを閉じます" />
+			<Button Content="キャンセル" IsCancel="True" ToolTip="変更を反映せずにダイアログを閉じます" />
 		</StackPanel>
 	</Grid>
 </Window>

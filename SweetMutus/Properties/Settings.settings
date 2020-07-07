@@ -41,5 +41,14 @@
     <Setting Name="ButtonsPanelVisibility" Type="System.Windows.Visibility" Scope="User">
       <Value Profile="(Default)">Collapsed</Value>
     </Setting>
+    <Setting Name="Mutus2RandomRantro" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="UseMutus2RandomRantro" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="Mutus2RandomRantroFactor" Type="System.Double" Scope="User">
+      <Value Profile="(Default)">0.97</Value>
+    </Setting>
   </Settings>
 </SettingsFile>
