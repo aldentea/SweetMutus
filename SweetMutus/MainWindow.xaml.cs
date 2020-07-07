@@ -1357,7 +1357,7 @@ namespace Aldentea.SweetMutus
 				{
 					// 同じ曲を再度開く。
 					// ↑と同様にPlayすればいいと思ったが、内部的な動作が違ってくるので、個別に処理を記述する。
-					var play_pos = RandomRantro ? GetRandomRantroPlayPos(Mutus2RandomRantroFactor) : CurrentQuestion.PlayPos;
+					var play_pos = RandomRantro ? GetRandomRantroPlayPos(Mutus2RandomRantroFactor) : CurrentSong.PlayPos;
 					if (MySettings.AutoPlayOnNext)
 					{
 						MySongPlayer.SeekPlay(play_pos);
