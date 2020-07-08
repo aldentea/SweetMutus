@@ -23,7 +23,7 @@
 					
 					<Label Margin="10,0,10,0">ファクター</Label>
 					<Label Margin="10,0"  Width="60" Content="{Binding ElementName=sliderFactor, Mode=OneWay, Path=Value}"
-								 HorizontalContentAlignment="Right" />
+								 HorizontalContentAlignment="Right" ContentStringFormat="f3" />
 					<Slider Maximum="1" Minimum="0" SmallChange="0.01" LargeChange="0.1" Name="sliderFactor"
 									Value="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}, Path=Mutus2RandomRantroFactor, NotifyOnTargetUpdated=True}"
 									MinWidth="200" Width="300" />
