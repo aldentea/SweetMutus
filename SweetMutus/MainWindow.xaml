@@ -190,23 +190,23 @@
 				<MenuItem Header="インポート(_I)..." Command="{x:Static base:Commands.ImportCommand}" />
 				<MenuItem Header="テキスト出力(_L)..." Command="{x:Static base:Commands.ExportQuestionsListCommand}" />
 			</MenuItem>
-			<MenuItem Header="表示(_V)">
-				<MenuItem Name="menuItemCategoryVisible" Header="カテゴリ" IsCheckable="True" IsChecked="False" />
+			<MenuItem Header="{x:Static properties:Resources.MenuView}">
+				<MenuItem Name="menuItemCategoryVisible" Header="{x:Static properties:Resources.MenuViewCategories}" IsCheckable="True" IsChecked="False" />
 				<Separator />
-				<MenuItem x:Name="menuItemIDColumnVisible" Header="ID列" IsCheckable="True"
+				<MenuItem x:Name="menuItemIDColumnVisible" Header="{x:Static properties:Resources.MenuViewIDColumn}" IsCheckable="True"
 									IsChecked="{Binding ElementName=questionsIDColumn, Path=Visibility, Converter={StaticResource fileNameVisibilityConverter}}" />
-				<MenuItem Name="menuItemFileNameColumnVisible" Header="ファイル名列" IsCheckable="True"
+				<MenuItem Name="menuItemFileNameColumnVisible" Header="{x:Static properties:Resources.MenuViewFileNameColumn}" IsCheckable="True"
 									IsChecked="{Binding ElementName=questionsFileNameColumn, Path=Visibility, Converter={StaticResource fileNameVisibilityConverter}}" />
-				<MenuItem Name="menuItemPlayPosColumnVisible" Header="開始位置列" IsCheckable="True"
+				<MenuItem Name="menuItemPlayPosColumnVisible" Header="{x:Static properties:Resources.MenuViewPlayPositionColumn}" IsCheckable="True"
 									IsChecked="{Binding ElementName=questionsPlayPosColumn, Path=Visibility, Converter={StaticResource fileNameVisibilityConverter}}" />
-				<MenuItem Name="menuItemSabiPosColumnVisible" Header="サビ位置列" IsCheckable="True"
+				<MenuItem Name="menuItemSabiPosColumnVisible" Header="{x:Static properties:Resources.MenuViewSeekPositionColumn}" IsCheckable="True"
 									IsChecked="{Binding ElementName=questionsSabiPosColumn, Path=Visibility, Converter={StaticResource fileNameVisibilityConverter}}" />
-				<MenuItem Name="menuItemStopPosColumnVisible" Header="停止位置列" IsCheckable="True"
+				<MenuItem Name="menuItemStopPosColumnVisible" Header="{x:Static properties:Resources.MenuViewStopPositionColumn}" IsCheckable="True"
 									IsChecked="{Binding ElementName=questionsStopPosColumn, Path=Visibility, Converter={StaticResource fileNameVisibilityConverter}}" />
-				<MenuItem Name="menuItemMemoColumnVisible" Header="メモ列" IsCheckable="True"
+				<MenuItem Name="menuItemMemoColumnVisible" Header="{x:Static properties:Resources.MenuViewMemoColumn}" IsCheckable="True"
 									IsChecked="{Binding ElementName=questionsMemoColumn, Path=Visibility, Converter={StaticResource fileNameVisibilityConverter}}" />
 				<Separator />
-				<MenuItem Name="menuItemButtonsColumnVisible" Header="再生制御ボタン" IsCheckable="True"
+				<MenuItem Name="menuItemButtonsColumnVisible" Header="{x:Static properties:Resources.MenuViewPlayerControlButtons}" IsCheckable="True"
 									IsChecked="{Binding ElementName=ButtonsPanel, Path=Visibility, Converter={StaticResource fileNameVisibilityConverter}}" />
 
 			</MenuItem>

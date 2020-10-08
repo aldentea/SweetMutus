@@ -153,4 +153,31 @@
   <data name="MenuFileSaveForHyperMutus" xml:space="preserve">
     <value>Save for HyperMutus(_M)...</value>
   </data>
+  <data name="MenuView" xml:space="preserve">
+    <value>View(_V)</value>
+  </data>
+  <data name="MenuViewCategories" xml:space="preserve">
+    <value>Categories(_C)</value>
+  </data>
+  <data name="MenuViewFileNameColumn" xml:space="preserve">
+    <value>FileName Column</value>
+  </data>
+  <data name="MenuViewIDColumn" xml:space="preserve">
+    <value>ID Column</value>
+  </data>
+  <data name="MenuViewMemoColumn" xml:space="preserve">
+    <value>Memo Column</value>
+  </data>
+  <data name="MenuViewPlayerControlButtons" xml:space="preserve">
+    <value>Player Control Buttons</value>
+  </data>
+  <data name="MenuViewPlayPositionColumn" xml:space="preserve">
+    <value>Play Position Column</value>
+  </data>
+  <data name="MenuViewSeekPositionColumn" xml:space="preserve">
+    <value>Seek Position Column</value>
+  </data>
+  <data name="MenuViewStopPositionColumn" xml:space="preserve">
+    <value>Stop Position Column</value>
+  </data>
 </root>

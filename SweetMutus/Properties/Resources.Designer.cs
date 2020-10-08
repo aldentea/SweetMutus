@@ -167,5 +167,86 @@ namespace Aldentea.SweetMutus.Properties {
                 return ResourceManager.GetString("MenuFileSaveForHyperMutus", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   View(_V) に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string MenuView {
+            get {
+                return ResourceManager.GetString("MenuView", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Categories(_C) に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string MenuViewCategories {
+            get {
+                return ResourceManager.GetString("MenuViewCategories", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   FileName Column に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string MenuViewFileNameColumn {
+            get {
+                return ResourceManager.GetString("MenuViewFileNameColumn", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   ID Column に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string MenuViewIDColumn {
+            get {
+                return ResourceManager.GetString("MenuViewIDColumn", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Memo Column に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string MenuViewMemoColumn {
+            get {
+                return ResourceManager.GetString("MenuViewMemoColumn", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Player Control Buttons に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string MenuViewPlayerControlButtons {
+            get {
+                return ResourceManager.GetString("MenuViewPlayerControlButtons", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Play Position Column に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string MenuViewPlayPositionColumn {
+            get {
+                return ResourceManager.GetString("MenuViewPlayPositionColumn", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Seek Position Column に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string MenuViewSeekPositionColumn {
+            get {
+                return ResourceManager.GetString("MenuViewSeekPositionColumn", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Stop Position Column に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string MenuViewStopPositionColumn {
+            get {
+                return ResourceManager.GetString("MenuViewStopPositionColumn", resourceCulture);
+            }
+        }
     }
 }

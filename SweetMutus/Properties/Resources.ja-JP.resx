@@ -153,4 +153,31 @@
   <data name="MenuFileSaveForHyperMutus" xml:space="preserve">
     <value>HyperMutus用に保存(_M)...</value>
   </data>
+  <data name="MenuView" xml:space="preserve">
+    <value>表示(_V)</value>
+  </data>
+  <data name="MenuViewCategories" xml:space="preserve">
+    <value>カテゴリ</value>
+  </data>
+  <data name="MenuViewFileNameColumn" xml:space="preserve">
+    <value>ファイル名列</value>
+  </data>
+  <data name="MenuViewIDColumn" xml:space="preserve">
+    <value>ID列</value>
+  </data>
+  <data name="MenuViewMemoColumn" xml:space="preserve">
+    <value>メモ列</value>
+  </data>
+  <data name="MenuViewPlayerControlButtons" xml:space="preserve">
+    <value>再生制御ボタン</value>
+  </data>
+  <data name="MenuViewPlayPositionColumn" xml:space="preserve">
+    <value>開始位置列</value>
+  </data>
+  <data name="MenuViewSeekPositionColumn" xml:space="preserve">
+    <value>サビ位置列</value>
+  </data>
+  <data name="MenuViewStopPositionColumn" xml:space="preserve">
+    <value>終了位置列</value>
+  </data>
 </root>
