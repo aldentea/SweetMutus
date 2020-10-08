@@ -118,39 +118,39 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="MenuEdit" xml:space="preserve">
-    <value>Edit(_E)</value>
+    <value>編集(_E)</value>
   </data>
   <data name="MenuEditRedo" xml:space="preserve">
-    <value>Redo(_R)</value>
+    <value>やり直し(_R)</value>
   </data>
   <data name="MenuEditUndo" xml:space="preserve">
-    <value>Undo(_U)</value>
+    <value>元に戻す(_U)</value>
   </data>
   <data name="MenuFile" xml:space="preserve">
-    <value>File(_F)</value>
+    <value>ファイル(_F)</value>
   </data>
   <data name="MenuFileExit" xml:space="preserve">
-    <value>Exit(_X)</value>
+    <value>終了(_X)</value>
   </data>
   <data name="MenuFileExport" xml:space="preserve">
-    <value>Export(_E)...</value>
+    <value>エクスポート(_E)...</value>
   </data>
   <data name="MenuFileNew" xml:space="preserve">
-    <value>New(_N)</value>
+    <value>新規作成(_N)</value>
   </data>
   <data name="MenuFileOpen" xml:space="preserve">
-    <value>Open(_O)...</value>
+    <value>開く(_O)...</value>
   </data>
   <data name="MenuFileOpenFromHistory" xml:space="preserve">
-    <value>Open from history(_H)</value>
+    <value>履歴から開く(_H)</value>
   </data>
   <data name="MenuFileSave" xml:space="preserve">
-    <value>Save(_S)</value>
+    <value>保存(_S)</value>
   </data>
   <data name="MenuFileSaveAs" xml:space="preserve">
-    <value>Save as(_A)...</value>
+    <value>名前をつけて保存(_A)...</value>
   </data>
   <data name="MenuFileSaveForHyperMutus" xml:space="preserve">
-    <value>Save for HyperMutus(_M)...</value>
+    <value>HyperMutus用に保存(_M)...</value>
   </data>
 </root>

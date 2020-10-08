@@ -8,6 +8,7 @@
 				xmlns:grand="clr-namespace:GrandMutus.Base;assembly=GrandMutusBase"
 				xmlns:base="clr-namespace:Aldentea.SweetMutus.Base;assembly=SweetMutusBase"
 				xmlns:local="clr-namespace:Aldentea.SweetMutus"
+			  xmlns:properties="clr-namespace:Aldentea.SweetMutus.Properties"
 				xmlns:ud="clr-namespace:Aldentea.Wpf.Controls;assembly=UpDownControl"
 				OpenFileDialogFilter="SweetMutusファイル(*.smt)|*.smt|mutus2ファイル(*.mtu)|*.mtu|HyperMutusファイル(*.mtu,*.mtq)|*.mtu;*.mtq"
 				SaveFileDialogFilter="SweetMutusファイル(*.smt)|*.smt"
@@ -162,20 +163,20 @@
 
 		<Menu Name="MainMenu" Grid.Row="0" HorizontalAlignment="Stretch" Padding="3"
 					>
-			<MenuItem Header="ファイル(_F)">
-				<MenuItem Header="新規作成(_N)" Command="New" />
-				<MenuItem Header="開く(_O)..." Command="Open" />
-				<MenuItem Header="履歴から開く(_H)" Name="menuItemHistory" />
-				<MenuItem Header="保存(_S)" Command="Save" />
-				<MenuItem Header="名前をつけて保存(_A)..." Command="SaveAs" />
-				<MenuItem Header="エクスポート(_E)..." Command="{x:Static base:Commands.ExportCommand}" />
-				<MenuItem Header="HyperMutus用に保存(_M)..." Command="{x:Static base:Commands.SaveAsMtqCommand}" />
+			<MenuItem Header="{x:Static properties:Resources.MenuFile}">
+				<MenuItem Header="{x:Static properties:Resources.MenuFileNew}" Command="New" />
+				<MenuItem Header="{x:Static properties:Resources.MenuFileOpen}" Command="Open" />
+				<MenuItem Header="{x:Static properties:Resources.MenuFileOpenFromHistory}" Name="menuItemHistory" />
+				<MenuItem Header="{x:Static properties:Resources.MenuFileSave}" Command="Save" />
+				<MenuItem Header="{x:Static properties:Resources.MenuFileSaveAs}" Command="SaveAs" />
+				<MenuItem Header="{x:Static properties:Resources.MenuFileExport}" Command="{x:Static base:Commands.ExportCommand}" />
+				<MenuItem Header="{x:Static properties:Resources.MenuFileSaveForHyperMutus}" Command="{x:Static base:Commands.SaveAsMtqCommand}" />
 				<Separator />
-				<MenuItem Header="終了(_X)" Command="Close" />
+				<MenuItem Header="{x:Static properties:Resources.MenuFileExit}" Command="Close" />
 			</MenuItem>
-			<MenuItem Header="編集(_E)">
-				<MenuItem Header="元に戻す(_U)" Command="Undo" />
-				<MenuItem Header="やり直し(_R)" Command="Redo" />
+			<MenuItem Header="{x:Static properties:Resources.MenuEdit}">
+				<MenuItem Header="{x:Static properties:Resources.MenuEditUndo}" Command="Undo" />
+				<MenuItem Header="{x:Static properties:Resources.MenuEditRedo}" Command="Redo" />
 			</MenuItem>
 			<MenuItem Header="曲リスト(_S)">
 				<MenuItem Header="曲追加(_A)..." Command="{x:Static grand:Commands.AddQuestionsCommand}" />
