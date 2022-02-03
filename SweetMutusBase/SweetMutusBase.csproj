@@ -53,7 +53,17 @@
     </Compile>
     <Compile Include="Commands.cs" />
     <Compile Include="Converters.cs" />
+    <Compile Include="ExportTextSettings.cs" />
+    <Compile Include="ExportTextWindow.xaml.cs">
+      <DependentUpon>ExportTextWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Helpers.cs" />
+    <Compile Include="ImportDialog.xaml.cs">
+      <DependentUpon>ImportDialog.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="OptionDialog.xaml.cs">
+      <DependentUpon>OptionDialog.xaml</DependentUpon>
+    </Compile>
     <Compile Include="PlayingPhase.cs" />
     <Compile Include="QuestionColumnsVisivility.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -65,12 +75,18 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\SweetMutusData\SweetMutusData.csproj">
-      <Project>{a593175e-e42b-4000-acde-c63fd4a0d2f7}</Project>
-      <Name>SweetMutusData</Name>
-    </ProjectReference>
+    <Page Include="ExportTextWindow.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="ImportDialog.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="OptionDialog.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

@@ -12,7 +12,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 
-namespace Aldentea.SweetMutus
+namespace Aldentea.SweetMutus.Base
 {
 	/// <summary>
 	/// ExportTextWindow.xaml の相互作用ロジック

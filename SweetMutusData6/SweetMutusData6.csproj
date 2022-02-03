@@ -9,10 +9,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\SweetMutusData\SweetMutusData.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
     <Reference Include="AldenteaWpfDocument">
       <HintPath>..\external\net6.0-windows\AldenteaWpfDocument.dll</HintPath>
     </Reference>
@@ -24,9 +20,6 @@
     </Reference>
     <Reference Include="AldenteRIFFBase">
       <HintPath>..\external\AldenteRIFFBase.dll</HintPath>
-    </Reference>
-    <Reference Include="GrandMutusData">
-      <HintPath>..\external\GrandMutusData.dll</HintPath>
     </Reference>
     <Reference Include="GrandMutusData6">
       <HintPath>..\external\net6.0-windows\GrandMutusData6.dll</HintPath>

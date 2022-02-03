@@ -3,20 +3,20 @@ using System.Xml.Linq;
 using System.IO;
 using System.Collections.Generic;
 
-
+using GrandMutus.Net6.Data;
 
 namespace Aldentea.SweetMutus.Net6.Data
 {
 	// (0.1.8)ISongインターフェイスを実装．
 	#region SweetQuestionクラス
-	public class SweetQuestion : GrandMutus.Net6.Data.QuestionBase<SweetQuestionsCollection>, GrandMutus.Net6.Data.ISong /*, IEditableObject*/
+	public class SweetQuestion : GrandMutus.Net6.Data.QuestionBase<SweetQuestionsCollection>, ISong /*, IEditableObject*/
 	{
 		// (0.1.8)ISongを引数にとるコンストラクタを追加．
 		#region *コンストラクタ(SweetQuestion)
 		public SweetQuestion()
 		{ }
 
-		public SweetQuestion(GrandMutus.Net6.Data.ISong song)
+		public SweetQuestion(ISong song)
 		{
 			this.Title = song.Title;
 			this.Artist = song.Artist;
@@ -412,7 +412,7 @@ namespace Aldentea.SweetMutus.Net6.Data
 
 		public XElement GenerateQuestionElement()
 		{
-			var element = new XElement(GrandMutus.Data.IntroQuestion.ELEMENT_NAME
+			var element = new XElement(IntroQuestion.ELEMENT_NAME
 				, new XAttribute("id", this.ID), new XAttribute("song_id", this.ID)
 			);
 
@@ -421,7 +421,7 @@ namespace Aldentea.SweetMutus.Net6.Data
 
 		public XElement GenerateSongElement(string songs_root, bool exporting = false)
 		{
-			var element = new XElement(GrandMutus.Data.Song.ELEMENT_NAME,
+			var element = new XElement(Song.ELEMENT_NAME,
 				new XAttribute("id", this.ID)
 			);
 			return AddSongProperty(element, songs_root, exporting);

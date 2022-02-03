@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
-using GrandMutus.Data;
+using GrandMutus.Net6.Data;
 
-namespace Aldentea.SweetMutus.Data
+namespace Aldentea.SweetMutus.Net6.Data
 {
 	// ☆オリジナル版でも実装途中だったらしい...。
 	// とりあえずSweetMutusDocumentとは分けて実装してみる．
@@ -142,7 +142,7 @@ namespace Aldentea.SweetMutus.Data
 		#region XML入出力関連
 
 		// (0.3.0)
-		protected override XElement GenerateSweetMutusElement(string destination_directory, string exported_songs_root = null)
+		protected override XElement GenerateSweetMutusElement(string destination_directory, string exported_songs_root = "")
 		{
 			var sweet = base.GenerateSweetMutusElement(destination_directory, exported_songs_root);
 

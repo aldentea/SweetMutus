@@ -12,7 +12,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 
-namespace Aldentea.SweetMutus
+namespace Aldentea.SweetMutus.Net6.Base
 {
 
 	// (0.2.6)

@@ -13,7 +13,7 @@ using Aldentea.Wpf.Document;
 namespace Aldentea.SweetMutus.Net6.Data
 {
 	// (0.4.0)ISongsCollectionインターフェイスを追加。
-	public class SweetQuestionsCollection : ObservableCollection<SweetQuestion>, GrandMutus.Data.ISongsCollection
+	public class SweetQuestionsCollection : ObservableCollection<SweetQuestion>, ISongsCollection
 	{
 
 		#region QuestionsCollectionのコピペ
@@ -46,7 +46,7 @@ namespace Aldentea.SweetMutus.Net6.Data
 		/// <summary>
 		/// 問題が削除された時に発生します．
 		/// </summary>
-		public event EventHandler<GrandMutus.Data.ItemEventArgs<IEnumerable<SweetQuestion>>> QuestionsRemoved = delegate { };
+		public event EventHandler<ItemEventArgs<IEnumerable<SweetQuestion>>> QuestionsRemoved = delegate { };
 
 
 		// (*0.4.1) Remove時の処理を追加(ほとんどSongsCollectionのコピペ)．
@@ -108,7 +108,7 @@ namespace Aldentea.SweetMutus.Net6.Data
 							// ここでOperationCacheの処理を行うことにした．
 							if (questions.Count > 0)
 							{
-								this.QuestionsRemoved(this, new GrandMutus.Data.ItemEventArgs<IEnumerable<SweetQuestion>> { Item = questions });
+								this.QuestionsRemoved(this, new ItemEventArgs<IEnumerable<SweetQuestion>> { Item = questions });
 							}
 						}
 					}
@@ -167,7 +167,7 @@ namespace Aldentea.SweetMutus.Net6.Data
 					var previous_value = this._rootDirectory;
 					this._rootDirectory = value;
 					UpdateRelativeFileNames();
-					this.RootDirectoryChanged(this, new GrandMutus.Data.ValueChangedEventArgs<string>(previous_value, value));
+					this.RootDirectoryChanged(this, new ValueChangedEventArgs<string>(previous_value, value));
 				}
 			}
 		}
@@ -187,7 +187,7 @@ namespace Aldentea.SweetMutus.Net6.Data
 		/// <summary>
 		/// RootDirecotyプロパティの値が変更されたときに発生します。
 		/// </summary>
-		public event EventHandler<GrandMutus.Data.ValueChangedEventArgs<string>> RootDirectoryChanged = delegate { };
+		public event EventHandler<ValueChangedEventArgs<string>> RootDirectoryChanged = delegate { };
 
 		#endregion
 
@@ -196,7 +196,7 @@ namespace Aldentea.SweetMutus.Net6.Data
 		/// <summary>
 		/// 格納されているアイテムのプロパティ値が変化したときに発生します．
 		/// </summary>
-		public event EventHandler<GrandMutus.Data.ItemEventArgs<IOperationCache>> ItemChanged = delegate { };
+		public event EventHandler<ItemEventArgs<IOperationCache>> ItemChanged = delegate { };
 
 
 		string _titleCache = string.Empty;	// 手抜き．Songオブジェクト自体もキャッシュするべき．
@@ -260,56 +260,56 @@ namespace Aldentea.SweetMutus.Net6.Data
 				switch (e.PropertyName)
 				{
 					case "Title":
-						this.ItemChanged(this, new GrandMutus.Data.ItemEventArgs<IOperationCache>
+						this.ItemChanged(this, new ItemEventArgs<IOperationCache>
 						{
 							Item = new QuestionTitleChangedCache(song, _titleCache, song.Title)
 						});
 						_titleCache = string.Empty;
 						break;
 					case "Artist":
-						this.ItemChanged(this, new GrandMutus.Data.ItemEventArgs<IOperationCache>
+						this.ItemChanged(this, new ItemEventArgs<IOperationCache>
 						{
 							Item = new QuestionArtistChangedCache(song, _artistCache, song.Artist)
 						});
 						_artistCache = string.Empty;
 						break;
 					case "PlayPos":
-						this.ItemChanged(this, new GrandMutus.Data.ItemEventArgs<IOperationCache>
+						this.ItemChanged(this, new ItemEventArgs<IOperationCache>
 						{
 							Item = new QuestionPlayPosChangedCache(song, _playPosCache, song.PlayPos)
 						});
 						_playPosCache = TimeSpan.Zero;
 						break;
 					case "SabiPos":
-						this.ItemChanged(this, new GrandMutus.Data.ItemEventArgs<IOperationCache>
+						this.ItemChanged(this, new ItemEventArgs<IOperationCache>
 						{
 							Item = new QuestionSabiPosChangedCache(song, _sabiPosCache, song.SabiPos)
 						});
 						_sabiPosCache = TimeSpan.Zero;
 						break;
 					case "StopPos":
-						this.ItemChanged(this, new GrandMutus.Data.ItemEventArgs<IOperationCache>
+						this.ItemChanged(this, new ItemEventArgs<IOperationCache>
 						{
 							Item = new QuestionStopPosChangedCache(song, _stopPosCache, song.StopPos)
 						});
 						_stopPosCache = TimeSpan.Zero;
 						break;
 					case "FileName":
-						this.ItemChanged(this, new GrandMutus.Data.ItemEventArgs<IOperationCache>
+						this.ItemChanged(this, new ItemEventArgs<IOperationCache>
 						{
 							Item = new QuestionFileNameChangedCache(song, _fileNameCache, song.FileName)
 						});
 						_fileNameCache = string.Empty;
 						break;
 					case "Category":
-						this.ItemChanged(this, new GrandMutus.Data.ItemEventArgs<IOperationCache>
+						this.ItemChanged(this, new ItemEventArgs<IOperationCache>
 						{
 							Item = new QuestionCategoryChangedCache(song, _categoryCache, song.Category)
 						});
 						_categoryCache = String.Empty;
 						break;
 					case "Memo":
-						this.ItemChanged(this, new GrandMutus.Data.ItemEventArgs<IOperationCache>
+						this.ItemChanged(this, new ItemEventArgs<IOperationCache>
 						{
 							Item = new QuestionMemoChangedCache(song, _memoCache, song.Memo)
 						});
@@ -332,7 +332,7 @@ namespace Aldentea.SweetMutus.Net6.Data
 
 		bool _noChangingFlag = false;
 
-		void Question_NoChanged(object? sender, GrandMutus.Data.ValueChangedEventArgs<int?> e)
+		void Question_NoChanged(object? sender, ValueChangedEventArgs<int?> e)
 		{
 			if (_noChangingFlag)
 			{
@@ -358,7 +358,7 @@ namespace Aldentea.SweetMutus.Net6.Data
 
 					// このあたりで操作履歴に加えておく。
 					// (ここまでの処理で変更になる可能性があるので、Questionから直接MutusDocumentに通知することはしない。)
-					this.QuestionNoChanged(self, new GrandMutus.Data.ValueChangedEventArgs<int?>(old_no, new_no));
+					this.QuestionNoChanged(self, new ValueChangedEventArgs<int?>(old_no, new_no));
 
 					if (old_no.HasValue)
 					{
@@ -416,7 +416,7 @@ namespace Aldentea.SweetMutus.Net6.Data
 
 					}
 
-					this.QuestionNoChangeCompleted(self, new GrandMutus.Data.ValueChangedEventArgs<int?>(old_no, new_no));
+					this.QuestionNoChangeCompleted(self, new ValueChangedEventArgs<int?>(old_no, new_no));
 
 				}
 				finally
@@ -431,7 +431,7 @@ namespace Aldentea.SweetMutus.Net6.Data
 		/// 問題の番号が変更になったときに発生します。(操作履歴管理用かな？)
 		/// senderはQuestionsCollectionではなくQuestionであることに一応注意。
 		/// </summary>
-		public event EventHandler<GrandMutus.Data.ValueChangedEventArgs<int?>> QuestionNoChanged = delegate { };
+		public event EventHandler<ValueChangedEventArgs<int?>> QuestionNoChanged = delegate { };
 
 		// 新しいNoの決定→変更→QuestionNoChanged→他の問題のNoの処理→QuestionNoChangeCompletedの順．
 
@@ -440,7 +440,7 @@ namespace Aldentea.SweetMutus.Net6.Data
 		/// 問題番号の変更処理が完了したときに発生します（他の問題の番号スライド処理の完了後）。
 		/// senderはQuestionsCollectionではなくQuestionであることに一応注意。
 		/// </summary>
-		public event EventHandler<GrandMutus.Data.ValueChangedEventArgs<int?>> QuestionNoChangeCompleted = delegate { };
+		public event EventHandler<ValueChangedEventArgs<int?>> QuestionNoChangeCompleted = delegate { };
 
 		#endregion
 

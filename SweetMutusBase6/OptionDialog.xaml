@@ -1,9 +1,8 @@
-﻿<Window x:Class="Aldentea.SweetMutus.OptionDialog"
+﻿<Window x:Class="Aldentea.SweetMutus.Net6.Base.OptionDialog"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:Aldentea.SweetMutus"
         mc:Ignorable="d"
         Title="オプション" Height="300" Width="549.231" ResizeMode="CanMinimize" WindowStartupLocation="CenterOwner">
 	<Grid>

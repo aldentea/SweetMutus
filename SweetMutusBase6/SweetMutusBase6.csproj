@@ -1,0 +1,33 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <UseWPF>true</UseWPF>
+    <RootNamespace>Aldentea.SweetMutus.Net6.Base</RootNamespace>
+    <Authors>aldentea</Authors>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\SweetMutusData6\SweetMutusData6.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="GrandMutusData6">
+      <HintPath>..\external\net6.0-windows\GrandMutusData6.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Page Update="ChangeFileNameDialog.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="ExportTextWindow.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="OptionDialog.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+  </ItemGroup>
+
+</Project>

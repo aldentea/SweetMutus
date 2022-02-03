@@ -1,0 +1,9 @@
+﻿<base:Application x:Class="Aldentea.SweetMutus.Net6.App"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:base="clr-namespace:Aldentea.Wpf.Application;assembly=AldenteaWpfFramework"
+             StartupUri="MainWindow.xaml">
+    <Application.Resources>
+         
+    </Application.Resources>
+</base:Application>

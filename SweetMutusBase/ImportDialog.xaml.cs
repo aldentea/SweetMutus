@@ -3,7 +3,7 @@ using System.Windows.Input;
 
 
 
-namespace Aldentea.SweetMutus
+namespace Aldentea.SweetMutus.Base
 {
 	using Data;
 

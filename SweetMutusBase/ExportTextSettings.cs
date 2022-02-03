@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 
-namespace Aldentea.SweetMutus
+namespace Aldentea.SweetMutus.Base
 {
 
 	// (0.2.6)

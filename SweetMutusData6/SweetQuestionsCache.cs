@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 using Aldentea.Wpf.Document;
-
+using GrandMutus.Net6.Data;
 
 namespace Aldentea.SweetMutus.Net6.Data
 {
@@ -150,7 +150,7 @@ namespace Aldentea.SweetMutus.Net6.Data
 
 	// (*0.2.0)
 	#region QuestionTitleChangedCacheクラス
-	public class QuestionTitleChangedCache : GrandMutus.Data.PropertyChangedCache<string>
+	public class QuestionTitleChangedCache : PropertyChangedCache<string>
 	{
 		SweetQuestion _question;
 
@@ -204,7 +204,7 @@ namespace Aldentea.SweetMutus.Net6.Data
 
 	// (*0.2.0)
 	#region QuestionArtistChangedCacheクラス
-	public class QuestionArtistChangedCache : GrandMutus.Data.PropertyChangedCache<string>
+	public class QuestionArtistChangedCache : PropertyChangedCache<string>
 	{
 		SweetQuestion _question;
 
@@ -289,7 +289,7 @@ namespace Aldentea.SweetMutus.Net6.Data
 
 	// (0.3.1)
 	#region QuestionPositionChangedCacheクラス
-	public abstract class QuestionPositionChangedCache : GrandMutus.Data.PropertyChangedCache<TimeSpan>
+	public abstract class QuestionPositionChangedCache : PropertyChangedCache<TimeSpan>
 	{
 		protected SweetQuestion _question;
 
@@ -317,7 +317,7 @@ namespace Aldentea.SweetMutus.Net6.Data
 
 	// (*0.4.5.1)
 	#region QuestionNoChangedCacheクラス
-	public class QuestionNoChangedCache : GrandMutus.Data.PropertyChangedCache<int?>
+	public class QuestionNoChangedCache : PropertyChangedCache<int?>
 	{
 		readonly SweetQuestion _question;
 
@@ -351,7 +351,7 @@ namespace Aldentea.SweetMutus.Net6.Data
 
 	// 
 	#region QuestionFileNameChangedCacheクラス
-	public class QuestionFileNameChangedCache : GrandMutus.Data.PropertyChangedCache<string>
+	public class QuestionFileNameChangedCache : PropertyChangedCache<string>
 	{
 		SweetQuestion _question;
 
@@ -408,7 +408,7 @@ namespace Aldentea.SweetMutus.Net6.Data
 
 	// 
 	#region QuestionCategoryChangedCacheクラス
-	public class QuestionCategoryChangedCache : GrandMutus.Data.PropertyChangedCache<string>
+	public class QuestionCategoryChangedCache : PropertyChangedCache<string>
 	{
 		SweetQuestion _question;
 
@@ -462,7 +462,7 @@ namespace Aldentea.SweetMutus.Net6.Data
 
 	// (0.4.3)
 	#region QuestionMemoChangedCacheクラス
-	public class QuestionMemoChangedCache : GrandMutus.Data.PropertyChangedCache<string>
+	public class QuestionMemoChangedCache : PropertyChangedCache<string>
 	{
 		SweetQuestion _question;
 

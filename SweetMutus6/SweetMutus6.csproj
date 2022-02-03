@@ -1,0 +1,69 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net6.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <UseWPF>true</UseWPF>
+    <RootNamespace>Aldentea.SweetMutus.Net6</RootNamespace>
+    <Authors>aldentea</Authors>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\SweetMutusBase6\SweetMutusBase6.csproj" />
+    <ProjectReference Include="..\SweetMutusData6\SweetMutusData6.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="AldenteaBackgroundWorkerDialog">
+      <HintPath>..\external\AldenteaBackgroundWorkerDialog.dll</HintPath>
+    </Reference>
+    <Reference Include="AldenteaFolderTreeView">
+      <HintPath>..\external\AldenteaFolderTreeView.dll</HintPath>
+    </Reference>
+    <Reference Include="AldenteaWpfDocument">
+      <HintPath>..\external\net6.0-windows\AldenteaWpfDocument.dll</HintPath>
+    </Reference>
+    <Reference Include="AldenteaWpfFramework">
+      <HintPath>..\external\net6.0-windows\AldenteaWpfFramework.dll</HintPath>
+    </Reference>
+    <Reference Include="AldenteaWpfUtility">
+      <HintPath>..\external\net6.0-windows\AldenteaWpfUtility.dll</HintPath>
+    </Reference>
+    <Reference Include="GrandMutusBase6">
+      <HintPath>..\external\net6.0-windows\GrandMutusBase6.dll</HintPath>
+    </Reference>
+    <Reference Include="GrandMutusData6">
+      <HintPath>..\external\net6.0-windows\GrandMutusData6.dll</HintPath>
+    </Reference>
+    <Reference Include="UpDownControl">
+      <HintPath>..\external\UpDownControl.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="ImportDialog.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Update="Properties\Settings.Designer.cs">
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Page Update="ImportDialog.xaml">
+      <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
+      <SubType>Designer</SubType>
+    </Page>
+  </ItemGroup>
+
+</Project>

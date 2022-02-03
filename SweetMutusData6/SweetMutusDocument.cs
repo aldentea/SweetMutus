@@ -2,15 +2,14 @@
 using System.Collections.Generic;
 using System.Linq;
 
-using Aldentea.Wpf.Document;
 using System.Xml;
 using System.Xml.Linq;
-using GrandMutus.Net6.Data;
 using System.IO;
 using System.Threading.Tasks;
 using System.Threading;
 
-//using GrandMutus.Data;
+using Aldentea.Wpf.Document;
+using GrandMutus.Net6.Data;
 
 namespace Aldentea.SweetMutus.Net6.Data
 {
@@ -71,9 +70,9 @@ namespace Aldentea.SweetMutus.Net6.Data
 		// (0.1.4)QuestionNoChangedイベントを発生。
 		// (0.1.2.1)QuestionCategoryChangedイベントを発生。
 		// (0.2.0)Songs以外でも共通に使えるのではなかろうか？
-		void Songs_ItemChanged(object? sender, GrandMutus.Data.ItemEventArgs<IOperationCache> e) // Aldentea.Wpf.DocumentにもIOperationCacheがある．
+		void Songs_ItemChanged(object? sender, ItemEventArgs<IOperationCache> e) // Aldentea.Wpf.DocumentにもIOperationCacheがある．
 		{
-			var operationCache = (IOperationCache)e.Item;
+			var operationCache = (IOperationCache?)e.Item;
 			if (operationCache != null)
 			{
 				this.AddOperationHistory(operationCache);
@@ -336,7 +335,7 @@ namespace Aldentea.SweetMutus.Net6.Data
 		// (0.5.0) parameter引数を追加。
 		// (0.4.2)
 		#region *問題リストをテキスト出力(ExportQuestionsList)
-		public void ExportQuestionsList(StreamWriter writer, Aldentea.SweetMutus.Data.IExportQuestionsListParameter parameter)
+		public void ExportQuestionsList(StreamWriter writer, IExportQuestionsListParameter parameter)
 		{
 			// TSVで出力する。
 			// id, category, no, title, artistの順。
@@ -397,7 +396,7 @@ namespace Aldentea.SweetMutus.Net6.Data
 
 		// (*0.4.5.1)
 		#region *Questionの番号変更時(Questions_NoChanged)
-		void Questions_QuestionNoChanged(object? sender, GrandMutus.Data.ValueChangedEventArgs<int?> e)
+		void Questions_QuestionNoChanged(object? sender, ValueChangedEventArgs<int?> e)
 		{
 			if (sender is SweetQuestion)
 			{
@@ -410,7 +409,7 @@ namespace Aldentea.SweetMutus.Net6.Data
 		// (0.4.0) GrandMutusDataのSongsRootDirectoryChangedCacheを使うように変更。
 		// (*0.4.4)
 		#region *曲のルートディレクトリ変更時(Questions_RootDirectoryChanged)
-		void Questions_RootDirectoryChanged(object? sender, GrandMutus.Data.ValueChangedEventArgs<string> e)
+		void Questions_RootDirectoryChanged(object? sender, ValueChangedEventArgs<string> e)
 		{
 			this.AddOperationHistory(new SongsRootDirectoryChangedCache(this.Questions, e.PreviousValue, e.CurrentValue));
 		}
@@ -543,8 +542,9 @@ namespace Aldentea.SweetMutus.Net6.Data
 		protected async override Task<bool> LoadDocument(string fileName)
 		{
 			CancellationToken token = CancellationToken.None;
-			using (XmlReader reader = XmlReader.Create(fileName))
+			using (var reader = XmlReader.Create(fileName, new XmlReaderSettings { Async = true }))
 			{
+				
 				var xdoc = await XDocument.LoadAsync(reader, LoadOptions.None, token);
 				var root = xdoc.Root;
 
@@ -640,7 +640,7 @@ namespace Aldentea.SweetMutus.Net6.Data
 
 		bool? TryLoadGrandMutusDocument(XElement root, string fileName)
 		{
-			var questions_element = root.Element(GrandMutus.Data.QuestionsCollection.ELEMENT_NAME);
+			var questions_element = root.Element(QuestionsCollection.ELEMENT_NAME);
 			if (questions_element == null)
 			{
 				// 他のドキュメント形式を試してみる余地がある？(そんなのあるかどうかわからんけど)
@@ -649,7 +649,7 @@ namespace Aldentea.SweetMutus.Net6.Data
 			}
 			else
 			{
-				if (questions_element.Elements().All(elem => elem.Name == GrandMutus.Data.IntroQuestion.ELEMENT_NAME))
+				if (questions_element.Elements().All(elem => elem.Name == IntroQuestion.ELEMENT_NAME))
 				{
 					return LoadGrandMutusDocument(root, fileName);
 				}
