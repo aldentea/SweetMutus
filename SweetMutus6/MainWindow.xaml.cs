@@ -417,15 +417,15 @@ namespace Aldentea.SweetMutus.Net6
 
 		#region AddQuestions
 
-		private void AddQuestions_Executed(object sender, ExecutedRoutedEventArgs e)
+		private async void AddQuestions_Executed(object sender, ExecutedRoutedEventArgs e)
 		{
 			if (e.Parameter is bool && (bool)e.Parameter)
 			{
-				AddQuestionsFromDirectory();
+				await AddQuestionsFromDirectory();
 			}
 			else
 			{
-				AddQuestions();
+				await AddQuestions();
 			}
 		}
 
@@ -508,7 +508,7 @@ namespace Aldentea.SweetMutus.Net6
 		#region SaveSongInformation
 
 		// (0.0.8.4)気休めにTask.Delayを追加。
-		private void SaveSongInformation_Executed(object sender, ExecutedRoutedEventArgs e)
+		private async void SaveSongInformation_Executed(object sender, ExecutedRoutedEventArgs e)
 		{
 			if (e.Parameter is SweetQuestion)
 			{
@@ -517,9 +517,9 @@ namespace Aldentea.SweetMutus.Net6
 				{
 					this.MySongPlayer.Close();
 					// 無意味にSleepする。
-					Task.Delay(140);
+					await Task.Delay(140);
 				}
-				question.SaveInformation();
+				await question.SaveInformation();
 			}
 		}
 
@@ -859,19 +859,19 @@ namespace Aldentea.SweetMutus.Net6
 		#region 問題リスト関連
 
 		// (0.1.3)GrandMutusのHelperを使用するように変更．
-		void AddQuestions()
+		async Task AddQuestions()
 		{
 			// ファイルダイアログを表示．
 			var fileNames = Helpers.SelectSongFiles();
 			if (fileNames != null)
 			{
-				AddQuestions(fileNames);
+				await AddQuestions(fileNames);
 				//SayInfo("曲追加完了！");
 			}
 		}
 
 		// (0.1.0)選択しないままOKするとアプリケーションが落ちるバグに対応。
-		void AddQuestionsFromDirectory()
+		async Task AddQuestionsFromDirectory()
 		{
 			var dialog = new Wpf.Controls.FolderBrowserDialog
 			{
@@ -884,7 +884,7 @@ namespace Aldentea.SweetMutus.Net6
 				var directory = dialog.SelectedPath;
 				if (!string.IsNullOrEmpty(directory))
 				{
-					AddQuestions(System.IO.Directory.GetFiles(directory, "*.mp3", System.IO.SearchOption.AllDirectories));
+					await AddQuestions(System.IO.Directory.GetFiles(directory, "*.mp3", System.IO.SearchOption.AllDirectories));
 					if (string.IsNullOrEmpty(MyDocument.Questions.RootDirectory))
 					{
 						MyDocument.Questions.RootDirectory = directory;
@@ -896,9 +896,9 @@ namespace Aldentea.SweetMutus.Net6
 		// (0.1.3.1)GrandMutusのWorkBackground～を使用するように変更．
 		// (0.1.0.3)CurrentCategoryを設定するように改良。
 		#region 問題を追加(AddQuestions)
-		public void AddQuestions(IEnumerable<string> fileNames)
+		public async Task AddQuestions(IEnumerable<string> fileNames)
 		{
-			this.MyDocument.AddQuestions(fileNames, CurrentCategory);
+			await this.MyDocument.AddQuestions(fileNames, CurrentCategory);
 		}
 
 		IList<SweetQuestion> AddQuestionsParallel(IEnumerable<string> fileNames)
@@ -910,7 +910,7 @@ namespace Aldentea.SweetMutus.Net6
 				// ObservableCollectionに対する操作は，それが作られたスレッドと同じスレッドで行う必要がある．
 
 				var question = this.Dispatcher.Invoke(
-					new Func<string, SweetQuestion?>(delegate (string f) { return MyDocument.AddQuestion(f, CurrentCategory); }), fileName);
+					new Func<string, Task<SweetQuestion?>>( async delegate  (string f) { return await MyDocument.AddQuestion(f, CurrentCategory); }), fileName);
 				if (question is SweetQuestion)
 				{
 					added_questions.Add((SweetQuestion)question);
@@ -1114,7 +1114,7 @@ namespace Aldentea.SweetMutus.Net6
 			e.Handled = true;
 		}
 
-		private void dataGridQuestions_Drop(object sender, DragEventArgs e)
+		private async void dataGridQuestions_Drop(object sender, DragEventArgs e)
 		{
 			List<string> songFileNames = new List<string>();
 
@@ -1131,7 +1131,7 @@ namespace Aldentea.SweetMutus.Net6
 					}
 				}
 			}
-			MyDocument.AddQuestions(songFileNames, CurrentCategory);
+			await MyDocument.AddQuestions(songFileNames, CurrentCategory);
 
 		}
 

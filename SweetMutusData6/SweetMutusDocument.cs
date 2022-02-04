@@ -130,10 +130,10 @@ namespace Aldentea.SweetMutus.Net6.Data
 		/// </summary>
 		/// <param name="fileName"></param>
 		/// <returns></returns>
-		public SweetQuestion? AddQuestion(string fileName, string category = "")
+		public async Task<SweetQuestion?> AddQuestion(string fileName, string category = "")
 		{
 			SweetQuestion question = new SweetQuestion { FileName = fileName, Category = string.IsNullOrEmpty(category) ? string.Empty : category };
-			if (LoadInformation(question))
+			if (await LoadInformation(question))
 			{
 				return this.AddQuestion(question);
 			}
@@ -167,7 +167,7 @@ namespace Aldentea.SweetMutus.Net6.Data
 
 		// (0.2.2.1)カテゴリを設定できるように改良。
 		// (0.2.0)追加された問題がない場合は、操作履歴に追加しないように修正。
-		public void AddQuestions(IEnumerable<string> fileNames, string category = "")
+		public async Task AddQuestions(IEnumerable<string> fileNames, string category = "")
 		{
 			IList<SweetQuestion> added_questions;
 
@@ -177,9 +177,11 @@ namespace Aldentea.SweetMutus.Net6.Data
 				added_questions = new List<SweetQuestion>();
 				foreach (var fileName in fileNames)
 				{
-					var question = AddQuestion(fileName, category);
+					var question = await AddQuestion(fileName, category);
 					if (question != null)
-					{ added_questions.Add(question); }
+					{
+						added_questions.Add(question);
+					}
 				}
 			}
 			else
@@ -230,6 +232,7 @@ namespace Aldentea.SweetMutus.Net6.Data
 		//	AddOperationHistory(new SweetQuestionsRemovedCache(this, e.Item));
 		//}
 
+		// ☆async化。
 		// (0.2.0)staticを解除。boolを返すように変更。
 		// (0.1.7)再生開始位置もロードするように変更．
 		// HyperMutusからのパクリ．古いメソッドだけど，とりあえずそのまま使う．
@@ -238,12 +241,12 @@ namespace Aldentea.SweetMutus.Net6.Data
 		/// <summary>
 		/// songのFileNameプロパティで指定されたファイルからメタデータを読み込みます．
 		/// </summary>
-		bool LoadInformation(SweetQuestion question)
+		async Task<bool> LoadInformation(SweetQuestion question)
 		{
-			SPP.Aldente.IID3Tag? tag;
+			Aldentea.MP3Tag.Base.IID3Tag? tag;
 			try
 			{
-				tag = SPP.Aldente.AldenteMP3TagAccessor.ReadFile(question.FileName);
+				tag = await Aldentea.MP3Tag.MP3TagAccessor.ReadFile(question.FileName);
 			}
 			catch (IOException ex)
 			{

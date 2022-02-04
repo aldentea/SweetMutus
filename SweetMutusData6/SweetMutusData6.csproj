@@ -12,20 +12,11 @@
     <Reference Include="AldenteaWpfDocument">
       <HintPath>..\external\net6.0-windows\AldenteaWpfDocument.dll</HintPath>
     </Reference>
-    <Reference Include="AldenteMP3TagAccessor">
-      <HintPath>..\external\AldenteMP3TagAccessor.dll</HintPath>
-    </Reference>
-    <Reference Include="AldenteMP3TagBase">
-      <HintPath>..\external\AldenteMP3TagBase.dll</HintPath>
-    </Reference>
-    <Reference Include="AldenteRIFFBase">
-      <HintPath>..\external\AldenteRIFFBase.dll</HintPath>
-    </Reference>
     <Reference Include="GrandMutusData6">
       <HintPath>..\external\net6.0-windows\GrandMutusData6.dll</HintPath>
     </Reference>
-    <Reference Include="RIFFMP3Tag">
-      <HintPath>..\external\RIFFMP3Tag.dll</HintPath>
+    <Reference Include="MP3Tag">
+      <HintPath>..\external\net6.0-windows\MP3Tag.dll</HintPath>
     </Reference>
   </ItemGroup>
 

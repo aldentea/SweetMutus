@@ -2,7 +2,7 @@
 using System.Xml.Linq;
 using System.IO;
 using System.Collections.Generic;
-
+using System.Threading.Tasks;
 using GrandMutus.Net6.Data;
 
 namespace Aldentea.SweetMutus.Net6.Data
@@ -174,12 +174,12 @@ namespace Aldentea.SweetMutus.Net6.Data
 		/// 予め指定した形式で，曲ファイルのメタデータのオブジェクトを取得します．
 		/// ※いまのところは常にID3v23を返すようになっています．
 		/// </summary>
-		public SPP.Aldente.IID3Tag SongTag
+		public Aldentea.MP3Tag.Base.IID3Tag SongTag
 		{
 			get
 			{
 				// とりあえずID3v23を生成する．
-				return new SPP.Aldente.ID3v23Tag {
+				return new Aldentea.MP3Tag.ID3v23Tag {
 					Title = this.Title,
 					Artist = this.Artist,
 					SabiPos = Convert.ToDecimal(this.SabiPos.TotalSeconds),
@@ -196,7 +196,7 @@ namespace Aldentea.SweetMutus.Net6.Data
 		/// <summary>
 		/// 曲情報を曲ファイルのメタデータとして保存します．再生開始位置と再生停止位置は0.0で置き換えるので注意して下さい．
 		/// </summary>
-		public int SaveInformation()
+		public async Task<int> SaveInformation()
 		{
 			// startPosとStopPosは0.0Mで書き換える！
 			if (File.Exists(this.FileName))
@@ -213,7 +213,7 @@ namespace Aldentea.SweetMutus.Net6.Data
 					// ※それでは，どうすればいいか？
 					// IID3Tagの基礎的な実装をしたクラスを用意する(ただしI/Oは未実装)．
 					// で，それをUpdateInfoに渡す．
-					SPP.Aldente.AldenteMP3TagAccessor.UpdateInfo(this.FileName, this.SongTag);
+					await Aldentea.MP3Tag.MP3TagAccessor.UpdateInfo(this.FileName, this.SongTag);
 
 
 //					break;
