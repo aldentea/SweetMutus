@@ -7,6 +7,8 @@
     <UseWPF>true</UseWPF>
     <RootNamespace>Aldentea.SweetMutus.Net6</RootNamespace>
     <Authors>aldentea</Authors>
+    <Version>0.7.0</Version>
+    <Copyright>Copyright © aldentea 2018</Copyright>
   </PropertyGroup>
 
   <ItemGroup>

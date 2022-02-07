@@ -510,6 +510,8 @@ namespace Aldentea.SweetMutus.Net6
 		// (0.0.8.4)気休めにTask.Delayを追加。
 		private async void SaveSongInformation_Executed(object sender, ExecutedRoutedEventArgs e)
 		{
+			// ☆再生中の曲に対してこれを行うとうまくいかない。
+			// ☆それをごまかすためにif文で判定しているけど、あまりうまくいかないので、禁止してしまった方がいいようにも感じる。
 			if (e.Parameter is SweetQuestion)
 			{
 				SweetQuestion question = (SweetQuestion)e.Parameter;
