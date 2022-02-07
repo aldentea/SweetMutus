@@ -8,6 +8,8 @@
     <Authors>aldentea</Authors>
     <Copyright>Copyright © aldentea 2018</Copyright>
     <Version>0.7.0</Version>
+    <AssemblyVersion>0.7.0.1</AssemblyVersion>
+    <FileVersion>0.7.0.1</FileVersion>
   </PropertyGroup>
 
   <ItemGroup>

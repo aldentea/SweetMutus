@@ -61,7 +61,8 @@ namespace Aldentea.SweetMutus.Net6.Data
 			_xmlWriterSettings = new XmlWriterSettings
 			{
 				Indent = true,
-				NewLineHandling = NewLineHandling.Entitize
+				NewLineHandling = NewLineHandling.Entitize,
+				Async = true
 			};
 		}
 		#endregion
