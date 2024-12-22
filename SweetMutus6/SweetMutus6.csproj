@@ -2,15 +2,15 @@
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <TargetFramework>net6.0-windows</TargetFramework>
+    <TargetFramework>net8.0-windows7.0</TargetFramework>
     <Nullable>enable</Nullable>
     <UseWPF>true</UseWPF>
     <RootNamespace>Aldentea.SweetMutus.Net6</RootNamespace>
     <Authors>aldentea</Authors>
-    <Version>0.7.0</Version>
+    <Version>0.8.0</Version>
     <Copyright>Copyright © aldentea 2018</Copyright>
-    <AssemblyVersion>0.7.0.1</AssemblyVersion>
-    <FileVersion>0.7.0.1</FileVersion>
+    <AssemblyVersion>0.8.0</AssemblyVersion>
+    <FileVersion>0.8.0</FileVersion>
   </PropertyGroup>
 
   <ItemGroup>
@@ -26,19 +26,19 @@
       <HintPath>..\external\AldenteaFolderTreeView.dll</HintPath>
     </Reference>
     <Reference Include="AldenteaWpfDocument">
-      <HintPath>..\external\net6.0-windows\AldenteaWpfDocument.dll</HintPath>
+      <HintPath>..\external\net8.0-windows7.0\AldenteaWpfDocument.dll</HintPath>
     </Reference>
     <Reference Include="AldenteaWpfFramework">
-      <HintPath>..\external\net6.0-windows\AldenteaWpfFramework.dll</HintPath>
+      <HintPath>..\external\net8.0-windows7.0\AldenteaWpfFramework.dll</HintPath>
     </Reference>
     <Reference Include="AldenteaWpfUtility">
-      <HintPath>..\external\net6.0-windows\AldenteaWpfUtility.dll</HintPath>
+      <HintPath>..\external\net8.0-windows7.0\AldenteaWpfUtility.dll</HintPath>
     </Reference>
     <Reference Include="GrandMutusBase6">
-      <HintPath>..\external\net6.0-windows\GrandMutusBase6.dll</HintPath>
+      <HintPath>..\external\net8.0-windows7.0\GrandMutusBase6.dll</HintPath>
     </Reference>
     <Reference Include="GrandMutusData6">
-      <HintPath>..\external\net6.0-windows\GrandMutusData6.dll</HintPath>
+      <HintPath>..\external\net8.0-windows7.0\GrandMutusData6.dll</HintPath>
     </Reference>
     <Reference Include="UpDownControl">
       <HintPath>..\external\UpDownControl.dll</HintPath>
